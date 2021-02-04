@@ -8,7 +8,7 @@ import { useLocation } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
     toolbar: {
-        backgroundColor: "#1976D2",
+        backgroundColor: "#298d63",
     },
     link: {
         color: "#fff",
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     },
     emphasis: {
         backgroundColor: "#fff",
-        color: "#1976D2",
+        color: "#298d63",
         textDecoration: "none",
     },
 }));
