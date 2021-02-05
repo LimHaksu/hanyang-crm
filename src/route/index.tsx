@@ -23,6 +23,11 @@ export const tabRoutes: TabRoute[] = [
         component: OrderListPage,
     },
     {
+        name: "전화 수신 기록",
+        path: "/phone-call-record",
+        component: PhoneCallRecordPage,
+    },
+    {
         name: "주문 작성",
         path: "/order-registry",
         component: OrderRegistryPage,
@@ -36,11 +41,6 @@ export const tabRoutes: TabRoute[] = [
         name: "통계",
         path: "/statistics",
         component: StatisticsPage,
-    },
-    {
-        name: "전화 수신 기록",
-        path: "/phone-call-record",
-        component: PhoneCallRecordPage,
     },
     {
         name: "상품 관리",
