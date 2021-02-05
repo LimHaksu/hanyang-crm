@@ -48,8 +48,7 @@ const columns: Column[] = [
     {
         id: "customerName",
         label: "주문자명",
-        width: 150,
-        minWidth: 150,
+        minWidth: 95,
         align: "center",
     },
     {
