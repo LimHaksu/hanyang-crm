@@ -127,6 +127,18 @@ const rows = [
         "현금",
         20000
     ),
+    createData(
+        2,
+        "오전 11:12",
+        "손님",
+        "010-1234-5678",
+        "지도",
+        "중구 선화동 123-456번지 선화아파트 101동 1001호",
+        "상품명상품명상품명상일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십",
+        "요청사항",
+        "현금",
+        20000
+    ),
 ];
 
 const StyledTableRow = withStyles((theme: Theme) =>
@@ -210,7 +222,7 @@ export function OrderListPage() {
                     <TableBody>
                         {rows.map((row) => {
                             return (
-                                <StyledTableRow role="checkbox" key={row.idx}>
+                                <StyledTableRow hover role="checkbox" key={row.idx}>
                                     {columns.map((column) => {
                                         const value = row[column.id];
                                         return (

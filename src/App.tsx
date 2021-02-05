@@ -15,6 +15,16 @@ const defaultTheme = createMuiTheme({
         },
     },
     overrides: {
+        MuiTableRow: {
+            hover: {
+                "&:hover": {
+                    "& td": {
+                        fontWeight: "bold",
+                        backgroundColor: "inherit",
+                    },
+                },
+            },
+        },
         MuiPickersToolbar: {
             toolbar: {
                 backgroundColor: MAIN_COLOR,
