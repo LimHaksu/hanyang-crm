@@ -7,9 +7,6 @@ import { tabRoutes } from "route";
 import { useLocation } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
-    toolbar: {
-        backgroundColor: "#298d63",
-    },
     link: {
         color: "#fff",
         fontWeight: "bold",
@@ -26,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     },
     emphasis: {
         backgroundColor: "#fff",
-        color: "#298d63",
+        color: theme.palette.primary.main,
         textDecoration: "none",
     },
 }));
@@ -36,7 +33,7 @@ export default function ProminentAppBar() {
     const classes = useStyles();
     return (
         <AppBar position="static">
-            <Toolbar className={classes.toolbar}>
+            <Toolbar>
                 {tabRoutes.map(({ name, path }, idx) => (
                     <Link
                         className={`${classes.link} ${pathname === path ? classes.emphasis : ""}`}
