@@ -7,6 +7,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
+import DatePicker from "component/datePicker/DatePicker";
 import MouseoverPopover, { isPopOverCell, getPopOverMessageById } from "component/popover/MouseoverPopover";
 
 interface Column {
@@ -149,9 +150,6 @@ const useStyles = makeStyles({
         width: "100%",
         height: "calc(100vh - 64px)",
     },
-    datePicker: {
-        margin: "5px 0 5px 20px",
-    },
     container: {
         maxHeight: "calc(100vh - 122px)",
     },
@@ -199,23 +197,7 @@ export const OrderListPage = () => {
 
     return (
         <Paper className={classes.root}>
-            <KeyboardDatePicker
-                className={classes.datePicker}
-                autoOk
-                showTodayButton
-                todayLabel="오늘"
-                label="날짜"
-                disableFuture
-                format="yyyy/MM/dd"
-                value={selectedDate}
-                onChange={handleDateChange}
-                okLabel="확인"
-                cancelLabel="취소"
-                invalidDateMessage="올바른 날짜를 입력해주세요."
-                maxDateMessage="오늘 이후는 조회할 수 없습니다."
-                minDateMessage="1900년 이전은 조회할 수 없습니다."
-                onAccept={handleAccept}
-            />
+            <DatePicker selectedDate={selectedDate} handleDateChange={handleDateChange} handleAccept={handleAccept} />
             <TableContainer className={classes.container}>
                 <Table stickyHeader aria-label="sticky table">
                     <TableHead>
