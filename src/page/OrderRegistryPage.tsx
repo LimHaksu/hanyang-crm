@@ -12,6 +12,7 @@ const useStyles = makeStyles((theme: Theme) =>
         root: {
             width: "100%",
             height: "calc(100vh - 64px)",
+            backgroundColor: theme.palette.primary.light,
         },
         leftSide: {
             width: "30%",
@@ -34,7 +35,7 @@ export const OrderRegistryPage = () => {
                     <Box>
                         <CustomerInfo />
                     </Box>
-                    <Box flexGrow={1}>
+                    <Box>
                         <OrderInfo />
                     </Box>
                     <Box>
