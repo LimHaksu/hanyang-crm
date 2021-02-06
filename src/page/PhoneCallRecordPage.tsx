@@ -8,6 +8,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import DatePicker from "component/datePicker/DatePicker";
+import clsx from "clsx";
 
 interface Column {
     id: "idx" | "orderTime" | "cidMachineIdx" | "customerName" | "phoneNumber" | "address" | "registerProduct";
@@ -112,9 +113,6 @@ const useStyles = makeStyles({
         cursor: "pointer",
         userSelect: "none",
     },
-    complete: {
-        fontWeight: "bold",
-    },
 });
 
 export function PhoneCallRecordPage() {
@@ -134,7 +132,7 @@ export function PhoneCallRecordPage() {
                         <TableRow>
                             {columns.map((column) => (
                                 <TableCell
-                                    className={`${classes.cell} ${classes.head}`}
+                                    className={clsx(classes.cell, classes.head)}
                                     key={column.id}
                                     align={column.align}
                                     style={{ width: column.width, minWidth: column.minWidth }}

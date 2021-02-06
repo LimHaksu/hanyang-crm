@@ -13,6 +13,7 @@ import MouseoverPopover, {
     isPopOverCell,
     getPopOverMessageById,
 } from "component/popover/MouseoverPopover";
+import clsx from "clsx";
 
 interface Column {
     id: ColumnId;
@@ -215,7 +216,7 @@ export const OrderListPage = () => {
                         <TableRow>
                             {columns.map((column) => (
                                 <TableCell
-                                    className={`${classes.cell} ${classes.head}`}
+                                    className={clsx(classes.cell, classes.head)}
                                     key={column.id}
                                     align={column.align}
                                     style={{ width: column.width, minWidth: column.minWidth }}
@@ -233,9 +234,10 @@ export const OrderListPage = () => {
                                         const value = row[column.id];
                                         return (
                                             <TableCell
-                                                className={`${classes.cell} ${
+                                                className={clsx(
+                                                    classes.cell,
                                                     column.id === "price" && classes.priceCell
-                                                }`}
+                                                )}
                                                 key={column.id}
                                                 align={column.id === "price" ? column.priceAlign : column.align}
                                                 data-message={getPopOverMessageById(column.id)}

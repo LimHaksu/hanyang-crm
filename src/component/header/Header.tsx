@@ -2,6 +2,7 @@ import React from "react";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Link from "@material-ui/core/Link";
+import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import { tabRoutes } from "route";
 import { useLocation } from "react-router-dom";
@@ -36,7 +37,7 @@ export default function ProminentAppBar() {
             <Toolbar>
                 {tabRoutes.map(({ name, path }, idx) => (
                     <Link
-                        className={`${classes.link} ${pathname === path ? classes.emphasis : ""}`}
+                        className={clsx(classes.link, pathname === path && classes.emphasis)}
                         href={`#${path}`}
                         key={idx}
                     >
