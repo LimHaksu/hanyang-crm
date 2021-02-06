@@ -164,6 +164,7 @@ const useStyles = makeStyles({
         borderStyle: "solid",
         padding: "15px 0",
         cursor: "pointer",
+        userSelect: "none",
     },
     priceCell: {
         padding: "0 10px 0 0",
