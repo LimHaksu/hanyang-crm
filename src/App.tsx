@@ -7,11 +7,13 @@ import DateFnsUtils from "@date-io/date-fns";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import koLocale from "date-fns/locale/ko";
 
-const MAIN_COLOR = "#298d63";
+const PRIMARY_MAIN_COLOR = "#298d63";
+const PRIMARY_LIGHT_COLOR = "#39b481";
 const defaultTheme = createMuiTheme({
     palette: {
         primary: {
-            main: MAIN_COLOR,
+            main: PRIMARY_MAIN_COLOR,
+            light: PRIMARY_LIGHT_COLOR,
         },
     },
     overrides: {
@@ -27,7 +29,7 @@ const defaultTheme = createMuiTheme({
         },
         MuiPickersToolbar: {
             toolbar: {
-                backgroundColor: MAIN_COLOR,
+                backgroundColor: PRIMARY_MAIN_COLOR,
             },
         },
     },
