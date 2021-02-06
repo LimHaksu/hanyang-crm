@@ -102,7 +102,7 @@ const rows = [createData(1, "족발小", 30000, 1, 30000), createData(2, "1인�
 const StyledTableRow = withStyles((theme: Theme) =>
     createStyles({
         root: {
-            "&:nth-of-type(odd)": {
+            "&:nth-of-type(even)": {
                 backgroundColor: "#f3f3f3",
             },
         },

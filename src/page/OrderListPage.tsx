@@ -149,7 +149,7 @@ const rows = [
 const StyledTableRow = withStyles((theme: Theme) =>
     createStyles({
         root: {
-            "&:nth-of-type(odd)": {
+            "&:nth-of-type(even)": {
                 backgroundColor: "#f3f3f3",
             },
         },
@@ -210,6 +210,7 @@ export const OrderListPage = () => {
     return (
         <Paper className={classes.root}>
             <DatePicker selectedDate={selectedDate} handleDateChange={handleDateChange} handleAccept={handleAccept} />
+            여기에 하루 총 매출 표시하기
             <TableContainer className={classes.container}>
                 <Table stickyHeader aria-label="sticky table">
                     <TableHead>
