@@ -21,6 +21,7 @@ const useStyles = makeStyles((theme) => ({
             textDecoration: "none",
             boxShadow: "1px 1px 3px 1px #000 inset",
         },
+        userSelect: "none",
     },
     emphasis: {
         backgroundColor: "#fff",
