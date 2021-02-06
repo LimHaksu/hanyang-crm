@@ -88,7 +88,8 @@ const columns: Column[] = [
     {
         id: "deleteRow",
         label: "삭제",
-        width: 50,
+        width: 38,
+        minWidth: 38,
         align: "center",
     },
 ];
