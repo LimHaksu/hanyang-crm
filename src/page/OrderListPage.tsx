@@ -7,8 +7,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import { KeyboardDatePicker } from "@material-ui/pickers";
-import MouseOverPopover, { isPopOverCell, getPopOverMessageById } from "component/popOver/MouseOverPopOver";
+import MouseoverPopover, { isPopOverCell, getPopOverMessageById } from "component/popover/MouseoverPopover";
 
 interface Column {
     id:
@@ -262,7 +261,7 @@ export const OrderListPage = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
-            <MouseOverPopover anchor={anchor} handlePopoverClose={handlePopoverClose} />
+            <MouseoverPopover anchor={anchor} handlePopoverClose={handlePopoverClose} />
         </Paper>
     );
 };

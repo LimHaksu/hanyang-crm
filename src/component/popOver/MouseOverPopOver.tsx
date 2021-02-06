@@ -50,7 +50,7 @@ interface Props {
     handlePopoverClose: () => void;
 }
 
-const MouseOverPopover = ({ anchor, handlePopoverClose }: Props) => {
+const MouseoverPopover = ({ anchor, handlePopoverClose }: Props) => {
     const classes = useStyles();
     const open = Boolean(anchor.el);
 
@@ -79,4 +79,4 @@ const MouseOverPopover = ({ anchor, handlePopoverClose }: Props) => {
     );
 };
 
-export default MouseOverPopover;
+export default MouseoverPopover;
