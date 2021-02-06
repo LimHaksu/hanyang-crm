@@ -180,6 +180,9 @@ const useStyles = makeStyles({
 export function OrderListPage() {
     const classes = useStyles();
     const [selectedDate, handleDateChange] = useState<Date | null>(new Date());
+    const handleAccept = useCallback((date) => {
+        handleDateChange(date);
+    }, []);
 
     const handleOk = useCallback((e) => {
         console.log(e);
@@ -190,6 +193,8 @@ export function OrderListPage() {
             <KeyboardDatePicker
                 className={classes.datePicker}
                 autoOk
+                showTodayButton
+                todayLabel="오늘"
                 label="날짜"
                 disableFuture
                 format="yyyy/MM/dd"
@@ -200,7 +205,7 @@ export function OrderListPage() {
                 invalidDateMessage="올바른 날짜를 입력해주세요."
                 maxDateMessage="오늘 이후는 조회할 수 없습니다."
                 minDateMessage="1900년 이전은 조회할 수 없습니다."
-                onAccept={handleOk}
+                onAccept={handleAccept}
             />
             <TableContainer className={classes.container}>
                 <Table stickyHeader aria-label="sticky table">
