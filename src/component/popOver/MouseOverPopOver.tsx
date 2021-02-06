@@ -3,17 +3,17 @@ import Popover from "@material-ui/core/Popover";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 
-type ID =
-    | "address"
-    | "productName"
-    | "map"
+export type ID =
     | "idx"
     | "orderTime"
     | "customerName"
     | "phoneNumber"
+    | "address"
+    | "productName"
     | "request"
     | "paymentMethod"
-    | "price";
+    | "price"
+    | "deleteRow";
 
 export const isPopOverCell = (id: ID) => {
     return id === "address" || id === "productName";

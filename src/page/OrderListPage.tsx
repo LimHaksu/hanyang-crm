@@ -8,20 +8,14 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import DatePicker from "component/datePicker/DatePicker";
-import MouseoverPopover, { isPopOverCell, getPopOverMessageById } from "component/popover/MouseoverPopover";
+import MouseoverPopover, {
+    ID as ColumnId,
+    isPopOverCell,
+    getPopOverMessageById,
+} from "component/popover/MouseoverPopover";
 
 interface Column {
-    id:
-        | "idx"
-        | "orderTime"
-        | "customerName"
-        | "phoneNumber"
-        | "address"
-        | "productName"
-        | "request"
-        | "paymentMethod"
-        | "price"
-        | "map";
+    id: ColumnId;
     label: string;
     width?: number;
     minWidth?: number;
@@ -35,12 +29,12 @@ interface Data {
     orderTime: string;
     customerName: string;
     phoneNumber: string;
-    map: string;
     address: string;
     productName: string;
     request: string;
     paymentMethod: "현금" | "카드" | "선결제";
     price: number;
+    deleteRow: string;
 }
 
 const columns: Column[] = [
@@ -91,6 +85,12 @@ const columns: Column[] = [
         priceAlign: "right",
         format: (value) => value.toLocaleString(),
     },
+    {
+        id: "deleteRow",
+        label: "삭제",
+        width: 50,
+        align: "center",
+    },
 ];
 
 const createData = (
@@ -98,14 +98,25 @@ const createData = (
     orderTime: string,
     customerName: string,
     phoneNumber: string,
-    map: string,
     address: string,
     productName: string,
     request: string,
     paymentMethod: "현금" | "카드" | "선결제",
-    price: number
+    price: number,
+    deleteRow: string = "❌"
 ): Data => {
-    return { idx, orderTime, customerName, phoneNumber, map, address, productName, request, paymentMethod, price };
+    return {
+        idx,
+        orderTime,
+        customerName,
+        phoneNumber,
+        address,
+        productName,
+        request,
+        paymentMethod,
+        price,
+        deleteRow,
+    };
 };
 
 const rows = [
@@ -114,7 +125,6 @@ const rows = [
         "오전 11:12",
         "손님",
         "010-1234-5678",
-        "지도",
         "중구 선화동 123-456번지 선화아파트 101동 1001호",
         "상품명상품명상품명상일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십",
         "요청사항",
@@ -126,7 +136,6 @@ const rows = [
         "오전 11:12",
         "손님",
         "010-1234-5678",
-        "지도",
         "중구 선화동 123-456번지 선화아파트 101동 1001호",
         "상품명상품명상품명상일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십일이삼사오육칠팔구십",
         "요청사항",
