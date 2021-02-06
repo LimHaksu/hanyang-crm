@@ -10,7 +10,7 @@ import TableRow from "@material-ui/core/TableRow";
 import DatePicker from "component/datePicker/DatePicker";
 
 interface Column {
-    id: "idx" | "orderTime" | "customerName" | "phoneNumber" | "address" | "registerProduct";
+    id: "idx" | "orderTime" | "cidMachineIdx" | "customerName" | "phoneNumber" | "address" | "registerProduct";
     label: string;
     width?: number;
     minWidth?: number;
@@ -22,6 +22,7 @@ interface Column {
 interface Data {
     idx: number;
     orderTime: string;
+    cidMachineIdx: number;
     customerName: string;
     phoneNumber: string;
     address: string;
@@ -31,6 +32,7 @@ interface Data {
 const columns: Column[] = [
     { id: "idx", label: "순서", width: 40, minWidth: 40, align: "center" },
     { id: "orderTime", label: "수신시각", width: 95, minWidth: 95, align: "center" },
+    { id: "cidMachineIdx", label: "수신기기", width: 95, minWidth: 95, align: "center" },
     {
         id: "customerName",
         label: "주문자명",
@@ -62,17 +64,18 @@ const columns: Column[] = [
 function createData(
     idx: number,
     orderTime: string,
+    cidMachineIdx: number,
     customerName: string,
     phoneNumber: string,
     address: string,
     registerProduct: "작성" | "완료"
 ): Data {
-    return { idx, orderTime, customerName, phoneNumber, address, registerProduct };
+    return { idx, orderTime, cidMachineIdx, customerName, phoneNumber, address, registerProduct };
 }
 
 const rows = [
-    createData(1, "오전 11:12", "손님", "010-1234-5678", "중구 선화동 123-456번지 선화아파트 101동 1001호", "완료"),
-    createData(2, "오전 11:12", "손님", "010-1234-5678", "중구 선화동 123-456번지 선화아파트 101동 1001호", "작성"),
+    createData(1, "오전 11:12", 1, "손님", "010-1234-5678", "중구 선화동 123-456번지 선화아파트 101동 1001호", "완료"),
+    createData(2, "오전 11:12", 2, "손님", "010-1234-5678", "중구 선화동 123-456번지 선화아파트 101동 1001호", "작성"),
 ];
 
 const StyledTableRow = withStyles((theme: Theme) =>
