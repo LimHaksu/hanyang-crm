@@ -41,6 +41,9 @@ const useStyles = makeStyles((theme: Theme) =>
                 backgroundColor: "#277e5a",
             },
         },
+        paymentMethod: {
+            margin: "auto 0",
+        },
         button: {
             width: 100,
             height: 50,
@@ -114,11 +117,17 @@ const SubmitOrder = () => {
                 <Box>
                     <StyledTextField className={classes.request} label="주문 요청사항" icon={<Comment />} />
                     <Box display="flex">
-                        <RadioGroup row defaultValue="cash" aria-label="gender" name="customized-radios">
-                            <FormControlLabel value="cash" control={<StyledRadio label="현금" />} label="" />
-                            <FormControlLabel value="card" control={<StyledRadio label="카드" />} label="" />
-                            <FormControlLabel value="prePayment" control={<StyledRadio label="선결제" />} label="" />
-                        </RadioGroup>
+                        <Box flexGrow={1} className={classes.paymentMethod}>
+                            <RadioGroup row defaultValue="cash" aria-label="gender" name="customized-radios">
+                                <FormControlLabel value="cash" control={<StyledRadio label="현금" />} label="" />
+                                <FormControlLabel value="card" control={<StyledRadio label="카드" />} label="" />
+                                <FormControlLabel
+                                    value="prePayment"
+                                    control={<StyledRadio label="선결제" />}
+                                    label=""
+                                />
+                            </RadioGroup>
+                        </Box>
                         <FormControl variant="outlined" className={classes.formControl}>
                             <InputLabel id="demo-simple-select-outlined-label">선결제</InputLabel>
                             <Select
