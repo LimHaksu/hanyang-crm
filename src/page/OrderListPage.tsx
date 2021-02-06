@@ -8,6 +8,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import { KeyboardDatePicker } from "@material-ui/pickers";
+import MouseOverPopover, { isPopOverCell, getPopOverMessageById } from "component/popOver/MouseOverPopOver";
 
 interface Column {
     id:
@@ -58,12 +59,6 @@ const columns: Column[] = [
         align: "center",
     },
     {
-        id: "map",
-        label: "지도",
-        minWidth: 50,
-        align: "center",
-    },
-    {
         id: "address",
         label: "배송지",
         minWidth: 300,
@@ -98,7 +93,7 @@ const columns: Column[] = [
     },
 ];
 
-function createData(
+const createData = (
     idx: number,
     orderTime: string,
     customerName: string,
@@ -109,9 +104,9 @@ function createData(
     request: string,
     paymentMethod: "현금" | "카드" | "선결제",
     price: number
-): Data {
+): Data => {
     return { idx, orderTime, customerName, phoneNumber, map, address, productName, request, paymentMethod, price };
-}
+};
 
 const rows = [
     createData(
@@ -171,21 +166,36 @@ const useStyles = makeStyles({
         borderColor: "#bebebe",
         borderStyle: "solid",
         padding: "15px 0",
+        cursor: "pointer",
     },
     priceCell: {
         padding: "0 10px 0 0",
     },
 });
 
-export function OrderListPage() {
+export const OrderListPage = () => {
     const classes = useStyles();
     const [selectedDate, handleDateChange] = useState<Date | null>(new Date());
     const handleAccept = useCallback((date) => {
         handleDateChange(date);
     }, []);
 
-    const handleOk = useCallback((e) => {
-        console.log(e);
+    const [anchor, setAnchor] = React.useState<{ el: HTMLElement | null; message: string | undefined }>({
+        el: null,
+        message: undefined,
+    });
+
+    const handlePopoverOpen = useCallback(
+        (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+            const target = event.currentTarget;
+            const message = target.dataset.message;
+            setAnchor({ el: target, message });
+        },
+        [setAnchor]
+    );
+
+    const handlePopoverClose = useCallback(() => {
+        setAnchor({ el: null, message: undefined });
     }, []);
 
     return (
@@ -236,6 +246,9 @@ export function OrderListPage() {
                                                 }`}
                                                 key={column.id}
                                                 align={column.id === "price" ? column.priceAlign : column.align}
+                                                data-message={getPopOverMessageById(column.id)}
+                                                onMouseEnter={isPopOverCell(column.id) ? handlePopoverOpen : () => {}}
+                                                onMouseLeave={isPopOverCell(column.id) ? handlePopoverClose : () => {}}
                                             >
                                                 {column.format && typeof value === "number"
                                                     ? column.format(value)
@@ -249,6 +262,7 @@ export function OrderListPage() {
                     </TableBody>
                 </Table>
             </TableContainer>
+            <MouseOverPopover anchor={anchor} handlePopoverClose={handlePopoverClose} />
         </Paper>
     );
-}
+};
