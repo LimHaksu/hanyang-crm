@@ -2,7 +2,6 @@ import React from "react";
 import {
     CustomerManagementPage,
     OrderListPage,
-    OrderManagementPage,
     OrderRegistryPage,
     PhoneCallRecordPage,
     PreferencesPage,
@@ -31,11 +30,6 @@ export const tabRoutes: TabRoute[] = [
         name: "주문 작성",
         path: "/order-registry",
         component: OrderRegistryPage,
-    },
-    {
-        name: "주문 관리",
-        path: "/order-management",
-        component: OrderManagementPage,
     },
     {
         name: "통계",
