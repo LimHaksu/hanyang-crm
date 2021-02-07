@@ -43,13 +43,7 @@ const StyledTextField = ({ label, icon, className, value, handlePhoneNumberChang
         <Grid container spacing={1} alignItems="flex-end">
             <Grid item>{icon}</Grid>
             <Grid item>
-                <TextField
-                    id="input-with-icon-grid"
-                    label={label}
-                    className={className}
-                    value={value}
-                    onChange={handlePhoneNumberChange}
-                />
+                <TextField label={label} className={className} value={value} onChange={handlePhoneNumberChange} />
             </Grid>
         </Grid>
     );
