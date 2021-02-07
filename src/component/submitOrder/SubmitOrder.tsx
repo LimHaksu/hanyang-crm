@@ -15,6 +15,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
 import Typography from "@material-ui/core/Typography";
 import clsx from "clsx";
+import Print from "@material-ui/icons/Print";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -33,12 +34,13 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         icon: {
             "input:hover ~ &": {
-                backgroundColor: "#e1f3eb",
+                border: "1px solid #298d63",
+                backgroundColor: "#F7FBF9",
             },
         },
         checkedIcon: {
             "input:hover ~ &": {
-                backgroundColor: "#277e5a",
+                backgroundColor: "#1C6245",
             },
         },
         paymentMethod: {
@@ -47,7 +49,7 @@ const useStyles = makeStyles((theme: Theme) =>
         button: {
             width: 100,
             height: 50,
-            margin: "20px 5px 0 20px",
+            margin: "20px 0 0 20px",
         },
         formControl: {
             margin: theme.spacing(1),
@@ -152,11 +154,10 @@ const SubmitOrder = () => {
                     </Typography>
                     <Box display="flex">
                         <Box flexGrow={1}></Box>
-                        <Button
-                            className={clsx(classes.checkedIcon, classes.button)}
-                            variant="contained"
-                            color="primary"
-                        >
+                        <Button className={clsx(classes.icon, classes.button)} variant="contained" color="primary">
+                            <Print /> 출력 저장
+                        </Button>
+                        <Button className={clsx(classes.icon, classes.button)} variant="outlined" color="primary">
                             저장
                         </Button>
                         <Button className={clsx(classes.icon, classes.button)} variant="outlined" color="primary">
