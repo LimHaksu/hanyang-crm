@@ -2,10 +2,10 @@ import React from "react";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
 import Paper from "@material-ui/core/Paper";
-import ProductList from "component/productList/ProductLIst";
-import CustomerInfo from "component/customerInfo/CustomerInfo";
-import OrderInfo from "component/orderInfo/OrderInfo";
-import SubmitOrder from "component/submitOrder/SubmitOrder";
+import ProductList from "component/ProductLIst";
+import CustomerInfo from "component/CustomerInfo";
+import OrderInfo from "component/OrderInfo";
+import SubmitOrder from "component/SubmitOrder";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
