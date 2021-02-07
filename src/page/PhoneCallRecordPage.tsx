@@ -10,6 +10,38 @@ import TableRow from "@material-ui/core/TableRow";
 import DatePicker from "component/datePicker/DatePicker";
 import clsx from "clsx";
 
+const useStyles = makeStyles({
+    root: {
+        width: "100%",
+        height: "calc(100vh - 64px)",
+    },
+    datePicker: {
+        margin: "5px 0 5px 20px",
+    },
+    container: {
+        maxHeight: "calc(100vh - 122px)",
+    },
+    head: {
+        fontWeight: "bold",
+    },
+    cell: {
+        fontSize: "1.1rem",
+        borderWidth: 0,
+        borderRightWidth: 1,
+        borderColor: "#bebebe",
+        borderStyle: "solid",
+        padding: "15px 0",
+        userSelect: "none",
+    },
+    clickableCell: {
+        cursor: "pointer",
+    },
+});
+
+const isClickableCell = (id: string) => {
+    return id === "registerProduct";
+};
+
 interface Column {
     id: "idx" | "orderTime" | "cidMachineIdx" | "customerName" | "phoneNumber" | "address" | "registerProduct";
     label: string;
@@ -89,32 +121,6 @@ const StyledTableRow = withStyles((theme: Theme) =>
     })
 )(TableRow);
 
-const useStyles = makeStyles({
-    root: {
-        width: "100%",
-        height: "calc(100vh - 64px)",
-    },
-    datePicker: {
-        margin: "5px 0 5px 20px",
-    },
-    container: {
-        maxHeight: "calc(100vh - 122px)",
-    },
-    head: {
-        fontWeight: "bold",
-    },
-    cell: {
-        fontSize: "1.1rem",
-        borderWidth: 0,
-        borderRightWidth: 1,
-        borderColor: "#bebebe",
-        borderStyle: "solid",
-        padding: "15px 0",
-        cursor: "pointer",
-        userSelect: "none",
-    },
-});
-
 export function PhoneCallRecordPage() {
     const classes = useStyles();
     const [selectedDate, handleDateChange] = useState<Date | null>(new Date());
@@ -149,7 +155,14 @@ export function PhoneCallRecordPage() {
                                     {columns.map((column) => {
                                         const value = row[column.id];
                                         return (
-                                            <TableCell className={classes.cell} key={column.id} align={column.align}>
+                                            <TableCell
+                                                className={clsx(
+                                                    classes.cell,
+                                                    isClickableCell(column.id) && classes.clickableCell
+                                                )}
+                                                key={column.id}
+                                                align={column.align}
+                                            >
                                                 {column.getRegistryTextWithEmoji && typeof value === "string"
                                                     ? column.getRegistryTextWithEmoji(value)
                                                     : value}

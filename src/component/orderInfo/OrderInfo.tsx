@@ -37,9 +37,15 @@ const useStyles = makeStyles((theme: Theme) =>
             cursor: "pointer",
             userSelect: "none",
         },
+        clickableCell: {
+            cursor: "pointer",
+        },
     })
 );
 
+const isClickableCell = (id: string) => {
+    return id === "remove";
+};
 interface Column {
     id: "idx" | "productName" | "price" | "amount" | "productTotalPrice" | "deleteRow";
     label: string;
@@ -138,7 +144,14 @@ const OrderInfo = () => {
                                     {columns.map((column) => {
                                         const value = row[column.id];
                                         return (
-                                            <TableCell className={classes.cell} key={column.id} align={column.align}>
+                                            <TableCell
+                                                className={clsx(
+                                                    classes.cell,
+                                                    isClickableCell(column.id) && classes.clickableCell
+                                                )}
+                                                key={column.id}
+                                                align={column.align}
+                                            >
                                                 {column.formatPrice && typeof value === "number"
                                                     ? column.formatPrice(value)
                                                     : value}

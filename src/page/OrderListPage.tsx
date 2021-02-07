@@ -15,6 +15,38 @@ import MouseoverPopover, {
 } from "component/popover/MouseoverPopover";
 import clsx from "clsx";
 
+const useStyles = makeStyles({
+    root: {
+        width: "100%",
+        height: "calc(100vh - 64px)",
+    },
+    container: {
+        maxHeight: "calc(100vh - 122px)",
+    },
+    head: {
+        fontWeight: "bold",
+    },
+    cell: {
+        fontSize: "1.1rem",
+        borderWidth: 0,
+        borderRightWidth: 1,
+        borderColor: "#bebebe",
+        borderStyle: "solid",
+        padding: "15px 0",
+        userSelect: "none",
+    },
+    clickableCell: {
+        cursor: "pointer",
+    },
+    priceCell: {
+        padding: "0 10px 0 0",
+    },
+});
+
+const isClickableCell = (id: string) => {
+    return id === "address" || id === "productName" || id === "print" || id === "remove";
+};
+
 interface Column {
     id: ColumnId;
     label: string;
@@ -156,32 +188,6 @@ const StyledTableRow = withStyles((theme: Theme) =>
     })
 )(TableRow);
 
-const useStyles = makeStyles({
-    root: {
-        width: "100%",
-        height: "calc(100vh - 64px)",
-    },
-    container: {
-        maxHeight: "calc(100vh - 122px)",
-    },
-    head: {
-        fontWeight: "bold",
-    },
-    cell: {
-        fontSize: "1.1rem",
-        borderWidth: 0,
-        borderRightWidth: 1,
-        borderColor: "#bebebe",
-        borderStyle: "solid",
-        padding: "15px 0",
-        cursor: "pointer",
-        userSelect: "none",
-    },
-    priceCell: {
-        padding: "0 10px 0 0",
-    },
-});
-
 export const OrderListPage = () => {
     const classes = useStyles();
     const [selectedDate, handleDateChange] = useState<Date | null>(new Date());
@@ -237,6 +243,7 @@ export const OrderListPage = () => {
                                             <TableCell
                                                 className={clsx(
                                                     classes.cell,
+                                                    isClickableCell(column.id) && classes.clickableCell,
                                                     column.id === "price" && classes.priceCell
                                                 )}
                                                 key={column.id}
