@@ -34,7 +34,6 @@ const useStyles = makeStyles((theme: Theme) =>
             borderColor: "#bebebe",
             borderStyle: "solid",
             padding: "15px 0",
-            cursor: "pointer",
             userSelect: "none",
         },
         clickableCell: {
