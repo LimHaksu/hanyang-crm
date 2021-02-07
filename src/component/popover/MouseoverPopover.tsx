@@ -13,7 +13,8 @@ export type ID =
     | "request"
     | "paymentMethod"
     | "price"
-    | "deleteRow";
+    | "print"
+    | "remove";
 
 export const isPopOverCell = (id: ID) => {
     return id === "address" || id === "productName";

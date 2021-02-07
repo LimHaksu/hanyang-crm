@@ -45,8 +45,9 @@ const useStyles = makeStyles((theme: Theme) =>
 const isClickableCell = (id: string) => {
     return id === "remove";
 };
+
 interface Column {
-    id: "idx" | "productName" | "price" | "amount" | "productTotalPrice" | "deleteRow";
+    id: "idx" | "productName" | "price" | "amount" | "productTotalPrice" | "remove";
     label: string;
     width?: number;
     minWidth?: number;
@@ -62,7 +63,7 @@ interface Data {
     price: number;
     amount: number;
     productTotalPrice: number;
-    deleteRow: string;
+    remove: string;
 }
 
 const columns: Column[] = [
@@ -83,7 +84,7 @@ const columns: Column[] = [
         formatPrice: (price) => price.toLocaleString(),
     },
     {
-        id: "deleteRow",
+        id: "remove",
         label: "삭제",
         width: 38,
         minWidth: 38,
@@ -97,9 +98,9 @@ function createData(
     price: number,
     amount: number,
     productTotalPrice: number,
-    deleteRow: string = "❌"
+    remove: string = "❌"
 ): Data {
-    return { idx, productName, price, amount, productTotalPrice, deleteRow };
+    return { idx, productName, price, amount, productTotalPrice, remove };
 }
 
 const rows = [createData(1, "족발小", 30000, 1, 30000), createData(2, "1인보쌈", 20000, 2, 40000)];

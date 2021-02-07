@@ -67,7 +67,8 @@ interface Data {
     request: string;
     paymentMethod: "현금" | "카드" | "선결제";
     price: number;
-    deleteRow: string;
+    print: string;
+    remove: string;
 }
 
 const columns: Column[] = [
@@ -118,8 +119,9 @@ const columns: Column[] = [
         priceAlign: "right",
         format: (value) => value.toLocaleString(),
     },
+    { id: "print", label: "출력", width: 38, minWidth: 38, align: "center" },
     {
-        id: "deleteRow",
+        id: "remove",
         label: "삭제",
         width: 38,
         minWidth: 38,
@@ -137,7 +139,8 @@ const createData = (
     request: string,
     paymentMethod: "현금" | "카드" | "선결제",
     price: number,
-    deleteRow: string = "❌"
+    print: string = "🖨️",
+    remove: string = "❌"
 ): Data => {
     return {
         idx,
@@ -149,7 +152,8 @@ const createData = (
         request,
         paymentMethod,
         price,
-        deleteRow,
+        print,
+        remove,
     };
 };
 
