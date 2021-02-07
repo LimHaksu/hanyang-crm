@@ -22,10 +22,10 @@ const useStyles = makeStyles((theme: Theme) =>
             marginBottom: "5px",
         },
         address: {
-            width: "400px",
+            width: "438px",
         },
         request: {
-            width: "400px",
+            width: "438px",
         },
     })
 );
@@ -64,13 +64,19 @@ const CustomerInfo = () => {
     return (
         <Paper className={classes.paper}>
             <div className={classes.head}>고객정보</div>
-            <StyledTextField label="이름" icon={<AccountBox />} />
-            <StyledTextField
-                label="전화"
-                value={insertDashIntoPhoneNumber(phoneNumber)}
-                handlePhoneNumberChange={handlePhoneNumberChange}
-                icon={<Phone />}
-            />
+            <Grid container spacing={2}>
+                <Grid item>
+                    <StyledTextField label="이름" icon={<AccountBox />} />
+                </Grid>
+                <Grid item>
+                    <StyledTextField
+                        label="전화"
+                        value={insertDashIntoPhoneNumber(phoneNumber)}
+                        handlePhoneNumberChange={handlePhoneNumberChange}
+                        icon={<Phone />}
+                    />
+                </Grid>
+            </Grid>
             <StyledTextField label="주소" className={classes.address} icon={<Home />} />
             <StyledTextField label="단골 요청사항" className={classes.request} icon={<Comment />} />
         </Paper>
