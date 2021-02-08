@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme: Theme) =>
             width: "100%",
             height: "calc(100vh - 64px)",
             overflow: "auto",
+            userSelect: "none",
         },
         head: {
             position: "sticky",
