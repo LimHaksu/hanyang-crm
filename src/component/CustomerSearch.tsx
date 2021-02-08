@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme: Theme) =>
             marginLeft: 0,
             marginBottom: 10,
             width: "100%",
-            border: "1px solid #eee",
+            border: "1px solid #aaa",
         },
         searchIcon: {
             color: "inherit",
