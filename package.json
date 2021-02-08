@@ -20,6 +20,7 @@
         "@types/react-router-dom": "^5.1.7",
         "csstype": "^3.0.6",
         "date-fns": "^2.16.1",
+        "electron-pos-printer": "^1.2.4",
         "history": "^4.0.0",
         "node-hid": "^2.1.1",
         "react": "^17.0.1",

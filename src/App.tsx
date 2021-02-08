@@ -32,6 +32,11 @@ const defaultTheme = createMuiTheme({
                 backgroundColor: PRIMARY_MAIN_COLOR,
             },
         },
+        MuiSvgIcon: {
+            root: {
+                color: PRIMARY_MAIN_COLOR,
+            },
+        },
     },
 });
 

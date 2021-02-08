@@ -1,5 +1,16 @@
-interface Props {}
+import Header from "component/Header";
+import { Route, Switch } from "react-router-dom";
+import { preferencesTabRoutes } from "route";
 
-export const PreferencesPage = (props: Props) => {
-    return <div>환경설정 페이지</div>;
+export const PreferencesPage = () => {
+    return (
+        <>
+            <Header tabRoutes={preferencesTabRoutes} subHeader />
+            <Switch>
+                {preferencesTabRoutes.map(({ path, component }, key) => (
+                    <Route path={path} exact key={key} component={component} />
+                ))}
+            </Switch>
+        </>
+    );
 };
