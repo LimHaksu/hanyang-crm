@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export const PreferencesPrinterPage = () => {
     const classes = useStyles();
-    const [printers, setPrinters] = useState<printerType[]>(getPrinters());
+    const [printers, setPrinters] = useState<printerType[]>(() => getPrinters());
     const [selectedPrinter, setSelectedPrinter] = useState(localStorage.getItem("selectedPrinter") || "");
 
     const handleSearchClick = useCallback(() => {
