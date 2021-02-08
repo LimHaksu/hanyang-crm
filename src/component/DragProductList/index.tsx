@@ -104,11 +104,17 @@ const DragProductList = ({ initial }: DragProductListProps) => {
     return (
         <Paper className={classes.root}>
             <Grid container className={classes.head}>
-                <Grid item xs={9} className={classes.alignCenter}>
+                <Grid item xs={8} className={classes.alignCenter}>
                     상품명
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={2}>
                     가격
+                </Grid>
+                <Grid item xs={1}>
+                    수정
+                </Grid>
+                <Grid item xs={1}>
+                    삭제
                 </Grid>
             </Grid>
             <DragDropContext onDragEnd={onDragEnd}>{board}</DragDropContext>
