@@ -72,7 +72,7 @@ const columns: Column[] = [
     { id: "orderTime", label: "주문시각", width: 95, minWidth: 95, align: "center" },
     {
         id: "customerName",
-        label: "주문자명",
+        label: "고객명",
         minWidth: 95,
         align: "center",
     },

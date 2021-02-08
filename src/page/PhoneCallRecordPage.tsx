@@ -68,7 +68,7 @@ const columns: Column[] = [
     { id: "cidMachineIdx", label: "수신기기", width: 95, minWidth: 95, align: "center" },
     {
         id: "customerName",
-        label: "주문자명",
+        label: "고객명",
         minWidth: 95,
         align: "center",
     },
