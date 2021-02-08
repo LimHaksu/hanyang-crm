@@ -5,17 +5,19 @@ import {
     OrderRegistryPage,
     PhoneCallRecordPage,
     PreferencesPage,
+    PreferencesCidPage,
+    PreferencesPrinterPage,
     ProductManagementPage,
     StatisticsPage,
 } from "page";
 
-interface TabRoute {
+export interface tabRouteType {
     name: string;
     path: string;
     component: React.FC;
 }
 
-export const tabRoutes: TabRoute[] = [
+export const tabRoutes: tabRouteType[] = [
     {
         name: "주문 목록",
         path: "/",
@@ -50,5 +52,18 @@ export const tabRoutes: TabRoute[] = [
         name: "환경 설정",
         path: "/preferences",
         component: PreferencesPage,
+    },
+];
+
+export const preferencesTabRoutes: tabRouteType[] = [
+    {
+        name: "CID(전화 발신 표시)설정",
+        path: "/preferences/cid",
+        component: PreferencesCidPage,
+    },
+    {
+        name: "프린터 설정",
+        path: "/preferences/printer",
+        component: PreferencesPrinterPage,
     },
 ];

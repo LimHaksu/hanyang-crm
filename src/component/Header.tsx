@@ -4,10 +4,13 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Link from "@material-ui/core/Link";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
-import { tabRoutes } from "route";
+import { tabRouteType } from "route";
 import { useLocation } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
+    subHeader: {
+        backgroundColor: theme.palette.primary.light,
+    },
     link: {
         color: "#fff",
         fontWeight: "bold",
@@ -30,16 +33,29 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function ProminentAppBar() {
+interface HeaderProps {
+    tabRoutes: tabRouteType[];
+    subHeader?: boolean;
+}
+
+const isSelectedPath = (pathname: string, path: string) => {
+    if (path === "/") {
+        return pathname === path;
+    } else {
+        return pathname.includes(path);
+    }
+};
+
+const Header = ({ tabRoutes, subHeader }: HeaderProps) => {
     const { pathname } = useLocation();
     const classes = useStyles();
     return (
-        <AppBar position="static">
+        <AppBar position="static" className={subHeader ? classes.subHeader : ""}>
             <Toolbar>
                 {tabRoutes.map(({ name, path }, idx) => (
                     <Link
-                        className={clsx(classes.link, pathname === path && classes.emphasis)}
-                        href={`#${path}`}
+                        className={clsx(classes.link, isSelectedPath(pathname, path) && classes.emphasis)}
+                        href={`#${path === "/preferences" ? `${path}/cid` : path}`}
                         key={idx}
                     >
                         {name}
@@ -48,4 +64,6 @@ export default function ProminentAppBar() {
             </Toolbar>
         </AppBar>
     );
-}
+};
+
+export default Header;

@@ -39,12 +39,12 @@ const App = () => {
     return (
         <HashRouter>
             <ThemeProvider theme={defaultTheme}>
-                <Header />
+                <Header tabRoutes={tabRoutes} />
                 <MuiPickersUtilsProvider utils={DateFnsUtils} locale={koLocale}>
                     <Switch>
-                        {tabRoutes.map(({ path, component }, key) => {
-                            return <Route path={path} exact key={key} component={component} />;
-                        })}
+                        {tabRoutes.map(({ path, component }, key) => (
+                            <Route path={path} exact={path !== "/preferences"} key={key} component={component} />
+                        ))}
                     </Switch>
                 </MuiPickersUtilsProvider>
             </ThemeProvider>
