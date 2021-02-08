@@ -102,21 +102,16 @@ const CategoryRow = ({ category, isOpen, setIsOpen }: Props) => {
                         const newIsOpen = setTrueOnlyOneCategory(isOpen, category.name);
                         setIsOpen(newIsOpen);
                     }}
+                    colSpan={2}
                 >
                     {category.name}
                 </TableCell>
-                <TableCell
-                    onClick={() => {
-                        const newIsOpen = setTrueOnlyOneCategory(isOpen, category.name);
-                        setIsOpen(newIsOpen);
-                    }}
-                />
             </TableRow>
             <TableRow>
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={2}>
                     <Collapse in={isOpen[category.name]} timeout="auto" unmountOnExit>
                         <Table aria-label="procuct">
-                            <TableBody style={{ width: "400px" }}>
+                            <TableBody>
                                 {category.products.map((product) => (
                                     <TableRow className={classes.row} key={product.idx} hover>
                                         <TableCell>{product.name}</TableCell>

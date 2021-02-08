@@ -19,6 +19,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         rightSide: {
             width: "70%",
+            paddingLeft: "10px",
         },
     })
 );
