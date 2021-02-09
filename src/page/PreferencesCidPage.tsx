@@ -6,6 +6,7 @@ import CidList from "component/CidList";
 const useStyles = makeStyles((theme: Theme) => ({
     root: {
         height: "calc(100vh - 128px)",
+        backgroundColor: theme.palette.secondary.dark,
     },
 }));
 
