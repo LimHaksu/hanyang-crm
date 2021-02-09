@@ -35,11 +35,13 @@
     },
     "devDependencies": {
         "electron": "^8.2.0",
-        "electron-builder": "^22.9.1"
+        "electron-builder": "^22.9.1",
+        "electron-rebuild": "^2.3.5"
     },
     "scripts": {
         "start": "react-scripts start",
         "build": "react-scripts build",
+        "rebuild": "electron-rebuild",
         "test": "react-scripts test",
         "eject": "react-scripts eject",
         "react-start": "set BROWSER=none && yarn start",
