@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme: Theme) =>
         head: {
             position: "sticky",
             top: 0,
-            backgroundColor: "#dbdbdb",
+            backgroundColor: "#f7f7f7",
             "& *": {
                 fontSize: "1.2rem",
                 fontWeight: "bold",
