@@ -49,7 +49,7 @@ const InnerList = ({ devices, handleItemClick, selectedIdxes }: InnserListProps)
                             !supportedDevices.includes(device.product) && classes.dn
                         )}
                     >
-                        지원 기기
+                        지원 장치
                     </div>
                 </ListItem>
             ))}
