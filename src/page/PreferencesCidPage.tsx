@@ -1,5 +1,6 @@
 import React from "react";
 import Paper from "@material-ui/core/Paper";
+import Box from "@material-ui/core/Box";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import CidList from "component/CidList";
 const useStyles = makeStyles((theme: Theme) => ({
@@ -13,7 +14,13 @@ export const PreferencesCidPage = () => {
 
     return (
         <Paper className={classes.root}>
-            <CidList />
+            <Box display="flex" justifyContent="center">
+                <Box flexGrow={2} />
+                <Box flexGrow={1}>
+                    <CidList />
+                </Box>
+                <Box flexGrow={2} />
+            </Box>
         </Paper>
     );
 };
