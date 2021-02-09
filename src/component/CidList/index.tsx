@@ -87,11 +87,11 @@ const CidList = () => {
             <Box display="flex" flexDirection="column">
                 <Box className={classes.searchButton}>
                     <Button onClick={handleSearchClick} variant="contained" color="primary">
-                        CID 기기 목록 갱신
+                        컴퓨터에 연결된 장치 목록 갱신
                     </Button>
                 </Box>
                 <Box className={clsx(classes.notice, devices.length === 0 && classes.dn)}>
-                    사용할 CID 기기를 선택해주세요.
+                    사용할 CID 장치를 선택해주세요.
                 </Box>
                 <Box>
                     <InnerList devices={devices} selectedIdxes={selectedIdxes} handleItemClick={handleItemClick} />

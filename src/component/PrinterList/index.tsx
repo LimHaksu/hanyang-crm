@@ -56,7 +56,7 @@ const PrinterList = () => {
             <Box display="flex" flexDirection="column">
                 <Box className={classes.serchButton}>
                     <Button onClick={handleSearchClick} variant="contained" color="primary">
-                        프린터 목록 갱신
+                        컴퓨터에 연결된 프린터 목록 갱신
                     </Button>
                 </Box>
                 <Box className={clsx(classes.notice, printers.length === 0 && classes.dn)}>
