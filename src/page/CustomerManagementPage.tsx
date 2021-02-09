@@ -29,6 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         container: {
             maxHeight: "calc(100vh - 161px)",
+            backgroundColor: "#fff",
         },
         head: {
             fontWeight: "bold",
@@ -137,49 +138,47 @@ export const CustomerManagementPage = () => {
             <Box display="flex">
                 <Box className={classes.leftSide}>
                     <CustomerSearch />
-                    <Paper>
-                        <TableContainer className={classes.container}>
-                            <Table stickyHeader aria-label="sticky table">
-                                <TableHead>
-                                    <TableRow>
-                                        {columns.map((column) => (
-                                            <TableCell
-                                                className={clsx(classes.cell, classes.head)}
-                                                key={column.id}
-                                                align={column.align}
-                                                style={{ width: column.width, minWidth: column.minWidth }}
-                                            >
-                                                {column.label}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {rows.map((row) => {
-                                        return (
-                                            <StyledTableRow hover role="checkbox" key={row.idx}>
-                                                {columns.map((column) => {
-                                                    const value = row[column.id];
-                                                    return (
-                                                        <TableCell
-                                                            className={clsx(
-                                                                classes.cell,
-                                                                isClickableCell(column.id) && classes.clickableCell
-                                                            )}
-                                                            key={column.id}
-                                                            align={column.align}
-                                                        >
-                                                            {value}
-                                                        </TableCell>
-                                                    );
-                                                })}
-                                            </StyledTableRow>
-                                        );
-                                    })}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </Paper>
+                    <TableContainer className={classes.container}>
+                        <Table stickyHeader aria-label="sticky table">
+                            <TableHead>
+                                <TableRow>
+                                    {columns.map((column) => (
+                                        <TableCell
+                                            className={clsx(classes.cell, classes.head)}
+                                            key={column.id}
+                                            align={column.align}
+                                            style={{ width: column.width, minWidth: column.minWidth }}
+                                        >
+                                            {column.label}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {rows.map((row) => {
+                                    return (
+                                        <StyledTableRow hover role="checkbox" key={row.idx}>
+                                            {columns.map((column) => {
+                                                const value = row[column.id];
+                                                return (
+                                                    <TableCell
+                                                        className={clsx(
+                                                            classes.cell,
+                                                            isClickableCell(column.id) && classes.clickableCell
+                                                        )}
+                                                        key={column.id}
+                                                        align={column.align}
+                                                    >
+                                                        {value}
+                                                    </TableCell>
+                                                );
+                                            })}
+                                        </StyledTableRow>
+                                    );
+                                })}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
                 </Box>
                 <Box className={classes.rightSide}>
                     <Box>
