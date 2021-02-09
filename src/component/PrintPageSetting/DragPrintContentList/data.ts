@@ -47,11 +47,11 @@ const createContent = (
 };
 
 export const contents = [
-    createContent(0, "text", "[순번]", "orderNumber", {}),
-    createContent(1, "text", "[결제방법]", "paymentMethod", {}),
-    createContent(2, "text", "[주문시각]", "orderTime", {}),
-    createContent(3, "text", "[주소]", "address", {}),
-    createContent(4, "text", "[연락처]", "phoneNumber", {}),
-    createContent(5, "text", "[요청사항]", "request", {}),
-    createContent(6, "text", "[메뉴]", "menu", {}),
+    createContent(0, "text", "[[[ 순번 ]]]", "orderNumber", {}),
+    createContent(1, "text", "[[[ 결제방법 ]]]", "paymentMethod", {}),
+    createContent(2, "text", "[[[ 주문시각 ]]]", "orderTime", {}),
+    createContent(3, "text", "[[[ 주소 ]]]", "address", {}),
+    createContent(4, "text", "[[[ 연락처 ]]]", "phoneNumber", {}),
+    createContent(5, "text", "[[[ 요청사항 ]]]", "request", {}),
+    createContent(6, "text", "[[[ 메뉴 ]]]", "menu", {}),
 ];
