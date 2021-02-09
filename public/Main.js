@@ -25,9 +25,6 @@ function createWindow() {
     win.loadURL(startUrl);
 }
 
-// electron 8 이전은 false, electron 9부터는 true
-app.allowRendererProcessReuse = true;
-
 app.whenReady().then(createWindow);
 
 // 모든 윈도우가 닫히면 종료된다.

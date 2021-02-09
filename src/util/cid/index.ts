@@ -17,5 +17,5 @@ export interface deviceType {
 export const getDevices = () => {
     return HID.devices();
 };
-};
+
 
