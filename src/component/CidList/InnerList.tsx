@@ -42,7 +42,7 @@ const InnerList = ({ devices, handleItemClick, selectedIdxes }: InnserListProps)
                     <ListItemIcon>
                         <Checkbox checked={selectedIdxes.includes(idx)} />
                     </ListItemIcon>
-                    <div>{device.product}</div>
+                    <div>{device.product ? device.product : "(이름없는 기기)"}</div>
                     <div
                         className={clsx(
                             classes.supportedDevices,
