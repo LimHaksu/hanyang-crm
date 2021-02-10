@@ -5,5 +5,6 @@ export * from "page/PhoneCallRecordPage";
 export * from "page/preferences/PreferencesPage";
 export * from "page/preferences/PreferencesCidPage";
 export * from "page/preferences/PreferencesPrinterPage";
+export * from "page/preferences/PreferencesOpeningHours";
 export * from "page/ProductManagementPage";
 export * from "page/StatisticsPage";
