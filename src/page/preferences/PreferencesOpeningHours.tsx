@@ -20,8 +20,8 @@ const useStyles = makeStyles((theme: Theme) =>
             marginBottom: 10,
         },
         notice: {
-            fontSize: "0.9rem",
-            lineHeight: "1rem",
+            fontSize: "1rem",
+            lineHeight: "1.5rem",
             marginBottom: 10,
         },
         emphasis: {
