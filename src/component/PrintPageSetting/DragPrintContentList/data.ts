@@ -54,4 +54,5 @@ export const contents = [
     createContent(4, "text", "[[[ 연락처 ]]]", "phoneNumber", {}),
     createContent(5, "text", "[[[ 요청사항 ]]]", "request", {}),
     createContent(6, "text", "[[[ 메뉴 ]]]", "menu", {}),
+    createContent(7, "text", "고정 문구 추가 입력 샘플", "text", {}),
 ];

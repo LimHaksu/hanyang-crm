@@ -31,6 +31,9 @@ const useStyles = makeStyles((theme: Theme) =>
         dn: {
             display: "none",
         },
+        text: {
+            fontSize: "0.9rem",
+        },
     })
 );
 
@@ -47,7 +50,7 @@ const Content = ({ content, isDragging, provided }: ProductProps) => {
         <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
             <div className={clsx(classes.root, isDragging && classes.isDragging)}>
                 <Grid container spacing={1}>
-                    <Grid item xs={9} className={classes.centerAlign}>
+                    <Grid item xs={9} className={content.valueType === "text" ? classes.text : classes.centerAlign}>
                         {content.value}
                     </Grid>
                     <Grid item xs={1}></Grid>
