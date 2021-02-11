@@ -32,13 +32,13 @@ const useStyles = makeStyles((theme: Theme) =>
         request: {
             width: "400px",
         },
-        icon: {
+        button: {
             "input:hover ~ &": {
                 border: "1px solid #298d63",
                 backgroundColor: "#F7FBF9",
             },
         },
-        checkedIcon: {
+        checkedButton: {
             "input:hover ~ &": {
                 backgroundColor: "#1C6245",
             },
@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme: Theme) =>
         paymentMethod: {
             margin: "auto 0",
         },
-        button: {
+        submitButton: {
             width: 100,
             height: 50,
             margin: "20px 0 0 20px",
@@ -54,6 +54,9 @@ const useStyles = makeStyles((theme: Theme) =>
         formControl: {
             margin: theme.spacing(1),
             minWidth: 120,
+        },
+        printIcon: {
+            color: "#fff",
         },
     })
 );
@@ -93,12 +96,12 @@ const StyledRadio = (props: RadioProps & { label: string }) => {
             disableRipple
             color="default"
             checkedIcon={
-                <Button className={classes.checkedIcon} variant="contained" color="primary">
+                <Button className={classes.checkedButton} variant="contained" color="primary">
                     {props.label}
                 </Button>
             }
             icon={
-                <Button className={classes.icon} variant="outlined" color="primary">
+                <Button className={classes.button} variant="outlined" color="primary">
                     {props.label}
                 </Button>
             }
@@ -154,13 +157,25 @@ const SubmitOrder = () => {
                     </Typography>
                     <Box display="flex">
                         <Box flexGrow={1}></Box>
-                        <Button className={clsx(classes.icon, classes.button)} variant="contained" color="primary">
-                            <Print /> 출력 저장
+                        <Button
+                            className={clsx(classes.button, classes.submitButton)}
+                            variant="contained"
+                            color="primary"
+                        >
+                            <Print className={classes.printIcon} /> 출력 저장
                         </Button>
-                        <Button className={clsx(classes.icon, classes.button)} variant="outlined" color="primary">
+                        <Button
+                            className={clsx(classes.button, classes.submitButton)}
+                            variant="outlined"
+                            color="primary"
+                        >
                             저장
                         </Button>
-                        <Button className={clsx(classes.icon, classes.button)} variant="outlined" color="primary">
+                        <Button
+                            className={clsx(classes.button, classes.submitButton)}
+                            variant="outlined"
+                            color="primary"
+                        >
                             취소
                         </Button>
                     </Box>
