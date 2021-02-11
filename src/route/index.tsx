@@ -7,6 +7,7 @@ import {
     PreferencesPage,
     PreferencesCidPage,
     PreferencesPrinterPage,
+    PreferencesOpeningHours,
     ProductManagementPage,
     StatisticsPage,
 } from "page";
@@ -65,5 +66,10 @@ export const preferencesTabRoutes: tabRouteType[] = [
         name: "프린터 설정",
         path: "/preferences/printer",
         component: PreferencesPrinterPage,
+    },
+    {
+        name: "영업시간 설정",
+        path: "/preferences/opening-hours",
+        component: PreferencesOpeningHours,
     },
 ];
