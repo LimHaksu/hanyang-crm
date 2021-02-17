@@ -20,7 +20,6 @@ import Print from "@material-ui/icons/Print";
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         submitPage: {
-            height: "150px",
             padding: "15px",
             boxSizing: "border-box",
         },
@@ -117,11 +116,10 @@ const SubmitOrder = () => {
     const [selectedPrepayment, setSelectedPrepayment] = useState<SelectedPrepayment>("배민");
     return (
         <Paper className={classes.submitPage}>
-            <Box display="flex">
-                <Box flexGrow={1}></Box>
+            <Box display="flex" flexWrap="wrap" justifyContent="flex-end">
                 <Box>
                     <StyledTextField className={classes.request} label="주문 요청사항" icon={<Comment />} />
-                    <Box display="flex">
+                    <Box display="flex" flexWrap="wrap">
                         <Box flexGrow={1} className={classes.paymentMethod}>
                             <RadioGroup row defaultValue="cash" aria-label="gender" name="customized-radios">
                                 <FormControlLabel value="cash" control={<StyledRadio label="현금" />} label="" />
@@ -155,7 +153,7 @@ const SubmitOrder = () => {
                     <Typography variant="h4" component="h2">
                         총 결제금액 : <span id="total-price">{Number(70000).toLocaleString()}</span>원
                     </Typography>
-                    <Box display="flex">
+                    <Box display="flex" flexWrap="wrap">
                         <Box flexGrow={1}></Box>
                         <Button
                             className={clsx(classes.button, classes.submitButton)}
