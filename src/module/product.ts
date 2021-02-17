@@ -252,7 +252,7 @@ const product = createReducer<ProductState, ProductAction>(initialState, {
                     products[plen - 1].lexoRank = getRankBetween(products[plen - 2].lexoRank, Z_LEXO_RANK);
                 }
                 // 새로운 lexoRank는 기존의 마지막 lexoRank (= 'z'* defaultLexoRankLength ),
-                products.push({ idx: draft.lastCategoryIdx, name, price, lexoRank: Z_LEXO_RANK });
+                products.push({ idx: draft.lastProductIdx, name, price, lexoRank: Z_LEXO_RANK });
             }
         }),
     [EDIT_PRODUCT]: (state, { payload: { idx, categoryIdx, name, price } }) =>
