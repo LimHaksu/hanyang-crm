@@ -8,6 +8,8 @@ import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
+import { Category } from "module/product";
+import useProduct from "hook/useProduct";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -38,48 +40,12 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 );
 
-interface Product {
-    idx: number;
-    name: string;
-    price: number;
-}
-
-const createCategory = (name: string, products: Product[]) => {
-    return {
-        name,
-        products,
-    };
-};
-
-const categories = [
-    createCategory("족발", [
-        { idx: 1, name: "1인족발", price: 20000 },
-        { idx: 2, name: "족발小", price: 30000 },
-    ]),
-    createCategory("보쌈", [
-        { idx: 3, name: "1인보쌈", price: 20000 },
-        {
-            idx: 4,
-            name: "보쌈小",
-            price: 30000,
-        },
-    ]),
-    createCategory("추가메뉴", [
-        { idx: 5, name: "콜라", price: 3000 },
-        { idx: 6, name: "사이다", price: 3000 },
-    ]),
-    createCategory("할인", [
-        { idx: 7, name: "내방객", price: -3000 },
-        { idx: 8, name: "쿠폰", price: -2000 },
-    ]),
-];
-
 interface IsOpen {
     [key: string]: boolean;
 }
 
 interface Props {
-    category: ReturnType<typeof createCategory>;
+    category: Category;
     isOpen: IsOpen;
     setIsOpen: (value: React.SetStateAction<{}>) => void;
 }
@@ -129,6 +95,7 @@ const CategoryRow = ({ category, isOpen, setIsOpen }: Props) => {
 
 const ProductList = () => {
     const classes = useStyles();
+    const { categories } = useProduct();
     const [isOpen, setIsOpen] = useState<IsOpen>(
         categories.reduce((acc, category) => ({ ...acc, [category.name]: false }), {})
     );
