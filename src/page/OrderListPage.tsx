@@ -10,6 +10,7 @@ import TableRow from "@material-ui/core/TableRow";
 import DatePicker from "component/DatePicker";
 import MouseoverPopover, { ID as ColumnId, isPopOverCell, getPopOverMessageById } from "component/MouseoverPopover";
 import clsx from "clsx";
+import useOrder from "hook/useOrder";
 
 const useStyles = makeStyles({
     root: {
@@ -191,6 +192,7 @@ const StyledTableRow = withStyles((theme: Theme) =>
 export const OrderListPage = () => {
     const classes = useStyles();
     const [selectedDate, handleDateChange] = useState<Date | null>(new Date());
+    const { orders, addOrder } = useOrder();
     const handleAccept = useCallback((date) => {
         handleDateChange(date);
     }, []);
@@ -234,11 +236,33 @@ export const OrderListPage = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rows.map((row) => {
+                        {orders.map((order, idx) => {
                             return (
-                                <StyledTableRow hover role="checkbox" key={row.idx}>
+                                <StyledTableRow hover role="checkbox" key={idx}>
                                     {columns.map((column) => {
-                                        const value = row[column.id];
+                                        if (column.id === "print") {
+                                            return (
+                                                <TableCell
+                                                    className={clsx(classes.cell, classes.clickableCell)}
+                                                    key="print"
+                                                    align="center"
+                                                >
+                                                    🖨️
+                                                </TableCell>
+                                            );
+                                        }
+                                        if (column.id === "remove") {
+                                            return (
+                                                <TableCell
+                                                    className={clsx(classes.cell, classes.clickableCell)}
+                                                    key="delete"
+                                                    align="center"
+                                                >
+                                                    ❌
+                                                </TableCell>
+                                            );
+                                        }
+                                        const value = order[column.id];
                                         return (
                                             <TableCell
                                                 className={clsx(
