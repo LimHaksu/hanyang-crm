@@ -9,6 +9,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import DatePicker from "component/DatePicker";
 import clsx from "clsx";
+import usePhone from "hook/usePhone";
 
 const useStyles = makeStyles({
     root: {
@@ -125,6 +126,7 @@ export function PhoneCallRecordPage() {
     const classes = useStyles();
     const [selectedDate, handleDateChange] = useState<Date | null>(new Date());
 
+    const { phoneCallRecords } = usePhone();
     const handleAccept = useCallback((date) => {
         handleDateChange(date);
     }, []);
@@ -149,7 +151,7 @@ export function PhoneCallRecordPage() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rows.map((row) => {
+                        {phoneCallRecords.map((row) => {
                             return (
                                 <StyledTableRow hover role="checkbox" key={row.idx}>
                                     {columns.map((column) => {
