@@ -54,12 +54,13 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 interface CategoryProps {
+    categoryIdx: number;
     name: string;
     products: Product[];
     index: number;
 }
 
-const Category = ({ name, products, index }: CategoryProps) => {
+const Category = ({ categoryIdx, name, products, index }: CategoryProps) => {
     const classes = useStyles();
     const { removeCategory, setCategoryForm, setCategoryEditMode } = useProduct();
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -82,7 +83,9 @@ const Category = ({ name, products, index }: CategoryProps) => {
 
     const handleDeleteOkClick = useCallback(() => {
         removeCategory(clickedCategory.idx);
-    }, [removeCategory, clickedCategory]);
+        setCategoryForm(-1, "");
+        setCategoryEditMode(false);
+    }, [removeCategory, clickedCategory, setCategoryForm, setCategoryEditMode]);
 
     const handleDeleteCancelClick = useCallback(() => {
         setIsModalOpen(false);
@@ -106,7 +109,7 @@ const Category = ({ name, products, index }: CategoryProps) => {
                                 item
                                 xs={1}
                                 className={clsx(classes.rightAlign, classes.hover)}
-                                data-idx={index}
+                                data-idx={categoryIdx}
                                 data-name={name}
                                 onClick={handleEditClick}
                             >
@@ -116,7 +119,7 @@ const Category = ({ name, products, index }: CategoryProps) => {
                                 item
                                 xs={1}
                                 className={clsx(classes.rightAlign, classes.hover)}
-                                data-idx={index}
+                                data-idx={categoryIdx}
                                 data-name={name}
                                 onClick={handleDeleteClick}
                             >
