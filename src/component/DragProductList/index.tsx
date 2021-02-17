@@ -44,7 +44,14 @@ interface DragProductListProps {
 
 const DragProductList = ({ categories }: DragProductListProps) => {
     const classes = useStyles();
-    const { moveCategory, moveProduct } = useProduct();
+    const {
+        moveCategory,
+        moveProduct,
+        setCategoryForm,
+        setProductForm,
+        setCategoryEditMode,
+        setProductEditMode,
+    } = useProduct();
 
     const onDragEnd = useCallback(
         (result: DropResult) => {
@@ -59,6 +66,8 @@ const DragProductList = ({ categories }: DragProductListProps) => {
 
                 // 카테고리 옮기기
                 if (result.type === "CATEGORY") {
+                    setCategoryForm(-1, "");
+                    setCategoryEditMode(false);
                     moveCategory(source.index, destination.index);
                     return;
                 }
@@ -66,10 +75,20 @@ const DragProductList = ({ categories }: DragProductListProps) => {
                 // 상품 옮기기
                 const currentIdx = categories.findIndex((category) => category.name === source.droppableId);
                 const nextIdx = categories.findIndex((category) => category.name === destination.droppableId);
+                setProductForm(-1, "", "", "");
+                setProductEditMode(false);
                 moveProduct(currentIdx, nextIdx, source.index, destination.index);
             }
         },
-        [categories, moveCategory, moveProduct]
+        [
+            categories,
+            moveCategory,
+            moveProduct,
+            setCategoryForm,
+            setProductForm,
+            setCategoryEditMode,
+            setProductEditMode,
+        ]
     );
     const board = (
         <Droppable droppableId="category" type="CATEGORY">
@@ -79,6 +98,7 @@ const DragProductList = ({ categories }: DragProductListProps) => {
                         return (
                             <Category
                                 key={category.idx}
+                                categoryIdx={category.idx}
                                 index={index}
                                 name={category.name}
                                 products={category.products.map((product) => ({

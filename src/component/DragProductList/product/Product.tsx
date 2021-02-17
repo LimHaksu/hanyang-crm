@@ -75,7 +75,9 @@ const Product = ({ product, isDragging, provided }: ProductProps) => {
 
     const handleDeleteOkClick = useCallback(() => {
         removeProduct(clickedProduct.idx);
-    }, [removeProduct, clickedProduct]);
+        setProductForm(-1, "", "", "");
+        setProductEditMode(false);
+    }, [removeProduct, clickedProduct.idx, setProductForm, setProductEditMode]);
 
     const handleDeleteCancelClick = useCallback(() => {
         setIsModalOpen(false);
