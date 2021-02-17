@@ -6,12 +6,13 @@ import { getTimeWithOpeningHour } from "util/time";
  * @param receivedDatetime 1970-01-01 기준 milliseconds 값
  * @param cidMachineIdx USB 목록에서 선택한 항목의 순서(가장위가 0번)
  * @param phoneNumber dash(-)포함한 문자열
+ * @return 새로 추가된 자료의 행 번호 (1부터 시작)
  */
-export const addPhoneRecord = async (receivedDatetime: number, cidMachineIdx: number, phoneNumber: string) => {
-    const query = `INSERT INTO 
-    phone_call_record(received_datetime, phone_number, cid_machine_idx)
-    VALUES(?,?,?);`;
+export const addPhoneCallRecord = async (receivedDatetime: number, cidMachineIdx: number, phoneNumber: string) => {
     try {
+        const query = `INSERT INTO 
+        phone_call_record(received_datetime, cid_machine_idx, phone_number)
+        VALUES(?,?,?);`;
         const data = await insert(query, receivedDatetime, cidMachineIdx, phoneNumber);
         return data;
     } catch (e) {
@@ -26,12 +27,12 @@ export const addPhoneRecord = async (receivedDatetime: number, cidMachineIdx: nu
  * @param date 일
  */
 export const getPhoneCallRecords = async (year: number, month: number, date: number) => {
-    const query = `SELECT received_datetime, phone_number, cid_machine_idx, order_idx
-    FROM phone_call_record
-    WHERE received_datetime between ? and ?;`;
-    const searchedDate = getTimeWithOpeningHour(new Date(year, month, date).getTime());
-    const nextDate = searchedDate + 86_400_000; // 24 * 60 * 60 * 1000
     try {
+        const query = `SELECT received_datetime, phone_number, cid_machine_idx, order_idx
+        FROM phone_call_record
+        WHERE received_datetime between ? and ?;`;
+        const searchedDate = getTimeWithOpeningHour(new Date(year, month, date).getTime());
+        const nextDate = searchedDate + 86_400_000; // 24 * 60 * 60 * 1000
         const rows = await select<PhoneCallRecord>(query, searchedDate, nextDate);
         return rows;
     } catch (e) {
