@@ -89,22 +89,9 @@ interface OrderForList {
 export const getOrders = async (year: number, month: number, date: number) => {
     /**
      * 주문시각, 고객명, 전화번호, 배송지, 상품명, 요청사항, 결제방법, 가격
-     *
-     * 로직
      * order: idx, order_datetime, customer_idx, payment_method, request
      * customer: idx, phone_number, name, address, request
      * order_product: order_idx, product_idx, product_count
-     *
-     * select order_datetime, customer_name, phone_number, address, order_request, customer_request, payment_method
-     * from order a join customer b
-     * on a.customer_idx = b.idx
-     * where a.idx = (? orderIdx)
-     *
-     * select b.product_name, b.product_price, a.product_count
-     * from order_product a join product b
-     * on a.product_idx = b.idx
-     * where order_idx = (? orderIdx)
-     *
      */
     try {
         const querySelectOrder = `SELECT a.idx order_idx, order_datetime, b.name customer_name, phone_number, address, a.request order_request, b.request customer_request, payment_method
