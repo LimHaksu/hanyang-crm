@@ -1,13 +1,13 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback } from "react";
 import Category from "./Category";
-import reorder, { reorderCategories } from "./reorder";
 import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
+import { makeStyles, createStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
-import { CategoryType } from "./data";
+import { Category as CategoryType } from "module/product";
+import useProduct from "hook/useProduct";
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
     createStyles({
         root: {
             width: "100%",
@@ -39,17 +39,12 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 interface DragProductListProps {
-    initial: CategoryType[];
+    categories: CategoryType[];
 }
 
-const getCategoryByIdx = (categories: CategoryType[], categoryIdx: number) => {
-    return categories.find((category) => category.idx === categoryIdx);
-};
-
-const DragProductList = ({ initial }: DragProductListProps) => {
+const DragProductList = ({ categories }: DragProductListProps) => {
     const classes = useStyles();
-    const [categories, setCategories] = useState(initial);
-    const [ordered, setOrdered] = useState(initial.map((category) => category.idx));
+    const { moveCategory, moveProduct } = useProduct();
 
     const onDragEnd = useCallback(
         (result: DropResult) => {
@@ -62,36 +57,34 @@ const DragProductList = ({ initial }: DragProductListProps) => {
                     return;
                 }
 
-                // reordering column
+                // 카테고리 옮기기
                 if (result.type === "CATEGORY") {
-                    const newOrdered = reorder(ordered, source.index, destination.index);
-                    setOrdered(newOrdered);
+                    moveCategory(source.index, destination.index);
                     return;
                 }
 
-                const newCategories = reorderCategories({
-                    categories: categories,
-                    source,
-                    destination,
-                });
-                setCategories(newCategories);
+                // 상품 옮기기
+                const currentIdx = categories.findIndex((category) => category.name === source.droppableId);
+                const nextIdx = categories.findIndex((category) => category.name === destination.droppableId);
+                moveProduct(currentIdx, nextIdx, source.index, destination.index);
             }
         },
-        [categories, ordered]
+        [categories, moveCategory, moveProduct]
     );
-
     const board = (
         <Droppable droppableId="category" type="CATEGORY">
             {(provided) => (
                 <div className={classes.container} ref={provided.innerRef} {...provided.droppableProps}>
-                    {ordered.map((categoryIdx, index) => {
-                        const category = getCategoryByIdx(categories, categoryIdx)!;
+                    {categories.map((category, index) => {
                         return (
                             <Category
-                                key={categoryIdx}
+                                key={category.idx}
                                 index={index}
                                 name={category.name}
-                                products={category.products}
+                                products={category.products.map((product) => ({
+                                    ...product,
+                                    categoryIdx: "" + category.idx,
+                                }))}
                             />
                         );
                     })}
@@ -122,4 +115,4 @@ const DragProductList = ({ initial }: DragProductListProps) => {
     );
 };
 
-export default DragProductList;
+export default React.memo(DragProductList);

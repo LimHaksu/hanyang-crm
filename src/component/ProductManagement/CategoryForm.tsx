@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import LabelIcon from "@material-ui/icons/Label";
@@ -32,21 +32,36 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const CategoryForm = () => {
     const classes = useStyles();
-    const [categoryName, setCategoryName] = useState("");
-    const { addCategory } = useProduct();
+    const {
+        categoryForm,
+        setCategoryForm,
+        addCategory,
+        editCategory,
+        isCategoryEditMode,
+        setCategoryEditMode,
+    } = useProduct();
 
     const handleAddCategoryClick = useCallback(() => {
-        addCategory(100, categoryName, "f");
-        setCategoryName("");
-    }, [addCategory, categoryName]);
+        if (isCategoryEditMode) {
+            editCategory(categoryForm.idx, categoryForm.name);
+        } else {
+            addCategory(categoryForm.name);
+        }
+        setCategoryForm(categoryForm.idx, "");
+        setCategoryEditMode(false);
+    }, [addCategory, editCategory, setCategoryForm, categoryForm, setCategoryEditMode, isCategoryEditMode]);
 
     const handleCancelCategoryClick = useCallback(() => {
-        setCategoryName("");
-    }, []);
+        setCategoryForm(-1, "");
+        setCategoryEditMode(false);
+    }, [setCategoryForm, setCategoryEditMode]);
 
-    const onCategoryNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        setCategoryName(e.target.value);
-    }, []);
+    const onCategoryNameChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            setCategoryForm(categoryForm.idx, e.target.value);
+        },
+        [setCategoryForm, categoryForm.idx]
+    );
 
     return (
         <Paper className={classes.category}>
@@ -56,7 +71,7 @@ const CategoryForm = () => {
                     label="이름"
                     icon={<LabelIcon />}
                     className={classes.textField}
-                    value={categoryName}
+                    value={categoryForm.name}
                     onChange={onCategoryNameChange}
                 />
                 <Box display="flex">
@@ -67,9 +82,9 @@ const CategoryForm = () => {
                             variant="contained"
                             color="primary"
                             onClick={handleAddCategoryClick}
-                            disabled={!categoryName}
+                            disabled={!categoryForm.name}
                         >
-                            추가
+                            {isCategoryEditMode ? "수정" : "추가"}
                         </Button>
                         <Button
                             className={classes.button}

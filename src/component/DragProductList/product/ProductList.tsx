@@ -3,7 +3,7 @@ import { Droppable, Draggable } from "react-beautiful-dnd";
 import Product from "./Product";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
-import { ProductType } from "../data";
+import { Product as ProductType } from "module/product";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -29,7 +29,7 @@ const InnerProductList = React.memo(({ products }: InnerQuoteListProps) => {
                 <Draggable key={product.idx} draggableId={`${product.idx}`} index={index}>
                     {(dragProvided, dragSnapshot) => (
                         <Product
-                            key={product.price}
+                            key={product.idx}
                             product={product}
                             isDragging={dragSnapshot.isDragging}
                             provided={dragProvided}
