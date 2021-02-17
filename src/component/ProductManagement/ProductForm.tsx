@@ -78,16 +78,16 @@ const ProductForm = () => {
     const [selectedCategoryIdx, setSelectedCategoryIdx] = useState("");
     const { categories, addProduct } = useProduct();
     const [productName, setProductName] = useState("");
-    const [productPrice, setProductPrice] = useState<number>(0);
+    const [productPrice, setProductPrice] = useState("");
 
     const resetProductForm = useCallback(() => {
         setSelectedCategoryIdx("");
         setProductName("");
-        setProductPrice(0);
+        setProductPrice("");
     }, []);
 
     const handleAddProductClick = useCallback(() => {
-        addProduct(100, productName, productPrice, "f", parseInt(selectedCategoryIdx, 10));
+        addProduct(100, productName, parseInt(productPrice, 10), "f", parseInt(selectedCategoryIdx, 10));
         resetProductForm();
     }, [addProduct, productName, productPrice, selectedCategoryIdx, resetProductForm]);
 
@@ -100,8 +100,7 @@ const ProductForm = () => {
     }, []);
 
     const onProductPriceChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setProductPrice(value ? parseInt(value.replace(/,/g, ""), 10) : 0);
+        setProductPrice(e.target.value.replace(/,/g, ""));
     }, []);
 
     const validate = useCallback(() => Number.isInteger(selectedCategoryIdx) && productName && productPrice, [
@@ -138,7 +137,7 @@ const ProductForm = () => {
                 <StyledTextField
                     label="가격"
                     icon={<Money />}
-                    value={productPrice.toLocaleString()}
+                    value={productPrice && parseInt(productPrice, 10).toLocaleString()}
                     onChange={onProductPriceChange}
                 />
                 <Box display="flex">
