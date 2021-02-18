@@ -137,6 +137,7 @@ const CustomerInfo = ({ customerForm, setCustomerForm }: CustomerInfoProp) => {
     const validatePhoneNumber = useCallback(() => !!customerForm.phoneNumber, [customerForm.phoneNumber]);
     const validateAddress = useCallback(() => !!customerForm.address, [customerForm.address]);
 
+    const { customerName, phoneNumber, address, request } = customerForm;
     return (
         <Paper className={classes.paper}>
             <div className={classes.head}>고객정보</div>
@@ -145,7 +146,7 @@ const CustomerInfo = ({ customerForm, setCustomerForm }: CustomerInfoProp) => {
                     <StyledTextField
                         label="이름"
                         icon={<AccountBox />}
-                        value={customerForm.customerName}
+                        value={customerName ? customerName : ""}
                         onChange={handleCustomerNameChange}
                     />
                 </Grid>
@@ -155,7 +156,7 @@ const CustomerInfo = ({ customerForm, setCustomerForm }: CustomerInfoProp) => {
                         // value={insertDashIntoPhoneNumber(phoneNumber)}
                         onChange={handlePhoneNumberChange}
                         icon={<Phone />}
-                        value={customerForm.phoneNumber}
+                        value={phoneNumber}
                         error={!validatePhoneNumber()}
                         helperText={!validatePhoneNumber() ? "전화번호는 반드시 입력해야합니다." : undefined}
                     />
@@ -165,7 +166,7 @@ const CustomerInfo = ({ customerForm, setCustomerForm }: CustomerInfoProp) => {
                 label="주소"
                 className={classes.address}
                 icon={<Home />}
-                value={customerForm.address}
+                value={address ? address : ""}
                 onChange={handleAddressChange}
                 error={!validateAddress()}
                 helperText={!validateAddress() ? "주소는 반드시 입력해야합니다." : undefined}
@@ -174,7 +175,7 @@ const CustomerInfo = ({ customerForm, setCustomerForm }: CustomerInfoProp) => {
                 label="단골 요청사항"
                 className={classes.request}
                 icon={<Comment />}
-                value={customerForm.request}
+                value={request ? request : ""}
                 onChange={handleRequestChange}
             />
         </Paper>

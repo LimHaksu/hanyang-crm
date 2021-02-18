@@ -9,10 +9,12 @@ import {
     setCustomerManagementFormAction,
     setCustomerOrderFormEditModeAction,
     setCustomerManagementFormEditModeAction,
+    SearchBy,
 } from "module/customer";
+import { searchCustomersAsync } from "module/customer/saga";
 
 const useCustomer = () => {
-    const customers = useSelector((state: RootState) => state.customer.customers);
+    const customers = useSelector((state: RootState) => state.customer.customers.data);
     const customerOrderForm = useSelector((state: RootState) => state.customer.customerOrderForm);
     const customerManagementForm = useSelector((state: RootState) => state.customer.customerManagementForm);
     const isCustomerOrderFormEditMode = useSelector((state: RootState) => state.customer.isCustomerOrderFormEditMode);
@@ -21,6 +23,11 @@ const useCustomer = () => {
     );
 
     const dispatch = useDispatch();
+
+    const searchCustomer = useCallback(
+        (searchBy: SearchBy, keyword: string) => dispatch(searchCustomersAsync.request({ searchBy, keyword })),
+        [dispatch]
+    );
 
     const addCustomer = useCallback(
         (customerName: string, phoneNumber: string, address: string, request?: string) =>
@@ -64,6 +71,7 @@ const useCustomer = () => {
         customerManagementForm,
         isCustomerOrderFormEditMode,
         isCustomerManagementFormEditMode,
+        searchCustomer,
         addCustomer,
         editCustomer,
         removeCustomer,

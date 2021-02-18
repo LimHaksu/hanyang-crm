@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles, createStyles, Theme, fade } from "@material-ui/core/styles";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -7,28 +7,15 @@ import Select from "@material-ui/core/Select";
 import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@material-ui/core/InputBase";
 import Box from "@material-ui/core/Box";
+import useCustomer from "hook/useCustomer";
+import { SearchBy } from "module/customer";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
-        root: {},
         title: {
             fontWeight: "bold",
             fontSize: "1.2rem",
             padding: 10,
-        },
-        tableHead: {
-            "& th": {
-                fontWeight: "bold",
-                fontSize: "1.2rem",
-                cursor: "default",
-            },
-        },
-        row: {
-            "& > *": {
-                borderBottom: "unset",
-                fontSize: "1.1rem",
-                cursor: "pointer",
-            },
         },
         formControl: {
             margin: theme.spacing(1),
@@ -99,8 +86,31 @@ const SelectBox = ({ value, onChange }: SelectBoxProps) => {
     );
 };
 
-const Search = () => {
+interface SearchProp {
+    searchBy: SearchBy;
+}
+
+const Search = ({ searchBy }: SearchProp) => {
     const classes = useStyles();
+    const [keyword, setKeyword] = useState("");
+    const { searchCustomer } = useCustomer();
+
+    const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setKeyword(e.target.value);
+    }, []);
+
+    const handleSubmit = useCallback(() => {
+        searchCustomer(searchBy, keyword);
+    }, [searchCustomer, searchBy, keyword]);
+
+    const handleEnter = useCallback(
+        (e) => {
+            if (e.key === "Enter") {
+                handleSubmit();
+            }
+        },
+        [handleSubmit]
+    );
 
     return (
         <Box className={classes.search} display="flex">
@@ -111,8 +121,11 @@ const Search = () => {
                     input: classes.inputInput,
                 }}
                 inputProps={{ "aria-label": "search" }}
+                onChange={handleInputChange}
+                onKeyUp={handleEnter}
+                value={keyword}
             />
-            <div className={classes.searchIcon}>
+            <div className={classes.searchIcon} onClick={handleSubmit}>
                 <SearchIcon />
             </div>
         </Box>
@@ -121,18 +134,18 @@ const Search = () => {
 
 const CustomerSearch = () => {
     const classes = useStyles();
-    const [column, setColumn] = useState("name");
+    const [searchBy, setSearchBy] = useState<SearchBy>("name");
 
     const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-        setColumn(event.target.value as string);
+        setSearchBy(event.target.value as SearchBy);
     };
 
     return (
         <Paper>
             <div className={classes.title}>고객 검색</div>
             <Box display="flex">
-                <SelectBox value={column} onChange={handleChange} />
-                <Search />
+                <SelectBox value={searchBy} onChange={handleChange} />
+                <Search searchBy={searchBy} />
             </Box>
         </Paper>
     );

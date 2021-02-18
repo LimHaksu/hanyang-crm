@@ -1,4 +1,5 @@
 import { insert, select, update, deleteQuery, Customer } from "./db";
+import { getSnakeCaseString, changePropertyFromSnakeToCamel } from "util/db";
 
 /**
  * 고객정보를 입력하여 등록함
@@ -20,16 +21,22 @@ export const addCustomer = async (phoneNumber: string, name: string, address: st
 
 /**
  * 검색기준과 검색어를 입력하면 검색 결과 고객리스트 반환
- * @param by 검색 기준 - name , phoneNumber, address
+ * @param searchBy 검색 기준 - name , phoneNumber, address
  * @param searchKekword 검색어
  */
-export const getCustomers = async (by: "name" | "phoneNumber" | "address", searchKekword: string) => {
+export const getCustomers = async ({
+    searchBy,
+    keyword,
+}: {
+    searchBy: "name" | "phoneNumber" | "address";
+    keyword: string;
+}) => {
     try {
         const query = `SELECT idx, phone_number, name, address, request
         FROM customer
-        WHERE ${by} like %?%;`;
-        const customers = await select<Customer>(query, searchKekword);
-        return customers;
+        WHERE ${getSnakeCaseString(searchBy)} like ?;`;
+        const customers = await select<Customer>(query, `%${keyword}%`);
+        return changePropertyFromSnakeToCamel(customers);
     } catch (e) {
         throw e;
     }
