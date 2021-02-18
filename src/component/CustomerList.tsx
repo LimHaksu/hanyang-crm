@@ -154,11 +154,22 @@ const CustomerList = ({ customers }: CustomerListProp) => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {customers.map((customer) => {
+                        {customers.map((customer, rowIdx) => {
                             const { idx, customerName, phoneNumber, address, request } = customer;
                             return (
                                 <StyledTableRow hover role="checkbox" key={customer.idx}>
                                     {columns.map((column) => {
+                                        if (column.id === "idx") {
+                                            return (
+                                                <TableCell
+                                                    className={classes.cell}
+                                                    key={column.id}
+                                                    align={column.align}
+                                                >
+                                                    {rowIdx + 1}
+                                                </TableCell>
+                                            );
+                                        }
                                         if (column.id === "edit") {
                                             return (
                                                 <TableCell
