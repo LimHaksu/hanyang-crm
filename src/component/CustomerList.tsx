@@ -109,7 +109,7 @@ const CustomerList = ({ customers }: CustomerListProp) => {
     const [clickedCustomer, setClickedCustomer] = useState<Customer>();
 
     const handleEditClick = useCallback(
-        (idx: number, customerName: string, phoneNumber: string, address: string, request?: string) => () => {
+        (idx: number, customerName: string, phoneNumber: string, address: string, request: string) => () => {
             setCustomerManagementForm(idx, customerName, phoneNumber, address, request);
             setCustomerManagementFormEditMode(true);
         },

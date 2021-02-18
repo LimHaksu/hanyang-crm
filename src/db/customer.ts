@@ -8,12 +8,21 @@ import { getSnakeCaseString, changePropertyFromSnakeToCamel } from "util/db";
  * @param address 주소
  * @param request 단골 요청사항
  */
-export const addCustomer = async (phoneNumber: string, name: string, address: string, request: string) => {
+export const addCustomer = async ({
+    phoneNumber,
+    name,
+    address,
+    request,
+}: {
+    phoneNumber: string;
+    name: string;
+    address: string;
+    request: string;
+}) => {
     try {
         const query = `INSERT INTO customer(phone_number, name, address, request)
         VALUES(?,?,?,?);`;
-        const lastId = await insert(query, phoneNumber, name, address, request);
-        return lastId;
+        await insert(query, phoneNumber, name, address, request);
     } catch (e) {
         throw e;
     }

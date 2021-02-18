@@ -74,7 +74,7 @@ interface CustomerInfoProp {
         customerName: string,
         phoneNumber: string,
         address: string,
-        request?: string
+        request: string
     ) => PayloadAction<typeof SET_CUSTOMER_ORDER_FORM | typeof SET_CUSTOMER_MANAGEMENT_FORM, CustomerForm>;
 }
 
