@@ -39,6 +39,7 @@ const useStyles = makeStyles((theme: Theme) =>
         readOnly: {
             "& .MuiSelect-select": {
                 cursor: "not-allowed",
+                backgroundColor: "#eee",
             },
         },
     })
@@ -81,7 +82,6 @@ const StyledSelect = ({ label, icon, className, value, children, onChange, readO
 
 const ProductForm = () => {
     const classes = useStyles();
-    const [selectedCategoryIdx, setSelectedCategoryIdx] = useState("");
     const {
         productForm,
         setProductForm,
@@ -93,7 +93,6 @@ const ProductForm = () => {
     } = useProduct();
 
     const resetProductForm = useCallback(() => {
-        setSelectedCategoryIdx("");
         setProductForm(-1, "", "", "");
         setProductEditMode(false);
     }, [setProductForm, setProductEditMode]);
@@ -103,23 +102,30 @@ const ProductForm = () => {
         if (isProductEditMode) {
             editProduct(+idx, +categoryIdx, name, +price);
         } else {
-            addProduct(name, +price, +selectedCategoryIdx);
+            addProduct(name, +price, +productForm.categoryIdx);
         }
         resetProductForm();
-    }, [addProduct, editProduct, productForm, selectedCategoryIdx, resetProductForm, isProductEditMode]);
+    }, [addProduct, editProduct, productForm, resetProductForm, isProductEditMode]);
 
     const handleCancelProductClick = useCallback(() => {
         resetProductForm();
     }, [resetProductForm]);
 
-    const onProductNameChange = useCallback(
+    const handleCategoryNameChange = useCallback(
+        (e) => {
+            setProductForm(productForm.idx, e.target.value, productForm.name, productForm.price);
+        },
+        [setProductForm, productForm.idx, productForm.name, productForm.price]
+    );
+
+    const handleProductNameChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             setProductForm(productForm.idx, productForm.categoryIdx, e.target.value, productForm.price);
         },
         [setProductForm, productForm.idx, productForm.categoryIdx, productForm.price]
     );
 
-    const onProductPriceChange = useCallback(
+    const handleProductPriceChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             setProductForm(
                 productForm.idx,
@@ -129,12 +135,6 @@ const ProductForm = () => {
             );
         },
         [setProductForm, productForm.idx, productForm.categoryIdx, productForm.name]
-    );
-
-    const validate = useCallback(
-        () =>
-            (productForm.categoryIdx || Number.isInteger(selectedCategoryIdx)) && productForm.name && productForm.price,
-        [selectedCategoryIdx, productForm.categoryIdx, productForm.name, productForm.price]
     );
 
     const getPriceLocale = useCallback((price: string) => {
@@ -149,12 +149,18 @@ const ProductForm = () => {
             return (+price).toLocaleString();
         } else {
             const newPrice = price.substring(0, price.length - 1);
-            if (newPrice.length > 0) {
+            if (newPrice.length > 2) {
                 return (+newPrice).toLocaleString();
             }
-            return "";
+            return newPrice;
         }
     }, []);
+
+    const validate = useCallback(
+        () => productForm.categoryIdx && productForm.name && getPriceLocale(productForm.price),
+        [productForm.categoryIdx, productForm.name, productForm.price, getPriceLocale]
+    );
+
     return (
         <Paper className={classes.product}>
             <div className={classes.title}>상품</div>
@@ -163,10 +169,8 @@ const ProductForm = () => {
                     className={isProductEditMode ? classes.readOnly : ""}
                     label="카테고리"
                     icon={<LabelIcon />}
-                    onChange={(e: React.ChangeEvent<{ value: unknown }>) => {
-                        setSelectedCategoryIdx(e.target.value as string);
-                    }}
-                    value={isProductEditMode ? productForm.categoryIdx : selectedCategoryIdx}
+                    onChange={handleCategoryNameChange}
+                    value={isProductEditMode ? productForm.categoryIdx : productForm.categoryIdx}
                     readOnly={isProductEditMode}
                 >
                     {categories.map((category, idx) => (
@@ -180,13 +184,13 @@ const ProductForm = () => {
                     icon={<RestaurantMenuIcon />}
                     className={classes.textField}
                     value={productForm.name}
-                    onChange={onProductNameChange}
+                    onChange={handleProductNameChange}
                 />
                 <StyledTextField
                     label="가격"
                     icon={<Money />}
                     value={getPriceLocale(productForm.price)}
-                    onChange={onProductPriceChange}
+                    onChange={handleProductPriceChange}
                 />
                 <Box display="flex">
                     <Box flexGrow={1}></Box>
