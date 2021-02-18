@@ -38,6 +38,9 @@ export const SET_CUSTOMER_ORDER_FORM = "customer/SET_CUSTOMER_ORDER_FORM";
 export const SET_CUSTOMER_MANAGEMENT_FORM = "customer/SET_CUSTOMER_MANAGEMENT_FORM";
 const SET_CUSTOMER_ORDER_FORM_EDIT_MODE = "customer/SET_CUSTOMER_ORDER_FORM_EDIT_MODE";
 const SET_CUSTOMER_MANAGEMENT_FORM_EDIT_MODE = "customer/SET_CUSTOMER_MANAGEMENT_FORM_EDIT_MODE";
+const SET_ADD_SUCCESS = "customer/SET_ADD_SUCCESS";
+const SET_EDIT_SUCCESS = "customer/SET_EDIT_SUCCESS";
+const SET_REMOVE_SUCCESS = "customer/SET_REMOVE_SUCCESS";
 
 export const searchCustomers = createAction(SEARCH_CUSTOMERS)();
 export const searchCustomersSuccess = createAction(SEARCH_CUSTOMERS_SUCCESS)<Customer[]>();
@@ -87,6 +90,19 @@ export const setCustomerManagementFormEditModeAction = createAction(
     (isEditMode: boolean) => isEditMode
 )();
 
+export const setAddSuccessAction = createAction(
+    SET_ADD_SUCCESS,
+    (isAddCustomerSuccess: boolean) => isAddCustomerSuccess
+)();
+export const setEditSuccessAction = createAction(
+    SET_EDIT_SUCCESS,
+    (isEditCustomerSuccess: boolean) => isEditCustomerSuccess
+)();
+export const setRemoveSuccessAction = createAction(
+    SET_REMOVE_SUCCESS,
+    (isRemoveCustomerSuccess: boolean) => isRemoveCustomerSuccess
+)();
+
 const actions = {
     searchCustomers,
     searchCustomersSuccess,
@@ -108,6 +124,9 @@ const actions = {
     setCustomerManagementFormAction,
     setCustomerOrderFormEditModeAction,
     setCustomerManagementFormEditModeAction,
+    setAddSuccessAction,
+    setEditSuccessAction,
+    setRemoveSuccessAction,
 };
 
 interface CustomerState {
@@ -116,9 +135,9 @@ interface CustomerState {
     customerManagementForm: CustomerForm;
     isCustomerOrderFormEditMode: boolean;
     isCustomerManagementFormEditMode: boolean;
-    addState: { loading: boolean; error: Error | null };
-    editState: { loading: boolean; error: Error | null };
-    removeState: { loading: boolean; error: Error | null };
+    addState: { loading: boolean; error: Error | null; isSuccess: boolean };
+    editState: { loading: boolean; error: Error | null; isSuccess: boolean };
+    removeState: { loading: boolean; error: Error | null; isSuccess: boolean };
 }
 
 const initialState: CustomerState = {
@@ -134,9 +153,9 @@ const initialState: CustomerState = {
     customerManagementForm: { customerName: "", address: "", phoneNumber: "", request: "" },
     isCustomerOrderFormEditMode: false,
     isCustomerManagementFormEditMode: false,
-    addState: { loading: false, error: null },
-    editState: { loading: false, error: null },
-    removeState: { loading: false, error: null },
+    addState: { loading: false, error: null, isSuccess: false },
+    editState: { loading: false, error: null, isSuccess: false },
+    removeState: { loading: false, error: null, isSuccess: false },
 };
 
 type CustomerAction = ActionType<typeof actions>;
@@ -160,29 +179,41 @@ const customer = createReducer<CustomerState, CustomerAction>(initialState, {
         },
     }),
 
-    [ADD_CUSTOMER]: (state) => ({ ...state, addState: { loading: true, error: null } }),
-    [ADD_CUSTOMER_SUCCESS]: (state) => ({ ...state, addState: { loading: false, error: null } }),
-    [ADD_CUSTOMER_ERROR]: (state, { payload: error }) => ({ ...state, addState: { loading: false, error } }),
+    [ADD_CUSTOMER]: (state) => ({ ...state, addState: { loading: true, error: null, isSuccess: false } }),
+    [ADD_CUSTOMER_SUCCESS]: (state) => ({ ...state, addState: { loading: false, error: null, isSuccess: true } }),
+    [ADD_CUSTOMER_ERROR]: (state, { payload: error }) => ({
+        ...state,
+        addState: { loading: false, error, isSuccess: false },
+    }),
 
-    [EDIT_CUSTOMER]: (state) => ({ ...state, editState: { loading: true, error: null } }),
+    [EDIT_CUSTOMER]: (state) => ({ ...state, editState: { loading: true, error: null, isSuccess: false } }),
     [EDIT_CUSTOMER_SUCCESS]: (state, { payload: customer }) =>
         produce(state, (draft) => {
-            const foundIdx = draft.customers.data?.findIndex((c) => c.idx === customer.idx);
-            if (foundIdx && foundIdx >= 0) {
-                draft.customers.data![foundIdx] = customer;
+            console.log(customer);
+            const foundIdx = draft.customers.data.findIndex((c) => c.idx === customer.idx);
+            if (foundIdx >= 0) {
+                draft.customers.data[foundIdx] = customer;
             }
             draft.editState.loading = false;
+            draft.editState.isSuccess = true;
         }),
-    [EDIT_CUSTOMER_ERROR]: (state, { payload: error }) => ({ ...state, editState: { loading: false, error } }),
+    [EDIT_CUSTOMER_ERROR]: (state, { payload: error }) => ({
+        ...state,
+        editState: { loading: false, error, isSuccess: false },
+    }),
 
-    [REMOVE_CUSTOMER]: (state) => ({ ...state, removeState: { loading: true, error: null } }),
+    [REMOVE_CUSTOMER]: (state) => ({ ...state, removeState: { loading: true, error: null, isSuccess: false } }),
     [REMOVE_CUSTOMER_SUCCESS]: (state, { payload: idx }) =>
         produce(state, (draft) => {
-            const foundIdx = draft.customers.data?.findIndex((customer) => customer.idx === idx);
+            const foundIdx = draft.customers.data.findIndex((customer) => customer.idx === idx);
             draft.customers.data?.splice(foundIdx!, 1);
             draft.removeState.loading = false;
+            draft.removeState.isSuccess = true;
         }),
-    [REMOVE_CUSTOMER_ERROR]: (state, { payload: error }) => ({ ...state, removeState: { loading: false, error } }),
+    [REMOVE_CUSTOMER_ERROR]: (state, { payload: error }) => ({
+        ...state,
+        removeState: { loading: false, error, isSuccess: false },
+    }),
 
     [SET_CUSTOMER_ORDER_FORM]: (state, { payload: customerOrderForm }) => ({
         ...state,
@@ -200,6 +231,18 @@ const customer = createReducer<CustomerState, CustomerAction>(initialState, {
         ...state,
         isCustomerManagementFormEditMode: isEditMode,
     }),
+    [SET_ADD_SUCCESS]: (state, { payload: isAddCustomerSuccess }) =>
+        produce(state, (draft) => {
+            draft.addState.isSuccess = isAddCustomerSuccess;
+        }),
+    [SET_EDIT_SUCCESS]: (state, { payload: isEditCustomerSuccess }) =>
+        produce(state, (draft) => {
+            draft.editState.isSuccess = isEditCustomerSuccess;
+        }),
+    [SET_REMOVE_SUCCESS]: (state, { payload: isRemoveCustomerSuccess }) =>
+        produce(state, (draft) => {
+            draft.removeState.isSuccess = isRemoveCustomerSuccess;
+        }),
 });
 
 export default customer;

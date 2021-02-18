@@ -7,6 +7,7 @@ import Button from "@material-ui/core/Button";
 import CustomerInfo from "component/CustomerInfo";
 import CustomerList from "component/CustomerList";
 import useCustomer from "hook/useCustomer";
+import Modal from "component/Modal";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -46,6 +47,11 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         submitButton: {
             marginRight: 10,
+        },
+        modalMessage: {
+            fontWeight: "bold",
+            fontSize: "1.2rem",
+            marginBottom: "20px",
         },
     })
 );
@@ -113,22 +119,82 @@ const SubmitCustomer = () => {
     );
 };
 
+const Modals = () => {
+    const classes = useStyles();
+    const {
+        isAddCustomerSuccess,
+        isEditCustomerSuccess,
+        isRemoveCustomerSuccess,
+        setAddSuccess,
+        setEditSuccess,
+        setRemoveSuccess,
+    } = useCustomer();
+
+    const handleOkButtonClick = useCallback(
+        (setSuccess) => () => {
+            setSuccess(false);
+        },
+        []
+    );
+
+    return (
+        <>
+            <Modal open={isAddCustomerSuccess} setOpen={setAddSuccess}>
+                <Box display="flex" flexDirection="column">
+                    <div className={classes.modalMessage}>고객 정보 추가 성공</div>
+                    <Box display="flex" justifyContent="space-around">
+                        <Button variant="contained" color="primary" onClick={handleOkButtonClick(setAddSuccess)}>
+                            확인
+                        </Button>
+                    </Box>
+                </Box>
+            </Modal>
+            <Modal open={isEditCustomerSuccess} setOpen={setEditSuccess}>
+                <Box display="flex" flexDirection="column">
+                    <div className={classes.modalMessage}>고객 정보 수정 성공</div>
+                    <Box display="flex" justifyContent="space-around">
+                        <Button variant="contained" color="primary" onClick={handleOkButtonClick(setEditSuccess)}>
+                            확인
+                        </Button>
+                    </Box>
+                </Box>
+            </Modal>
+            <Modal open={isRemoveCustomerSuccess} setOpen={setRemoveSuccess}>
+                <Box display="flex" flexDirection="column">
+                    <div className={classes.modalMessage}>고객 정보 삭제 성공</div>
+                    <Box display="flex" justifyContent="space-around">
+                        <Button variant="contained" color="primary" onClick={handleOkButtonClick(setRemoveSuccess)}>
+                            확인
+                        </Button>
+                    </Box>
+                </Box>
+            </Modal>
+        </>
+    );
+};
+
 export const CustomerManagementPage = () => {
     const classes = useStyles();
     const { customers, customerManagementForm, setCustomerManagementForm } = useCustomer();
 
     return (
-        <Paper className={classes.root}>
-            <Box display="flex">
-                <Box className={classes.leftSide}>
-                    <CustomerSearch />
-                    <CustomerList customers={customers} />
+        <>
+            <Paper className={classes.root}>
+                <Box display="flex">
+                    <Box className={classes.leftSide}>
+                        <CustomerSearch />
+                        <CustomerList customers={customers} />
+                    </Box>
+                    <Box className={classes.rightSide}>
+                        <CustomerInfo
+                            customerForm={customerManagementForm}
+                            setCustomerForm={setCustomerManagementForm}
+                        />
+                        <SubmitCustomer />
+                    </Box>
                 </Box>
-                <Box className={classes.rightSide}>
-                    <CustomerInfo customerForm={customerManagementForm} setCustomerForm={setCustomerManagementForm} />
-                    <SubmitCustomer />
-                </Box>
-            </Box>
-        </Paper>
+            </Paper>
+            <Modals />
+        </>
     );
 };

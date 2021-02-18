@@ -4,6 +4,7 @@ import Modal from "@material-ui/core/Modal";
 import Paper from "@material-ui/core/Paper";
 import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
+import { PayloadAction } from "typesafe-actions";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -23,7 +24,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface StyledModalProps {
     open: boolean;
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    setOpen: React.Dispatch<React.SetStateAction<boolean>> | ((param: boolean) => PayloadAction<string, boolean>);
     children: React.ReactNode;
 }
 

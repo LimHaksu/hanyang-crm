@@ -6,6 +6,9 @@ import {
     setCustomerManagementFormAction,
     setCustomerOrderFormEditModeAction,
     setCustomerManagementFormEditModeAction,
+    setAddSuccessAction,
+    setEditSuccessAction,
+    setRemoveSuccessAction,
     SearchBy,
 } from "module/customer";
 import { searchCustomersAsync, addCustomerAsync, editCustomerAsync, removeCustomerAsync } from "module/customer/saga";
@@ -18,6 +21,9 @@ const useCustomer = () => {
     const isCustomerManagementFormEditMode = useSelector(
         (state: RootState) => state.customer.isCustomerManagementFormEditMode
     );
+    const isAddCustomerSuccess = useSelector((state: RootState) => state.customer.addState.isSuccess);
+    const isEditCustomerSuccess = useSelector((state: RootState) => state.customer.editState.isSuccess);
+    const isRemoveCustomerSuccess = useSelector((state: RootState) => state.customer.removeState.isSuccess);
 
     const dispatch = useDispatch();
 
@@ -62,12 +68,30 @@ const useCustomer = () => {
         [dispatch]
     );
 
+    const setAddSuccess = useCallback(
+        (isAddCustomerSuccess: boolean) => dispatch(setAddSuccessAction(isAddCustomerSuccess)),
+        [dispatch]
+    );
+
+    const setEditSuccess = useCallback(
+        (isEditCustomerSuccess: boolean) => dispatch(setEditSuccessAction(isEditCustomerSuccess)),
+        [dispatch]
+    );
+
+    const setRemoveSuccess = useCallback(
+        (isRemoveCustomerSuccess: boolean) => dispatch(setRemoveSuccessAction(isRemoveCustomerSuccess)),
+        [dispatch]
+    );
+
     return {
         customers,
         customerOrderForm,
         customerManagementForm,
         isCustomerOrderFormEditMode,
         isCustomerManagementFormEditMode,
+        isAddCustomerSuccess,
+        isEditCustomerSuccess,
+        isRemoveCustomerSuccess,
         searchCustomer,
         addCustomer,
         editCustomer,
@@ -76,6 +100,9 @@ const useCustomer = () => {
         setCustomerManagementForm,
         setCustomerOrderFormEditMode,
         setCustomerManagementFormEditMode,
+        setAddSuccess,
+        setEditSuccess,
+        setRemoveSuccess,
     };
 };
 
