@@ -12,9 +12,21 @@ import {
     StatisticsPage,
 } from "page";
 
+export type Path =
+    | "/"
+    | "/phone-call-record"
+    | "/order-registry"
+    | "/statistics"
+    | "/product-management"
+    | "/customer-management"
+    | "/preferences"
+    | "/preferences/cid"
+    | "/preferences/printer"
+    | "/preferences/opening-hours";
+
 export interface tabRouteType {
     name: string;
-    path: string;
+    path: Path;
     component: React.FC;
 }
 

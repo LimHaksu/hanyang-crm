@@ -4,7 +4,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Link from "@material-ui/core/Link";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
-import { tabRouteType } from "route";
+import { tabRouteType, Path } from "route";
 import { useLocation } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
@@ -38,7 +38,7 @@ interface HeaderProps {
     subHeader?: boolean;
 }
 
-const isSelectedPath = (pathname: string, path: string) => {
+const isSelectedPath = (pathname: string, path: Path) => {
     if (path === "/") {
         return pathname === path;
     } else {
@@ -49,6 +49,7 @@ const isSelectedPath = (pathname: string, path: string) => {
 const Header = ({ tabRoutes, subHeader }: HeaderProps) => {
     const { pathname } = useLocation();
     const classes = useStyles();
+
     return (
         <AppBar position="static" className={subHeader ? classes.subHeader : ""}>
             <Toolbar>
