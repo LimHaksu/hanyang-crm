@@ -7,12 +7,16 @@ import {
     ADD_CUSTOMER,
     ADD_CUSTOMER_SUCCESS,
     ADD_CUSTOMER_ERROR,
+    EDIT_CUSTOMER,
+    EDIT_CUSTOMER_SUCCESS,
+    EDIT_CUSTOMER_ERROR,
 } from "./saga";
 
 export type SearchBy = "name" | "phoneNumber" | "address";
 
 export interface Customer {
     idx?: number;
+    name?: string;
     customerName: string;
     phoneNumber: string;
     address: string;
@@ -27,7 +31,6 @@ export interface CustomerForm {
     request: string;
 }
 
-const EDIT_CUSTOMER = "customer/EDIT_CUSTOMER";
 const REMOVE_CUSTOMER = "customer/REMOVE_CUSTOMER";
 
 export const SET_CUSTOMER_ORDER_FORM = "customer/SET_CUSTOMER_ORDER_FORM";
@@ -43,16 +46,9 @@ export const addCustomer = createAction(ADD_CUSTOMER)();
 export const addCustomerSuccess = createAction(ADD_CUSTOMER_SUCCESS)();
 export const addCustomerError = createAction(ADD_CUSTOMER_ERROR)<Error>();
 
-export const editCustomerAction = createAction(
-    EDIT_CUSTOMER,
-    (idx: number | undefined, customerName: string, phoneNumber: string, address: string, request: string) => ({
-        idx,
-        customerName,
-        phoneNumber,
-        address,
-        request,
-    })
-)();
+export const editCustomer = createAction(EDIT_CUSTOMER)();
+export const editCustomerSuccess = createAction(EDIT_CUSTOMER_SUCCESS)<Customer>();
+export const editCustomerError = createAction(EDIT_CUSTOMER_ERROR)<Error>();
 
 export const removeCustomerAction = createAction(REMOVE_CUSTOMER, (idx: number) => idx)();
 
@@ -92,10 +88,15 @@ const actions = {
     searchCustomers,
     searchCustomersSuccess,
     searchCustomersError,
+
     addCustomer,
     addCustomerSuccess,
     addCustomerError,
-    editCustomerAction,
+
+    editCustomer,
+    editCustomerSuccess,
+    editCustomerError,
+
     removeCustomerAction,
     setCustomerOrderFormAction,
     setCustomerManagementFormAction,
@@ -139,7 +140,7 @@ const customer = createReducer<CustomerState, CustomerAction>(initialState, {
         customers: {
             loading: false,
             error: null,
-            data: searchResults,
+            data: searchResults.map((row) => ({ ...row, customerName: row.name! })),
         },
     }),
     [SEARCH_CUSTOMERS_ERROR]: (state, { payload: searchResults }) => ({
@@ -155,18 +156,23 @@ const customer = createReducer<CustomerState, CustomerAction>(initialState, {
     [ADD_CUSTOMER_SUCCESS]: (state) => ({ ...state, addState: { loading: false, error: null } }),
     [ADD_CUSTOMER_ERROR]: (state, { payload: error }) => ({ ...state, addState: { loading: false, error } }),
 
-    [EDIT_CUSTOMER]: (state, { payload: customer }) =>
+    [EDIT_CUSTOMER]: (state) => ({ ...state, editState: { loading: true, error: null } }),
+    [EDIT_CUSTOMER_SUCCESS]: (state, { payload: customer }) =>
         produce(state, (draft) => {
             const foundIdx = draft.customers.data?.findIndex((c) => c.idx === customer.idx);
             if (foundIdx && foundIdx >= 0) {
                 draft.customers.data![foundIdx] = customer;
             }
+            draft.editState.loading = false;
         }),
+    [EDIT_CUSTOMER_ERROR]: (state, { payload: error }) => ({ ...state, editState: { loading: false, error } }),
+
     [REMOVE_CUSTOMER]: (state, { payload: idx }) =>
         produce(state, (draft) => {
             const foundIdx = draft.customers.data?.findIndex((customer) => customer.idx === idx);
             draft.customers.data?.splice(foundIdx!, 1);
         }),
+
     [SET_CUSTOMER_ORDER_FORM]: (state, { payload: customerOrderForm }) => ({
         ...state,
         customerOrderForm,

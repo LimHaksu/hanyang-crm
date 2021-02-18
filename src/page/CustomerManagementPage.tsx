@@ -64,7 +64,6 @@ const SubmitCustomer = () => {
     const handleSubmitButtonClick = useCallback(() => {
         const { idx, customerName, phoneNumber, address, request } = customerManagementForm;
         if (isCustomerManagementFormEditMode) {
-            console.log(customerManagementForm);
             editCustomer(idx!, customerName, phoneNumber, address, request);
             setCustomerManagementFormEditMode(false);
         } else {

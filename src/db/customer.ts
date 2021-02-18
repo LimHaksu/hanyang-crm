@@ -55,22 +55,28 @@ export const getCustomers = async ({
  * 고객 idx에 해당하는 고객 정보 수정
  * @param idx 고객 idx
  * @param phoneNumber 전화번호
- * @param name 고객 이름
+ * @param customerName 고객 이름
  * @param address 주소
  * @param request 고객 요청사항
  */
-export const editCustomer = async (
-    idx: number,
-    phoneNumber: string,
-    name: string,
-    address: string,
-    request: string
-) => {
+export const editCustomer = async ({
+    idx,
+    phoneNumber,
+    customerName,
+    address,
+    request,
+}: {
+    idx: number;
+    phoneNumber: string;
+    customerName: string;
+    address: string;
+    request: string;
+}) => {
     try {
         const query = `UPDATE customer
         SET phone_number = ?, name = ?, address = ?, request = ?
         WHERE idx = ?;`;
-        await update(query, phoneNumber, name, address, request, idx);
+        await update(query, phoneNumber, customerName, address, request, idx);
     } catch (e) {
         throw e;
     }
