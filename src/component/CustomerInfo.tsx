@@ -1,5 +1,6 @@
-import { useState } from "react";
+import React, { useCallback } from "react";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
+import { PayloadAction } from "typesafe-actions";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import Paper from "@material-ui/core/Paper";
@@ -8,6 +9,7 @@ import Phone from "@material-ui/icons/Phone";
 import Home from "@material-ui/icons/Home";
 import Comment from "@material-ui/icons/Comment";
 import { insertDashIntoPhoneNumber } from "util/phone";
+import { CustomerForm, SET_CUSTOMER_ORDER_FORM, SET_CUSTOMER_MANAGEMENT_FORM } from "module/customer";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -27,6 +29,9 @@ const useStyles = makeStyles((theme: Theme) =>
         request: {
             width: "438px",
         },
+        icon: {
+            marginTop: 25,
+        },
     })
 );
 
@@ -35,46 +40,145 @@ interface StyledTextFieldProp {
     icon?: React.ReactElement;
     className?: string;
     value?: string;
-    handlePhoneNumberChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    error?: boolean;
+    helperText?: string;
 }
 
-const StyledTextField = ({ label, icon, className, value, handlePhoneNumberChange }: StyledTextFieldProp) => {
+const StyledTextField = ({ label, icon, className, value, onChange, error, helperText }: StyledTextFieldProp) => {
+    const classes = useStyles();
+
     return (
-        <Grid container spacing={1} alignItems="flex-end">
-            <Grid item>{icon}</Grid>
+        <Grid container spacing={1}>
+            <Grid item className={classes.icon}>
+                {icon}
+            </Grid>
             <Grid item>
-                <TextField label={label} className={className} value={value} onChange={handlePhoneNumberChange} />
+                <TextField
+                    label={label}
+                    className={className}
+                    value={value}
+                    onChange={onChange}
+                    error={error}
+                    helperText={helperText}
+                />
             </Grid>
         </Grid>
     );
 };
 
-const CustomerInfo = () => {
+interface CustomerInfoProp {
+    customerForm: CustomerForm;
+    setCustomerForm: (
+        idx: number | undefined,
+        customerName: string,
+        phoneNumber: string,
+        address: string,
+        request?: string
+    ) => PayloadAction<typeof SET_CUSTOMER_ORDER_FORM | typeof SET_CUSTOMER_MANAGEMENT_FORM, CustomerForm>;
+}
+
+const CustomerInfo = ({ customerForm, setCustomerForm }: CustomerInfoProp) => {
     const classes = useStyles();
-    const [phoneNumber, setPhoneNumber] = useState("");
-    const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setPhoneNumber(e.target.value);
-    };
+
+    const handleCustomerNameChange = useCallback(
+        (e) => {
+            const customerName = e.target.value;
+            setCustomerForm(
+                customerForm.idx,
+                customerName,
+                customerForm.phoneNumber,
+                customerForm.address,
+                customerForm.request
+            );
+        },
+        [setCustomerForm, customerForm.idx, customerForm.address, customerForm.phoneNumber, customerForm.request]
+    );
+    const handlePhoneNumberChange = useCallback(
+        (e) => {
+            const customerPhoneNumber = insertDashIntoPhoneNumber(e.target.value);
+            setCustomerForm(
+                customerForm.idx,
+                customerForm.customerName,
+                customerPhoneNumber,
+                customerForm.address,
+                customerForm.request
+            );
+        },
+        [setCustomerForm, customerForm.idx, customerForm.address, customerForm.customerName, customerForm.request]
+    );
+    const handleAddressChange = useCallback(
+        (e) => {
+            const address = e.target.value;
+            setCustomerForm(
+                customerForm.idx,
+                customerForm.customerName,
+                customerForm.phoneNumber,
+                address,
+                customerForm.request
+            );
+        },
+        [setCustomerForm, customerForm.idx, customerForm.customerName, customerForm.phoneNumber, customerForm.request]
+    );
+    const handleRequestChange = useCallback(
+        (e) => {
+            const request = e.target.value;
+            setCustomerForm(
+                customerForm.idx,
+                customerForm.customerName,
+                customerForm.phoneNumber,
+                customerForm.address,
+                request
+            );
+        },
+        [setCustomerForm, customerForm.idx, customerForm.customerName, customerForm.phoneNumber, customerForm.address]
+    );
+
+    const validatePhoneNumber = useCallback(() => !!customerForm.phoneNumber, [customerForm.phoneNumber]);
+    const validateAddress = useCallback(() => !!customerForm.address, [customerForm.address]);
+
     return (
         <Paper className={classes.paper}>
             <div className={classes.head}>고객정보</div>
             <Grid container spacing={2}>
                 <Grid item>
-                    <StyledTextField label="이름" icon={<AccountBox />} />
+                    <StyledTextField
+                        label="이름"
+                        icon={<AccountBox />}
+                        value={customerForm.customerName}
+                        onChange={handleCustomerNameChange}
+                    />
                 </Grid>
                 <Grid item>
                     <StyledTextField
                         label="전화"
-                        value={insertDashIntoPhoneNumber(phoneNumber)}
-                        handlePhoneNumberChange={handlePhoneNumberChange}
+                        // value={insertDashIntoPhoneNumber(phoneNumber)}
+                        onChange={handlePhoneNumberChange}
                         icon={<Phone />}
+                        value={customerForm.phoneNumber}
+                        error={!validatePhoneNumber()}
+                        helperText={!validatePhoneNumber() ? "전화번호는 반드시 입력해야합니다." : undefined}
                     />
                 </Grid>
             </Grid>
-            <StyledTextField label="주소" className={classes.address} icon={<Home />} />
-            <StyledTextField label="단골 요청사항" className={classes.request} icon={<Comment />} />
+            <StyledTextField
+                label="주소"
+                className={classes.address}
+                icon={<Home />}
+                value={customerForm.address}
+                onChange={handleAddressChange}
+                error={!validateAddress()}
+                helperText={!validateAddress() ? "주소는 반드시 입력해야합니다." : undefined}
+            />
+            <StyledTextField
+                label="단골 요청사항"
+                className={classes.request}
+                icon={<Comment />}
+                value={customerForm.request}
+                onChange={handleRequestChange}
+            />
         </Paper>
     );
 };
 
-export default CustomerInfo;
+export default React.memo(CustomerInfo);
