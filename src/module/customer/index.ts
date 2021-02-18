@@ -10,6 +10,9 @@ import {
     EDIT_CUSTOMER,
     EDIT_CUSTOMER_SUCCESS,
     EDIT_CUSTOMER_ERROR,
+    REMOVE_CUSTOMER,
+    REMOVE_CUSTOMER_SUCCESS,
+    REMOVE_CUSTOMER_ERROR,
 } from "./saga";
 
 export type SearchBy = "name" | "phoneNumber" | "address";
@@ -31,8 +34,6 @@ export interface CustomerForm {
     request: string;
 }
 
-const REMOVE_CUSTOMER = "customer/REMOVE_CUSTOMER";
-
 export const SET_CUSTOMER_ORDER_FORM = "customer/SET_CUSTOMER_ORDER_FORM";
 export const SET_CUSTOMER_MANAGEMENT_FORM = "customer/SET_CUSTOMER_MANAGEMENT_FORM";
 const SET_CUSTOMER_ORDER_FORM_EDIT_MODE = "customer/SET_CUSTOMER_ORDER_FORM_EDIT_MODE";
@@ -50,7 +51,9 @@ export const editCustomer = createAction(EDIT_CUSTOMER)();
 export const editCustomerSuccess = createAction(EDIT_CUSTOMER_SUCCESS)<Customer>();
 export const editCustomerError = createAction(EDIT_CUSTOMER_ERROR)<Error>();
 
-export const removeCustomerAction = createAction(REMOVE_CUSTOMER, (idx: number) => idx)();
+export const removeCustomer = createAction(REMOVE_CUSTOMER)();
+export const removeCustomerSuccess = createAction(REMOVE_CUSTOMER_SUCCESS)<number>();
+export const removeCustomerError = createAction(REMOVE_CUSTOMER_ERROR)<Error>();
 
 export const setCustomerOrderFormAction = createAction(
     SET_CUSTOMER_ORDER_FORM,
@@ -97,7 +100,10 @@ const actions = {
     editCustomerSuccess,
     editCustomerError,
 
-    removeCustomerAction,
+    removeCustomer,
+    removeCustomerSuccess,
+    removeCustomerError,
+
     setCustomerOrderFormAction,
     setCustomerManagementFormAction,
     setCustomerOrderFormEditModeAction,
@@ -112,6 +118,7 @@ interface CustomerState {
     isCustomerManagementFormEditMode: boolean;
     addState: { loading: boolean; error: Error | null };
     editState: { loading: boolean; error: Error | null };
+    removeState: { loading: boolean; error: Error | null };
 }
 
 const initialState: CustomerState = {
@@ -129,6 +136,7 @@ const initialState: CustomerState = {
     isCustomerManagementFormEditMode: false,
     addState: { loading: false, error: null },
     editState: { loading: false, error: null },
+    removeState: { loading: false, error: null },
 };
 
 type CustomerAction = ActionType<typeof actions>;
@@ -167,11 +175,14 @@ const customer = createReducer<CustomerState, CustomerAction>(initialState, {
         }),
     [EDIT_CUSTOMER_ERROR]: (state, { payload: error }) => ({ ...state, editState: { loading: false, error } }),
 
-    [REMOVE_CUSTOMER]: (state, { payload: idx }) =>
+    [REMOVE_CUSTOMER]: (state) => ({ ...state, removeState: { loading: true, error: null } }),
+    [REMOVE_CUSTOMER_SUCCESS]: (state, { payload: idx }) =>
         produce(state, (draft) => {
             const foundIdx = draft.customers.data?.findIndex((customer) => customer.idx === idx);
             draft.customers.data?.splice(foundIdx!, 1);
+            draft.removeState.loading = false;
         }),
+    [REMOVE_CUSTOMER_ERROR]: (state, { payload: error }) => ({ ...state, removeState: { loading: false, error } }),
 
     [SET_CUSTOMER_ORDER_FORM]: (state, { payload: customerOrderForm }) => ({
         ...state,

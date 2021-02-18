@@ -1,7 +1,7 @@
 import { call, put, takeLatest, takeEvery } from "redux-saga/effects";
 import { createAsyncAction } from "typesafe-actions";
 import { SearchBy, Customer } from "module/customer";
-import { getCustomers, addCustomer, editCustomer } from "db/customer";
+import { getCustomers, addCustomer, editCustomer, removeCustomer } from "db/customer";
 
 export const SEARCH_CUSTOMERS = "customer/SEARCH_CUSTOMERS";
 export const SEARCH_CUSTOMERS_SUCCESS = "customer/SEARCH_CUSTOMERS_SUCCESS";
@@ -14,6 +14,10 @@ export const ADD_CUSTOMER_ERROR = "customer/ADD_CUSTOMER_ERROR";
 export const EDIT_CUSTOMER = "customer/EDIT_CUSTOMER";
 export const EDIT_CUSTOMER_SUCCESS = "customer/EDIT_CUSTOMER_SUCCESS";
 export const EDIT_CUSTOMER_ERROR = "customer/EDIT_CUSTOMER_ERROR";
+
+export const REMOVE_CUSTOMER = "customer/REMOVE_CUSTOMER";
+export const REMOVE_CUSTOMER_SUCCESS = "customer/REMOVE_CUSTOMER_SUCCESS";
+export const REMOVE_CUSTOMER_ERROR = "customer/REMOVE_CUSTOMER_ERROR";
 
 // createAsyncAction : request, success, failure, cancel arg를 넣으면
 // asyncAction을 만들어줌
@@ -52,6 +56,12 @@ export const editCustomerAsync = createAsyncAction(EDIT_CUSTOMER, EDIT_CUSTOMER_
     Error
 >();
 
+export const removeCustomerAsync = createAsyncAction(REMOVE_CUSTOMER, REMOVE_CUSTOMER_SUCCESS, REMOVE_CUSTOMER_ERROR)<
+    number,
+    number,
+    Error
+>();
+
 function* searchCustomersSaga(action: ReturnType<typeof searchCustomersAsync.request>) {
     try {
         const customers = yield call(getCustomers, action.payload);
@@ -79,8 +89,18 @@ function* editCustomerSaga(action: ReturnType<typeof editCustomerAsync.request>)
     }
 }
 
+function* removeCustomerSaga(action: ReturnType<typeof removeCustomerAsync.request>) {
+    try {
+        yield call(removeCustomer, action.payload);
+        yield put(removeCustomerAsync.success(action.payload));
+    } catch (e) {
+        yield put(removeCustomerAsync.failure(e));
+    }
+}
+
 export function* customerSaga() {
     yield takeLatest(SEARCH_CUSTOMERS, searchCustomersSaga);
     yield takeEvery(ADD_CUSTOMER, addCustomerSaga);
     yield takeEvery(EDIT_CUSTOMER, editCustomerSaga);
+    yield takeEvery(REMOVE_CUSTOMER, removeCustomerSaga);
 }

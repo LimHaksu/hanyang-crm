@@ -2,14 +2,13 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../module";
 import { useCallback } from "react";
 import {
-    removeCustomerAction,
     setCustomerOrderFormAction,
     setCustomerManagementFormAction,
     setCustomerOrderFormEditModeAction,
     setCustomerManagementFormEditModeAction,
     SearchBy,
 } from "module/customer";
-import { searchCustomersAsync, addCustomerAsync, editCustomerAsync } from "module/customer/saga";
+import { searchCustomersAsync, addCustomerAsync, editCustomerAsync, removeCustomerAsync } from "module/customer/saga";
 
 const useCustomer = () => {
     const customers = useSelector((state: RootState) => state.customer.customers.data);
@@ -39,7 +38,7 @@ const useCustomer = () => {
         [dispatch]
     );
 
-    const removeCustomer = useCallback((idx: number) => dispatch(removeCustomerAction(idx)), [dispatch]);
+    const removeCustomer = useCallback((idx: number) => dispatch(removeCustomerAsync.request(idx)), [dispatch]);
 
     const setCustomerOrderForm = useCallback(
         (idx: number | undefined, customerName: string, phoneNumber: string, address: string, request: string) =>
