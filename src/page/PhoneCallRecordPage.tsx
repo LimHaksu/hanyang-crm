@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { makeStyles, withStyles, Theme, createStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Table from "@material-ui/core/Table";
@@ -53,16 +53,6 @@ interface Column {
     getRegistryTextWithEmoji?: (value: string) => string;
 }
 
-interface Data {
-    idx: number;
-    orderTime: string;
-    cidMachineIdx: number;
-    customerName: string;
-    phoneNumber: string;
-    address: string;
-    registerProduct: string;
-}
-
 const columns: Column[] = [
     { id: "idx", label: "순서", width: 40, minWidth: 40, align: "center" },
     { id: "orderTime", label: "수신시각", width: 95, minWidth: 95, align: "center" },
@@ -95,23 +85,6 @@ const columns: Column[] = [
     },
 ];
 
-function createData(
-    idx: number,
-    orderTime: string,
-    cidMachineIdx: number,
-    customerName: string,
-    phoneNumber: string,
-    address: string,
-    registerProduct: "작성" | "완료"
-): Data {
-    return { idx, orderTime, cidMachineIdx, customerName, phoneNumber, address, registerProduct };
-}
-
-const rows = [
-    createData(1, "오전 11:12", 1, "손님", "010-1234-5678", "중구 선화동 123-456번지 선화아파트 101동 1001호", "완료"),
-    createData(2, "오전 11:12", 2, "손님", "010-1234-5678", "중구 선화동 123-456번지 선화아파트 101동 1001호", "작성"),
-];
-
 const StyledTableRow = withStyles((theme: Theme) =>
     createStyles({
         root: {
@@ -126,7 +99,29 @@ export function PhoneCallRecordPage() {
     const classes = useStyles();
     const [selectedDate, handleDateChange] = useState<Date | null>(new Date());
 
-    const { phoneCallRecords } = usePhone();
+    const { addPhoneCallRecord, phoneCallRecords } = usePhone();
+
+    useEffect(() => {
+        addPhoneCallRecord(
+            1,
+            "오전 11:12",
+            1,
+            "손님",
+            "010-1234-5678",
+            "중구 선화동 123-456번지 선화아파트 101동 1001호",
+            "완료"
+        );
+        addPhoneCallRecord(
+            2,
+            "오전 11:12",
+            2,
+            "손님",
+            "010-1234-5678",
+            "중구 선화동 123-456번지 선화아파트 101동 1001호",
+            "작성"
+        );
+    }, []);
+
     const handleAccept = useCallback((date) => {
         handleDateChange(date);
     }, []);
