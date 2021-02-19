@@ -40,13 +40,9 @@ const useStyles = makeStyles(() =>
     })
 );
 
-interface DragProductListProps {
-    categories: CategoryType[];
-}
-
-const DragProductList = ({ categories }: DragProductListProps) => {
+const DragProductList = () => {
     const classes = useStyles();
-    const { moveCategory } = useCategory();
+    const { categories, moveCategory } = useCategory();
     const { moveProduct, setProductForm, setProductEditMode } = useProduct();
     const { setCategoryForm, setCategoryEditMode } = useCategoryForm();
 
