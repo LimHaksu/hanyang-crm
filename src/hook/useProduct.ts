@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "module/index";
-import { moveProductAction, removeProductAction, setProductFormAction, setProductEditModeAction } from "module/product";
-import { addProductAsync, editProductAsync } from "module/product/saga";
+import { removeProductAction, setProductFormAction, setProductEditModeAction } from "module/product";
+import { addProductAsync, editProductAsync, moveProductAsync } from "module/product/saga";
 import { useCallback } from "react";
 
 const useProduct = () => {
@@ -22,8 +22,8 @@ const useProduct = () => {
     );
 
     const moveProduct = useCallback(
-        (currentIdx: number, nextIdx: number, srcIdx: number, destIdx: number) =>
-            dispatch(moveProductAction(currentIdx, nextIdx, srcIdx, destIdx)),
+        (currentIndex: number, nextIndex: number, srcIdx: number, destIdx: number) =>
+            dispatch(moveProductAsync.request({ currentIndex, nextIndex, srcIdx, destIdx })),
         [dispatch]
     );
 

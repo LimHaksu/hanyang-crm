@@ -29,7 +29,11 @@ import {
     EDIT_PRODUCT,
     EDIT_PRODUCT_SUCCESS,
     EDIT_PRODUCT_ERROR,
+    MOVE_PRODUCT,
+    MOVE_PRODUCT_SUCCESS,
+    MOVE_PRODUCT_ERROR,
 } from "module/product";
+import { sr } from "date-fns/locale";
 
 // createAsyncAction : request, success, failure, cancel arg를 넣으면
 // asyncAction을 만들어줌
@@ -75,10 +79,19 @@ export const editProductAsync = createAsyncAction(EDIT_PRODUCT, EDIT_PRODUCT_SUC
     Error
 >();
 
+export const moveProductAsync = createAsyncAction(MOVE_PRODUCT, MOVE_PRODUCT_SUCCESS, MOVE_PRODUCT_ERROR)<
+    { currentIndex: number; nextIndex: number; srcIdx: number; destIdx: number },
+    Category[],
+    Error
+>();
+
 function* getCategoriesSaga(action: ReturnType<typeof getCategoriesAsync.request>) {
     try {
         const categories: Category[] = yield call(getCategories);
         categories.sort((a, b) => (a.lexoRank < b.lexoRank ? -1 : 1));
+        categories.forEach((category) => {
+            category.products.sort((a, b) => (a.lexoRank < b.lexoRank ? -1 : 1));
+        });
         yield put(getCategoriesAsync.success(categories));
     } catch (e) {
         yield put(getCategoriesAsync.failure(e));
@@ -229,7 +242,14 @@ function* addProductSaga(action: ReturnType<typeof addProductAsync.request>) {
                 // 마지막 한칸 전이 없는경우(길이 1)에는 'a'* defaultLexoRankLength 와 마지막의 중간값
                 const newLexoRank = getRankBetween(A_LEXO_RANK, Z_LEXO_RANK);
                 // DB
-                yield call(editProduct, lastProduct.idx, lastProduct.name, lastProduct.price, newLexoRank);
+                yield call(
+                    editProduct,
+                    lastProduct.idx,
+                    lastProduct.name,
+                    lastProduct.price,
+                    newLexoRank,
+                    lastProduct.categoryIdx
+                );
                 // redux store
                 yield put({
                     type: CHANGE_PRODUCT_LEXO_RANK,
@@ -239,7 +259,14 @@ function* addProductSaga(action: ReturnType<typeof addProductAsync.request>) {
                 // 기존의 마지막 lexoRank는 마지막 한칸 전과 마지막의 중간 값
                 const newLexoRank = getRankBetween(products[plen - 2].lexoRank, Z_LEXO_RANK);
                 // DB
-                yield call(editProduct, lastProduct.idx, lastProduct.name, lastProduct.price, newLexoRank);
+                yield call(
+                    editProduct,
+                    lastProduct.idx,
+                    lastProduct.name,
+                    lastProduct.price,
+                    newLexoRank,
+                    lastProduct.categoryIdx
+                );
                 // redux store
                 yield put({
                     type: CHANGE_PRODUCT_LEXO_RANK,
@@ -269,11 +296,184 @@ function* addProductSaga(action: ReturnType<typeof addProductAsync.request>) {
 
 function* editProductSaga(action: ReturnType<typeof editProductAsync.request>) {
     try {
-        const { idx, name, price, lexoRank } = action.payload;
-        yield call(editProduct, idx, name, price, lexoRank);
+        const { idx, name, price, lexoRank, categoryIdx } = action.payload;
+        yield call(editProduct, idx, name, price, lexoRank, categoryIdx);
         yield put(editProductAsync.success(action.payload));
     } catch (e) {
         yield put(editProductAsync.failure(e));
+    }
+}
+
+function* moveProductSaga(action: ReturnType<typeof moveProductAsync.request>) {
+    try {
+        const { currentIndex, nextIndex, srcIdx, destIdx } = action.payload;
+        const categories: Category[] = JSON.parse(
+            JSON.stringify(yield select((state: RootState) => state.product.categories.data))
+        );
+
+        // 같은 카테고리 내에서 이동
+        if (currentIndex === nextIndex) {
+            const products = categories[currentIndex].products;
+            const srcProduct = products[srcIdx];
+            const destProduct = products[destIdx];
+            let newLexoRank = "";
+            if (srcIdx < destIdx) {
+                if (destIdx === products.length - 1) {
+                    // destProduct가 마지막 상품인 경우
+                    newLexoRank = getRankBetween(products[destIdx].lexoRank, Z_LEXO_RANK);
+                    products[srcIdx].lexoRank = Z_LEXO_RANK;
+                    products[destIdx].lexoRank = newLexoRank;
+                } else {
+                    // destProduct 뒤에 상품이 있는 경우
+                    newLexoRank = getRankBetween(products[destIdx].lexoRank, products[destIdx + 1].lexoRank);
+                    products[srcIdx].lexoRank = newLexoRank;
+                }
+            } else {
+                if (destIdx === 0) {
+                    // destProduct가 첫번째 상품인 경우
+                    newLexoRank = getRankBetween(A_LEXO_RANK, products[destIdx].lexoRank);
+                    products[srcIdx].lexoRank = A_LEXO_RANK;
+                    products[destIdx].lexoRank = newLexoRank;
+                } else {
+                    // destProduct 앞에 상품이 있는 경우
+                    newLexoRank = getRankBetween(products[destIdx - 1].lexoRank, products[destIdx].lexoRank);
+                    products[srcIdx].lexoRank = newLexoRank;
+                }
+            }
+            // 정렬
+            products.sort((a, b) => (a.lexoRank < b.lexoRank ? -1 : 1));
+            yield put(moveProductAsync.success(categories));
+
+            // DB 업데이트
+            if (srcIdx < destIdx) {
+                if (destIdx === products.length - 1) {
+                    // destProduct가 마지막 상품인 경우
+                    yield call(
+                        editProduct,
+                        srcProduct.idx,
+                        srcProduct.name,
+                        srcProduct.price,
+                        Z_LEXO_RANK,
+                        srcProduct.categoryIdx
+                    );
+                    yield call(
+                        editProduct,
+                        destProduct.idx,
+                        destProduct.name,
+                        destProduct.price,
+                        newLexoRank,
+                        destProduct.categoryIdx
+                    );
+                } else {
+                    // destProduct 뒤에 상품이 있는 경우
+                    yield call(
+                        editProduct,
+                        srcProduct.idx,
+                        srcProduct.name,
+                        srcProduct.price,
+                        newLexoRank,
+                        srcProduct.categoryIdx
+                    );
+                }
+            } else {
+                if (destIdx === 0) {
+                    // destProduct가 첫번째 상품인 경우
+                    yield call(
+                        editProduct,
+                        srcProduct.idx,
+                        srcProduct.name,
+                        srcProduct.price,
+                        A_LEXO_RANK,
+                        srcProduct.categoryIdx
+                    );
+                    yield call(
+                        editProduct,
+                        destProduct.idx,
+                        destProduct.name,
+                        destProduct.price,
+                        newLexoRank,
+                        destProduct.categoryIdx
+                    );
+                } else {
+                    // destProduct 앞에 상품이 있는 경우
+                    yield call(
+                        editProduct,
+                        srcProduct.idx,
+                        srcProduct.name,
+                        srcProduct.price,
+                        newLexoRank,
+                        srcProduct.categoryIdx
+                    );
+                }
+            }
+        } else {
+            // 다른 카테고리로 이동
+            const [srcProduct] = categories[currentIndex].products.splice(srcIdx, 1);
+            const destProducts = categories[nextIndex].products;
+            destProducts.push(srcProduct);
+            const destProduct = destProducts[destIdx];
+            let newLexoRank = "";
+
+            if (destProducts.length === 1) {
+                srcProduct.lexoRank = Z_LEXO_RANK;
+            } else if (destIdx === 0) {
+                // destProduct가 첫번째 상품인 경우
+                newLexoRank = getRankBetween(A_LEXO_RANK, destProduct.lexoRank);
+                srcProduct.lexoRank = A_LEXO_RANK;
+                destProduct.lexoRank = newLexoRank;
+            } else {
+                // destProduct 앞에 상품이 있는 경우
+                newLexoRank = getRankBetween(destProducts[destIdx - 1].lexoRank, destProduct.lexoRank);
+                srcProduct.lexoRank = newLexoRank;
+            }
+
+            destProducts.sort((a, b) => (a.lexoRank < b.lexoRank ? -1 : 1));
+            yield put(moveProductAsync.success(categories));
+
+            // DB 수정
+            // 다른 카테고리로 이동 : srcProduct의 categoryIdx를 destCategory로 변경
+            if (destProducts.length === 1) {
+                yield call(
+                    editProduct,
+                    srcProduct.idx,
+                    srcProduct.name,
+                    srcProduct.price,
+                    Z_LEXO_RANK,
+                    categories[nextIndex].idx
+                );
+            } else if (destIdx === 0) {
+                // destProduct가 첫번째 상품인 경우
+                yield call(
+                    editProduct,
+                    srcProduct.idx,
+                    srcProduct.name,
+                    srcProduct.price,
+                    A_LEXO_RANK,
+                    categories[nextIndex].idx
+                );
+                yield call(
+                    editProduct,
+                    destProduct.idx,
+                    destProduct.name,
+                    destProduct.price,
+                    newLexoRank,
+                    destProduct.categoryIdx
+                );
+            } else {
+                // destProduct 앞에 상품이 있는 경우
+                yield call(
+                    editProduct,
+                    srcProduct.idx,
+                    srcProduct.name,
+                    srcProduct.price,
+                    newLexoRank,
+                    categories[nextIndex].idx
+                );
+            }
+        }
+    } catch (e) {
+        console.error(e);
+        yield put(moveCategoryAsync.failure(e));
     }
 }
 
@@ -285,4 +485,5 @@ export function* productSaga() {
     yield takeEvery(REMOVE_CATEGORY, removeCategorySaga);
     yield takeEvery(ADD_PRODUCT, addProductSaga);
     yield takeEvery(EDIT_PRODUCT, editProductSaga);
+    yield takeEvery(MOVE_PRODUCT, moveProductSaga);
 }

@@ -47,7 +47,10 @@ export const EDIT_PRODUCT = "product/EDIT_PRODUCT";
 export const EDIT_PRODUCT_SUCCESS = "product/EDIT_PRODUCT_SUCCESS";
 export const EDIT_PRODUCT_ERROR = "product/EDIT_PRODUCT_ERROR";
 
-const MOVE_PRODUCT = "product/MOVE_PRODUCT";
+export const MOVE_PRODUCT = "product/MOVE_PRODUCT";
+export const MOVE_PRODUCT_SUCCESS = "product/MOVE_PRODUCT_SUCCESS";
+export const MOVE_PRODUCT_ERROR = "product/MOVE_PRODUCT_ERROR";
+
 const REMOVE_PRODUCT = "product/REMOVE_PRODUCT";
 
 const SET_CATEGORY_FORM = "product/SET_CATEGORY_FORM";
@@ -93,15 +96,8 @@ export const addProductError = createAction(ADD_PRODUCT_ERROR)<Error>();
 export const editProductSuccess = createAction(EDIT_PRODUCT_SUCCESS)<Product>();
 export const editProductError = createAction(EDIT_PRODUCT_ERROR)<Error>();
 
-export const moveProductAction = createAction(
-    MOVE_PRODUCT,
-    (currentIdx: number, nextIdx: number, srcIdx: number, destIdx: number) => ({
-        currentIdx,
-        nextIdx,
-        srcIdx,
-        destIdx,
-    })
-)();
+export const moveProductSuccess = createAction(MOVE_PRODUCT_SUCCESS)<Category[]>();
+export const moveProductError = createAction(MOVE_PRODUCT_ERROR)<Error>();
 
 export const removeProductAction = createAction(REMOVE_PRODUCT, (idx: number) => idx)();
 
@@ -153,7 +149,9 @@ const actions = {
     editProductSuccess,
     editProductError,
 
-    moveProductAction,
+    moveProductSuccess,
+    moveProductError,
+
     removeProductAction,
     setCategoryFormAction,
     setProductFormAction,
@@ -294,60 +292,13 @@ const product = createReducer<ProductState, ProductAction>(initialState, {
             //TODO... 에러 핸들링 로직
         }),
 
-    [MOVE_PRODUCT]: (state, { payload: { currentIdx, nextIdx, srcIdx, destIdx } }) =>
+    [MOVE_PRODUCT_SUCCESS]: (state, { payload: categories }) =>
         produce(state, (draft) => {
-            const categories = draft.categories;
-
-            // 같은 카테고리 내에서 이동
-            if (currentIdx === nextIdx) {
-                const products = categories.data[currentIdx].products;
-                if (srcIdx < destIdx) {
-                    if (destIdx === products.length - 1) {
-                        // destProduct가 마지막 상품인 경우
-                        products[srcIdx].lexoRank = Z_LEXO_RANK;
-                        products[destIdx].lexoRank = getRankBetween(products[destIdx].lexoRank, Z_LEXO_RANK);
-                    } else {
-                        // destProduct 뒤에 상품이 있는 경우
-                        products[srcIdx].lexoRank = getRankBetween(
-                            products[destIdx].lexoRank,
-                            products[destIdx + 1].lexoRank
-                        );
-                    }
-                } else {
-                    if (destIdx === 0) {
-                        // destProduct가 첫번째 상품인 경우
-                        products[srcIdx].lexoRank = A_LEXO_RANK;
-                        products[destIdx].lexoRank = getRankBetween(A_LEXO_RANK, products[destIdx].lexoRank);
-                    } else {
-                        // destProduct 앞에 상품이 있는 경우
-                        products[srcIdx].lexoRank = getRankBetween(
-                            products[destIdx - 1].lexoRank,
-                            products[destIdx].lexoRank
-                        );
-                    }
-                }
-                // 정렬
-                products.sort((a, b) => (a.lexoRank < b.lexoRank ? -1 : 1));
-            } else {
-                // 다른 카테고리로 이동
-                const [srcProduct] = categories.data[currentIdx].products.splice(srcIdx, 1);
-                const destProducts = categories.data[nextIdx].products;
-                destProducts.push(srcProduct);
-                if (destProducts.length === 1) {
-                    srcProduct.lexoRank = Z_LEXO_RANK;
-                } else if (destIdx === 0) {
-                    // destProduct가 첫번째 상품인 경우
-                    srcProduct.lexoRank = A_LEXO_RANK;
-                    destProducts[destIdx].lexoRank = getRankBetween(A_LEXO_RANK, destProducts[destIdx].lexoRank);
-                } else {
-                    // destProduct 앞에 상품이 있는 경우
-                    srcProduct.lexoRank = getRankBetween(
-                        destProducts[destIdx - 1].lexoRank,
-                        destProducts[destIdx].lexoRank
-                    );
-                }
-                destProducts.sort((a, b) => (a.lexoRank < b.lexoRank ? -1 : 1));
-            }
+            draft.categories.data = categories;
+        }),
+    [MOVE_PRODUCT_ERROR]: (state, { payload: error }) =>
+        produce(state, (draft) => {
+            // TODO... 에러 핸들링 로직
         }),
     [REMOVE_PRODUCT]: (state, { payload: idx }) =>
         produce(state, (draft) => {

@@ -101,13 +101,14 @@ export const addProduct = async (name: string, price: number, categoryIdx: numbe
  * @param name 상품 이름
  * @param price 상품 가격
  * @param lexoRank 정렬을 위한 랭크 필드 (알파벳 소문자)
+ * @param categoryIdx 상품이 소속된 카테고리 idx
  */
-export const editProduct = async (idx: number, name: string, price: number, lexoRank: string) => {
+export const editProduct = async (idx: number, name: string, price: number, lexoRank: string, categoryIdx: number) => {
     try {
         const query = `UPDATE product
-        SET name = ?, price = ?, lexo_rank = ?
+        SET name = ?, price = ?, lexo_rank = ?, category_idx = ?
         WHERE idx = ?;`;
-        await update(query, name, price, lexoRank, idx);
+        await update(query, name, price, lexoRank, categoryIdx, idx);
     } catch (e) {
         throw e;
     }
