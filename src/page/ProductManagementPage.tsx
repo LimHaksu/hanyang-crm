@@ -3,7 +3,7 @@ import Paper from "@material-ui/core/Paper";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import DragProductList from "component/DragProductList/index";
 import ProductManagement from "component/ProductManagement";
-import useProduct from "hook/useProduct";
+import useCategory from "hook/useCategory";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const ProductManagementPage = () => {
     const classes = useStyles();
-    const { categories } = useProduct();
+    const { categories } = useCategory();
 
     return (
         <Paper className={classes.root}>

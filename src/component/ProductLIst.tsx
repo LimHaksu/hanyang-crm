@@ -9,7 +9,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import { Category } from "module/product";
-import useProduct from "hook/useProduct";
+import useCategory from "hook/useCategory";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -95,7 +95,7 @@ const CategoryRow = ({ category, isOpen, setIsOpen }: Props) => {
 
 const ProductList = () => {
     const classes = useStyles();
-    const { categories } = useProduct();
+    const { categories } = useCategory();
     const [isOpen, setIsOpen] = useState<IsOpen>(
         categories.reduce((acc, category) => ({ ...acc, [category.name]: false }), {})
     );

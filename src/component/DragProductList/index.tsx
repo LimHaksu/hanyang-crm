@@ -5,6 +5,7 @@ import { makeStyles, createStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import { Category as CategoryType } from "module/product";
+import useCategory from "hook/useCategory";
 import useProduct from "hook/useProduct";
 import useCategoryForm from "hook/useCategoryForm";
 
@@ -45,7 +46,8 @@ interface DragProductListProps {
 
 const DragProductList = ({ categories }: DragProductListProps) => {
     const classes = useStyles();
-    const { moveCategory, moveProduct, setProductForm, setProductEditMode } = useProduct();
+    const { moveCategory } = useCategory();
+    const { moveProduct, setProductForm, setProductEditMode } = useProduct();
     const { setCategoryForm, setCategoryEditMode } = useCategoryForm();
 
     const onDragEnd = useCallback(

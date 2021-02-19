@@ -11,8 +11,9 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
-import useProduct from "hook/useProduct";
 import { StyledTextField } from "./index";
+import useCategory from "hook/useCategory";
+import useProduct from "hook/useProduct";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -82,10 +83,10 @@ const StyledSelect = ({ label, icon, className, value, children, onChange, readO
 
 const ProductForm = () => {
     const classes = useStyles();
+    const { categories } = useCategory();
     const {
         productForm,
         setProductForm,
-        categories,
         addProduct,
         editProduct,
         isProductEditMode,

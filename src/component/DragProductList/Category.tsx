@@ -11,7 +11,7 @@ import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
 import clsx from "clsx";
 import { Product } from "module/product";
-import useProduct from "hook/useProduct";
+import useCategory from "hook/useCategory";
 import useCategoryForm from "hook/useCategoryForm";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -64,7 +64,7 @@ interface CategoryProps {
 
 const Category = ({ categoryIdx, name, lexoRank, products, index }: CategoryProps) => {
     const classes = useStyles();
-    const { removeCategory } = useProduct();
+    const { removeCategory } = useCategory();
     const { setCategoryForm, setCategoryEditMode } = useCategoryForm();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [clickedCategory, setClickedCategory] = useState({ name: "", idx: -1 });

@@ -4,9 +4,9 @@ import Paper from "@material-ui/core/Paper";
 import LabelIcon from "@material-ui/icons/Label";
 import Button from "@material-ui/core/Button";
 import Box from "@material-ui/core/Box";
-import useProduct from "hook/useProduct";
 import { StyledTextField } from "./index";
 import useCategoryForm from "hook/useCategoryForm";
+import useCategory from "hook/useCategory";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const CategoryForm = () => {
     const classes = useStyles();
-    const { addCategory, editCategory } = useProduct();
+    const { addCategory, editCategory } = useCategory();
     const { categoryForm, setCategoryForm, isCategoryEditMode, setCategoryEditMode } = useCategoryForm();
 
     const handleAddCategoryClick = useCallback(() => {
