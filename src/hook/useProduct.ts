@@ -1,7 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "module/index";
 import {
-    removeCategoryAction,
     addProductAction,
     editProductAction,
     moveProductAction,
@@ -10,7 +9,7 @@ import {
     setProductEditModeAction,
 } from "module/product";
 import { useCallback } from "react";
-import { addCategoryAsync, editCategoryAsync, moveCategoryAsync } from "module/product/saga";
+import { addCategoryAsync, editCategoryAsync, moveCategoryAsync, removeCategoryAsync } from "module/product/saga";
 
 const useProduct = () => {
     const categories = useSelector((state: RootState) => state.product.categories.data);
@@ -30,7 +29,7 @@ const useProduct = () => {
         [dispatch]
     );
 
-    const removeCategory = useCallback((idx: number) => dispatch(removeCategoryAction(idx)), [dispatch]);
+    const removeCategory = useCallback((idx: number) => dispatch(removeCategoryAsync.request(idx)), [dispatch]);
 
     const addProduct = useCallback(
         (name: string, price: number, categoryIdx: number) => dispatch(addProductAction(name, price, categoryIdx)),

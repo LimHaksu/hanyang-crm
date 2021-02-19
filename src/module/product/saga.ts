@@ -1,6 +1,6 @@
-import { select, call, put, takeEvery, takeLatest } from "redux-saga/effects";
+import { select, call, put, takeEvery } from "redux-saga/effects";
 import { createAsyncAction } from "typesafe-actions";
-import { addCategory, editCategory } from "db/product";
+import { addCategory, editCategory, removeCategory } from "db/product";
 import { Category, CHANGE_CATEGORY_LEXO_RANK } from "module/product";
 import { RootState } from "../index";
 import { getRankBetween, A_LEXO_RANK, Z_LEXO_RANK } from "util/lexoRank";
@@ -16,6 +16,10 @@ export const EDIT_CATEGORY_ERROR = "product/EDIT_CATEGORY_ERROR";
 export const MOVE_CATEGORY = "product/MOVE_CATEGORY";
 export const MOVE_CATEGORY_SUCCESS = "product/MOVE_CATEGORY_SUCCESS";
 export const MOVE_CATEGORY_ERROR = "product/MOVE_CATEGORY_ERROR";
+
+export const REMOVE_CATEGORY = "product/REMOVE_CATEGORY";
+export const REMOVE_CATEGORY_SUCCESS = "product/REMOVE_CATEGORY_SUCCESS";
+export const REMOVE_CATEGORY_ERROR = "product/REMOVE_CATEGORY_ERROR";
 
 // createAsyncAction : request, success, failure, cancel arg를 넣으면
 // asyncAction을 만들어줌
@@ -34,6 +38,12 @@ export const editCategoryAsync = createAsyncAction(EDIT_CATEGORY, EDIT_CATEGORY_
 export const moveCategoryAsync = createAsyncAction(MOVE_CATEGORY, MOVE_CATEGORY_SUCCESS, MOVE_CATEGORY_ERROR)<
     { srcIdx: number; destIdx: number },
     Category[],
+    Error
+>();
+
+export const removeCategoryAsync = createAsyncAction(REMOVE_CATEGORY, REMOVE_CATEGORY_SUCCESS, REMOVE_CATEGORY_ERROR)<
+    number,
+    number,
     Error
 >();
 
@@ -156,8 +166,19 @@ function* moveCategorySaga(action: ReturnType<typeof moveCategoryAsync.request>)
     }
 }
 
+function* removeCategorySaga(action: ReturnType<typeof removeCategoryAsync.request>) {
+    try {
+        const idx = action.payload;
+        yield call(removeCategory, idx);
+        yield put(removeCategoryAsync.success(idx));
+    } catch (e) {
+        yield put(removeCategoryAsync.failure(e));
+    }
+}
+
 export function* productSaga() {
     yield takeEvery(ADD_CATEGORY, addCategorySaga);
     yield takeEvery(EDIT_CATEGORY, editCategorySaga);
-    yield takeLatest(MOVE_CATEGORY, moveCategorySaga);
+    yield takeEvery(MOVE_CATEGORY, moveCategorySaga);
+    yield takeEvery(REMOVE_CATEGORY, removeCategorySaga);
 }

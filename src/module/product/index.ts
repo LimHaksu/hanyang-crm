@@ -5,11 +5,12 @@ import {
     ADD_CATEGORY,
     ADD_CATEGORY_SUCCESS,
     ADD_CATEGORY_ERROR,
-    EDIT_CATEGORY,
     EDIT_CATEGORY_SUCCESS,
     EDIT_CATEGORY_ERROR,
     MOVE_CATEGORY_SUCCESS,
     MOVE_CATEGORY_ERROR,
+    REMOVE_CATEGORY_SUCCESS,
+    REMOVE_CATEGORY_ERROR,
 } from "./saga";
 
 export interface Product {
@@ -28,8 +29,6 @@ export interface Category {
 }
 
 export const CHANGE_CATEGORY_LEXO_RANK = "product/CHANGE_CATEGORY_LEXO_RANK";
-
-const REMOVE_CATEGORY = "product/REMOVE_CATEGORY";
 
 const ADD_PRODUCT = "product/ADD_PRODUCT";
 const EDIT_PRODUCT = "product/EDIT_PRODUCT";
@@ -51,14 +50,14 @@ export const addCategory = createAction(ADD_CATEGORY)();
 export const addCategorySuccess = createAction(ADD_CATEGORY_SUCCESS)<Category>();
 export const addCategoryError = createAction(ADD_CATEGORY_ERROR)<Error>();
 
-export const editCategory = createAction(EDIT_CATEGORY)();
 export const editCategorySuccess = createAction(EDIT_CATEGORY_SUCCESS)<Omit<Category, "products" | "lexoRank">>();
 export const editCategoryError = createAction(EDIT_CATEGORY_ERROR)<Error>();
 
 export const moveCategorySuccess = createAction(MOVE_CATEGORY_SUCCESS)<Category[]>();
 export const moveCategoryError = createAction(MOVE_CATEGORY_ERROR)<Error>();
 
-export const removeCategoryAction = createAction(REMOVE_CATEGORY, (idx: number) => idx)();
+export const removeCategorySuccess = createAction(REMOVE_CATEGORY_SUCCESS)<number>();
+export const removeCategoryError = createAction(REMOVE_CATEGORY_ERROR)<Error>();
 
 export const addProductAction = createAction(ADD_PRODUCT, (name: string, price: number, categoryIdx: number) => ({
     name,
@@ -109,14 +108,15 @@ const actions = {
     addCategorySuccess,
     addCategoryError,
 
-    editCategory,
     editCategorySuccess,
     editCategoryError,
 
     moveCategorySuccess,
     moveCategoryError,
 
-    removeCategoryAction,
+    removeCategorySuccess,
+    removeCategoryError,
+
     addProductAction,
     editProductAction,
     moveProductAction,
@@ -171,7 +171,6 @@ const product = createReducer<ProductState, ProductAction>(initialState, {
             draft.categories.error = error;
         }),
 
-    [EDIT_CATEGORY]: (state) => state,
     [EDIT_CATEGORY_SUCCESS]: (state, { payload: { idx, name } }) =>
         produce(state, (draft) => {
             const category = draft.categories.data.find((category) => category.idx === idx);
@@ -194,10 +193,15 @@ const product = createReducer<ProductState, ProductAction>(initialState, {
             //TODO... 에러 핸들링 로직
         }),
 
-    [REMOVE_CATEGORY]: (state, { payload: idx }) => ({
+    [REMOVE_CATEGORY_SUCCESS]: (state, { payload: idx }) => ({
         ...state,
         categories: { ...state.categories, data: state.categories.data.filter((category) => category.idx !== idx) },
     }),
+    [REMOVE_CATEGORY_ERROR]: (state, { payload: error }) =>
+        produce(state, (draft) => {
+            //TODO... 에러 핸들링 로직
+        }),
+
     [ADD_PRODUCT]: (state, { payload: { name, price, categoryIdx } }) =>
         produce(state, (draft) => {
             const products = draft.categories.data.find((category) => category.idx === categoryIdx)?.products;
