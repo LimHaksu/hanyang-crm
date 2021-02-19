@@ -1,4 +1,4 @@
-import { select, call, put, takeEvery } from "redux-saga/effects";
+import { select, call, put, takeEvery, takeLatest } from "redux-saga/effects";
 import { createAsyncAction } from "typesafe-actions";
 import { addCategory, editCategory } from "db/product";
 import { Category, CHANGE_CATEGORY_LEXO_RANK } from "module/product";
@@ -13,6 +13,10 @@ export const EDIT_CATEGORY = "product/EDIT_CATEGORY";
 export const EDIT_CATEGORY_SUCCESS = "product/EDIT_CATEGORY_SUCCESS";
 export const EDIT_CATEGORY_ERROR = "product/EDIT_CATEGORY_ERROR";
 
+export const MOVE_CATEGORY = "product/MOVE_CATEGORY";
+export const MOVE_CATEGORY_SUCCESS = "product/MOVE_CATEGORY_SUCCESS";
+export const MOVE_CATEGORY_ERROR = "product/MOVE_CATEGORY_ERROR";
+
 // createAsyncAction : request, success, failure, cancel arg를 넣으면
 // asyncAction을 만들어줌
 export const addCategoryAsync = createAsyncAction(ADD_CATEGORY, ADD_CATEGORY_SUCCESS, ADD_CATEGORY_ERROR)<
@@ -24,6 +28,12 @@ export const addCategoryAsync = createAsyncAction(ADD_CATEGORY, ADD_CATEGORY_SUC
 export const editCategoryAsync = createAsyncAction(EDIT_CATEGORY, EDIT_CATEGORY_SUCCESS, EDIT_CATEGORY_ERROR)<
     Omit<Category, "products">,
     Omit<Category, "products" | "lexoRank">,
+    Error
+>();
+
+export const moveCategoryAsync = createAsyncAction(MOVE_CATEGORY, MOVE_CATEGORY_SUCCESS, MOVE_CATEGORY_ERROR)<
+    { srcIdx: number; destIdx: number },
+    Category[],
     Error
 >();
 
@@ -77,7 +87,77 @@ function* editCategorySaga(action: ReturnType<typeof editCategoryAsync.request>)
     }
 }
 
+function* moveCategorySaga(action: ReturnType<typeof moveCategoryAsync.request>) {
+    // 카테고리 옮기는 로직
+    const { srcIdx, destIdx } = action.payload;
+    // categories는 정렬돼있는 상태
+    const categories: Category[] = JSON.parse(
+        JSON.stringify(yield select((state: RootState) => state.product.categories.data))
+    );
+    const srcCategory = categories[srcIdx];
+    const destCategory = categories[destIdx];
+    let newLexoRank = "";
+    try {
+        if (srcIdx < destIdx) {
+            if (destIdx === categories.length - 1) {
+                // destCategory가 마지막 카테고리인 경우
+                newLexoRank = getRankBetween(categories[destIdx - 1].lexoRank, Z_LEXO_RANK);
+                // redux store 수정
+                srcCategory.lexoRank = Z_LEXO_RANK;
+                destCategory.lexoRank = newLexoRank;
+            } else {
+                // destCategory 뒤에 카테고리가 있는 경우
+                newLexoRank = getRankBetween(categories[destIdx].lexoRank, categories[destIdx + 1].lexoRank);
+                // redux store 수정
+                srcCategory.lexoRank = newLexoRank;
+            }
+        } else {
+            if (destIdx === 0) {
+                // destCategory가 첫번째 카테고리인 경우
+                newLexoRank = getRankBetween(A_LEXO_RANK, categories[destIdx + 1].lexoRank);
+                // redux store 수정
+                srcCategory.lexoRank = A_LEXO_RANK;
+                destCategory.lexoRank = newLexoRank;
+            } else {
+                // destCategory 앞에 카테고리가 있는 경우
+                newLexoRank = getRankBetween(categories[destIdx - 1].lexoRank, categories[destIdx].lexoRank);
+                // redux store 수정
+                srcCategory.lexoRank = newLexoRank;
+            }
+        }
+
+        categories.sort((a, b) => (a.lexoRank < b.lexoRank ? -1 : 1));
+        yield put(moveCategoryAsync.success(categories));
+    } catch (e) {
+        yield put(moveCategoryAsync.failure(e));
+    } finally {
+        // DB 수정 로직은 마지막(finally)에 함.
+        // try 부분에서 yield call을 호출하면 렌더링이 한번 되는 현상이 발생해서
+        // 옮긴 위치로 정렬되기 전 리스트가 불필요하게 한 번 더 렌더링 됨.
+        if (srcIdx < destIdx) {
+            if (destIdx === categories.length - 1) {
+                // destCategory가 마지막 카테고리인 경우
+                yield call(editCategory, srcCategory.idx, srcCategory.name, Z_LEXO_RANK);
+                yield call(editCategory, destCategory.idx, destCategory.name, newLexoRank);
+            } else {
+                // destCategory 뒤에 카테고리가 있는 경우
+                yield call(editCategory, srcCategory.idx, srcCategory.name, newLexoRank);
+            }
+        } else {
+            if (destIdx === 0) {
+                // destCategory가 첫번째 카테고리인 경우
+                yield call(editCategory, srcCategory.idx, srcCategory.name, A_LEXO_RANK);
+                yield call(editCategory, destCategory.idx, destCategory.name, newLexoRank);
+            } else {
+                // destCategory 앞에 카테고리가 있는 경우
+                yield call(editCategory, srcCategory.idx, srcCategory.name, newLexoRank);
+            }
+        }
+    }
+}
+
 export function* productSaga() {
     yield takeEvery(ADD_CATEGORY, addCategorySaga);
     yield takeEvery(EDIT_CATEGORY, editCategorySaga);
+    yield takeLatest(MOVE_CATEGORY, moveCategorySaga);
 }

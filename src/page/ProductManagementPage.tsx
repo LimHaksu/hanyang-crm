@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import Box from "@material-ui/core/Box";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
@@ -25,16 +24,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const ProductManagementPage = () => {
     const classes = useStyles();
-    const { categories, setLastCategoryIdx, setLastProductIdx } = useProduct();
-
-    useEffect(() => {
-        const lastCategoryIdx = Math.max(...categories.map((category) => category.idx));
-        setLastCategoryIdx(lastCategoryIdx);
-        const lastProductIdx = Math.max(
-            ...categories.map((category) => Math.max(...category.products.map((product) => product.idx)))
-        );
-        setLastProductIdx(lastProductIdx);
-    }, [categories, setLastCategoryIdx, setLastProductIdx]);
+    const { categories } = useProduct();
 
     return (
         <Paper className={classes.root}>
