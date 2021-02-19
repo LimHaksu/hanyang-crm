@@ -43,24 +43,24 @@ const CategoryForm = () => {
 
     const handleAddCategoryClick = useCallback(() => {
         if (isCategoryEditMode) {
-            editCategory(categoryForm.idx, categoryForm.name);
+            editCategory(categoryForm.idx, categoryForm.name, categoryForm.lexoRank);
         } else {
             addCategory(categoryForm.name);
         }
-        setCategoryForm(categoryForm.idx, "");
+        setCategoryForm(categoryForm.idx, "", "");
         setCategoryEditMode(false);
     }, [addCategory, editCategory, setCategoryForm, categoryForm, setCategoryEditMode, isCategoryEditMode]);
 
     const handleCancelCategoryClick = useCallback(() => {
-        setCategoryForm(-1, "");
+        setCategoryForm(-1, "", "");
         setCategoryEditMode(false);
     }, [setCategoryForm, setCategoryEditMode]);
 
     const onCategoryNameChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
-            setCategoryForm(categoryForm.idx, e.target.value);
+            setCategoryForm(categoryForm.idx, e.target.value, categoryForm.lexoRank);
         },
-        [setCategoryForm, categoryForm.idx]
+        [setCategoryForm, categoryForm.idx, categoryForm.lexoRank]
     );
 
     return (

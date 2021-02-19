@@ -56,11 +56,12 @@ const useStyles = makeStyles((theme: Theme) =>
 interface CategoryProps {
     categoryIdx: number;
     name: string;
+    lexoRank: string;
     products: Product[];
     index: number;
 }
 
-const Category = ({ categoryIdx, name, products, index }: CategoryProps) => {
+const Category = ({ categoryIdx, name, lexoRank, products, index }: CategoryProps) => {
     const classes = useStyles();
     const { removeCategory, setCategoryForm, setCategoryEditMode } = useProduct();
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -68,22 +69,20 @@ const Category = ({ categoryIdx, name, products, index }: CategoryProps) => {
 
     const handleEditClick = useCallback(
         (e) => {
-            const { idx, name } = e.currentTarget.dataset;
-            setCategoryForm(+idx, name);
+            setCategoryForm(categoryIdx, name, lexoRank);
             setCategoryEditMode(true);
         },
-        [setCategoryForm, setCategoryEditMode]
+        [setCategoryForm, categoryIdx, name, lexoRank, setCategoryEditMode]
     );
 
     const handleDeleteClick = useCallback((e) => {
-        const { idx, name } = e.currentTarget.dataset;
-        setClickedCategory({ idx: +idx, name });
+        setClickedCategory({ idx: categoryIdx, name });
         setIsModalOpen(true);
     }, []);
 
     const handleDeleteOkClick = useCallback(() => {
         removeCategory(clickedCategory.idx);
-        setCategoryForm(-1, "");
+        setCategoryForm(-1, "", "");
         setCategoryEditMode(false);
     }, [removeCategory, clickedCategory, setCategoryForm, setCategoryEditMode]);
 
@@ -109,8 +108,6 @@ const Category = ({ categoryIdx, name, products, index }: CategoryProps) => {
                                 item
                                 xs={1}
                                 className={clsx(classes.rightAlign, classes.hover)}
-                                data-idx={categoryIdx}
-                                data-name={name}
                                 onClick={handleEditClick}
                             >
                                 <Edit />
@@ -119,8 +116,6 @@ const Category = ({ categoryIdx, name, products, index }: CategoryProps) => {
                                 item
                                 xs={1}
                                 className={clsx(classes.rightAlign, classes.hover)}
-                                data-idx={categoryIdx}
-                                data-name={name}
                                 onClick={handleDeleteClick}
                             >
                                 <Delete />

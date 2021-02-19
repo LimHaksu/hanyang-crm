@@ -1,7 +1,14 @@
 import { createAction, ActionType, createReducer } from "typesafe-actions";
 import produce from "immer";
 import { getRankBetween, A_LEXO_RANK, Z_LEXO_RANK } from "util/lexoRank";
-import { ADD_CATEGORY, ADD_CATEGORY_SUCCESS, ADD_CATEGORY_ERROR } from "./saga";
+import {
+    ADD_CATEGORY,
+    ADD_CATEGORY_SUCCESS,
+    ADD_CATEGORY_ERROR,
+    EDIT_CATEGORY,
+    EDIT_CATEGORY_SUCCESS,
+    EDIT_CATEGORY_ERROR,
+} from "./saga";
 
 export interface Product {
     idx: number;
@@ -20,7 +27,6 @@ export interface Category {
 
 export const CHANGE_CATEGORY_LEXO_RANK = "product/CHANGE_CATEGORY_LEXO_RANK";
 
-const EDIT_CATEGORY = "product/EDIT_CATEGORY";
 const MOVE_CATEGORY = "product/MOVE_CATEGORY";
 const REMOVE_CATEGORY = "product/REMOVE_CATEGORY";
 
@@ -47,10 +53,9 @@ export const addCategory = createAction(ADD_CATEGORY)();
 export const addCategorySuccess = createAction(ADD_CATEGORY_SUCCESS)<Category>();
 export const addCategoryError = createAction(ADD_CATEGORY_ERROR)<Error>();
 
-export const editCategoryAction = createAction(EDIT_CATEGORY, (idx: number, name: string) => ({
-    idx,
-    name,
-}))();
+export const editCategory = createAction(EDIT_CATEGORY)();
+export const editCategorySuccess = createAction(EDIT_CATEGORY_SUCCESS)<Omit<Category, "products" | "lexoRank">>();
+export const editCategoryError = createAction(EDIT_CATEGORY_ERROR)<Error>();
 
 export const moveCategoryAction = createAction(MOVE_CATEGORY, (srcIdx: number, destIdx: number) => ({
     srcIdx,
@@ -87,7 +92,11 @@ export const moveProductAction = createAction(
 
 export const removeProductAction = createAction(REMOVE_PRODUCT, (idx: number) => idx)();
 
-export const setCategoryFormAction = createAction(SET_CATEGORY_FORM, (idx: number, name: string) => ({ idx, name }))();
+export const setCategoryFormAction = createAction(SET_CATEGORY_FORM, (idx: number, name: string, lexoRank: string) => ({
+    idx,
+    name,
+    lexoRank,
+}))();
 
 export const setProductFormAction = createAction(
     SET_PRODUCT_FORM,
@@ -105,7 +114,9 @@ const actions = {
     addCategory,
     addCategorySuccess,
     addCategoryError,
-    editCategoryAction,
+    editCategory,
+    editCategorySuccess,
+    editCategoryError,
     moveCategoryAction,
     removeCategoryAction,
     addProductAction,
@@ -122,7 +133,7 @@ const actions = {
 
 interface ProductState {
     categories: { loading: boolean; error: Error | null; data: Category[] };
-    categoryForm: { idx: number; name: string };
+    categoryForm: { idx: number; name: string; lexoRank: string };
     productForm: { idx: number; categoryIdx: string; name: string; price: string };
     isCategoryEditMode: boolean;
     isProductEditMode: boolean;
@@ -136,7 +147,7 @@ const initialState: ProductState = {
         error: null,
         data: [],
     },
-    categoryForm: { idx: -1, name: "" },
+    categoryForm: { idx: -1, name: "", lexoRank: "" },
     productForm: { idx: -1, categoryIdx: "", name: "", price: "" },
     isCategoryEditMode: false,
     isProductEditMode: false,
@@ -167,18 +178,21 @@ const product = createReducer<ProductState, ProductAction>(initialState, {
             draft.categories.loading = false;
             draft.categories.error = error;
         }),
-    [EDIT_CATEGORY]: (state, { payload: { idx, name } }) => ({
-        ...state,
-        categories: {
-            ...state.categories,
-            data: state.categories.data.map((category) => {
-                if (category.idx !== idx) {
-                    return category;
-                }
-                return { ...category, name };
-            }),
-        },
-    }),
+
+    [EDIT_CATEGORY]: (state) => state,
+
+    [EDIT_CATEGORY_SUCCESS]: (state, { payload: { idx, name } }) =>
+        produce(state, (draft) => {
+            const category = draft.categories.data.find((category) => category.idx === idx);
+            if (category) {
+                category.name = name;
+            }
+        }),
+    [EDIT_CATEGORY_ERROR]: (state, { payload: error }) =>
+        produce(state, (draft) => {
+            //TODO... 에러 핸들링 로직
+        }),
+
     [MOVE_CATEGORY]: (state, { payload: { srcIdx, destIdx } }) =>
         produce(state, (draft) => {
             // categories는 정렬돼있는 상태

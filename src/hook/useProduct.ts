@@ -1,7 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "module/index";
 import {
-    editCategoryAction,
     moveCategoryAction,
     removeCategoryAction,
     addProductAction,
@@ -16,7 +15,7 @@ import {
     setLastProductIdxAction,
 } from "module/product";
 import { useCallback } from "react";
-import { addCategoryAsync } from "module/product/saga";
+import { addCategoryAsync, editCategoryAsync } from "module/product/saga";
 
 const useProduct = () => {
     const categories = useSelector((state: RootState) => state.product.categories.data);
@@ -29,9 +28,10 @@ const useProduct = () => {
 
     const addCategory = useCallback((name: string) => dispatch(addCategoryAsync.request(name)), [dispatch]);
 
-    const editCategory = useCallback((idx: number, name: string) => dispatch(editCategoryAction(idx, name)), [
-        dispatch,
-    ]);
+    const editCategory = useCallback(
+        (idx: number, name: string, lexoRank: string) => dispatch(editCategoryAsync.request({ idx, name, lexoRank })),
+        [dispatch]
+    );
 
     const moveCategory = useCallback(
         (srcIdx: number, destIdx: number) => dispatch(moveCategoryAction(srcIdx, destIdx)),
@@ -59,9 +59,10 @@ const useProduct = () => {
 
     const removeProduct = useCallback((idx: number) => dispatch(removeProductAction(idx)), [dispatch]);
 
-    const setCategoryForm = useCallback((idx: number, name: string) => dispatch(setCategoryFormAction(idx, name)), [
-        dispatch,
-    ]);
+    const setCategoryForm = useCallback(
+        (idx: number, name: string, lexoRank: string) => dispatch(setCategoryFormAction(idx, name, lexoRank)),
+        [dispatch]
+    );
 
     const setProductForm = useCallback(
         (idx: number, categoryIdx: string, name: string, price: string) =>

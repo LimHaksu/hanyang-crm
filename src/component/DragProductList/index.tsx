@@ -66,7 +66,7 @@ const DragProductList = ({ categories }: DragProductListProps) => {
 
                 // 카테고리 옮기기
                 if (result.type === "CATEGORY") {
-                    setCategoryForm(-1, "");
+                    setCategoryForm(-1, "", "");
                     setCategoryEditMode(false);
                     moveCategory(source.index, destination.index);
                     return;
@@ -101,6 +101,7 @@ const DragProductList = ({ categories }: DragProductListProps) => {
                                 categoryIdx={category.idx}
                                 index={index}
                                 name={category.name}
+                                lexoRank={category.lexoRank}
                                 products={category.products.map((product) => ({
                                     ...product,
                                     categoryIdx: "" + category.idx,

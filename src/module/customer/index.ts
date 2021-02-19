@@ -186,7 +186,6 @@ const customer = createReducer<CustomerState, CustomerAction>(initialState, {
     [EDIT_CUSTOMER]: (state) => ({ ...state, editState: { loading: true, error: null, isSuccess: false } }),
     [EDIT_CUSTOMER_SUCCESS]: (state, { payload: customer }) =>
         produce(state, (draft) => {
-            console.log(customer);
             const foundIdx = draft.customers.data.findIndex((c) => c.idx === customer.idx);
             if (foundIdx >= 0) {
                 draft.customers.data[foundIdx] = customer;

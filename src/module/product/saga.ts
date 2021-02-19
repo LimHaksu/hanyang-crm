@@ -9,11 +9,21 @@ export const ADD_CATEGORY = "product/ADD_CATEGORY";
 export const ADD_CATEGORY_SUCCESS = "product/ADD_CATEGORY_SUCCESS";
 export const ADD_CATEGORY_ERROR = "product/ADD_CATEGORY_ERROR";
 
+export const EDIT_CATEGORY = "product/EDIT_CATEGORY";
+export const EDIT_CATEGORY_SUCCESS = "product/EDIT_CATEGORY_SUCCESS";
+export const EDIT_CATEGORY_ERROR = "product/EDIT_CATEGORY_ERROR";
+
 // createAsyncAction : request, success, failure, cancel arg를 넣으면
 // asyncAction을 만들어줌
 export const addCategoryAsync = createAsyncAction(ADD_CATEGORY, ADD_CATEGORY_SUCCESS, ADD_CATEGORY_ERROR)<
     string,
     Category,
+    Error
+>();
+
+export const editCategoryAsync = createAsyncAction(EDIT_CATEGORY, EDIT_CATEGORY_SUCCESS, EDIT_CATEGORY_ERROR)<
+    Omit<Category, "products">,
+    Omit<Category, "products" | "lexoRank">,
     Error
 >();
 
@@ -57,6 +67,17 @@ function* addCategorySaga(action: ReturnType<typeof addCategoryAsync.request>) {
     }
 }
 
+function* editCategorySaga(action: ReturnType<typeof editCategoryAsync.request>) {
+    try {
+        const { idx, name, lexoRank } = action.payload;
+        yield call(editCategory, idx, name, lexoRank);
+        yield put(editCategoryAsync.success({ idx, name }));
+    } catch (e) {
+        yield put(editCategoryAsync.failure(e));
+    }
+}
+
 export function* productSaga() {
     yield takeEvery(ADD_CATEGORY, addCategorySaga);
+    yield takeEvery(EDIT_CATEGORY, editCategorySaga);
 }
