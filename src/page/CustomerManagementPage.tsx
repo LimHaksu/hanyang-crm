@@ -6,8 +6,9 @@ import CustomerSearch from "component/CustomerSearch";
 import Button from "@material-ui/core/Button";
 import CustomerInfo from "component/CustomerInfo";
 import CustomerList from "component/CustomerList";
-import useCustomer from "hook/useCustomer";
 import Modal from "component/Modal";
+import useCustomer from "hook/useCustomer";
+import useCustomerForm from "hook/useCustomerForm";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -58,14 +59,14 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const SubmitCustomer = () => {
     const classes = useStyles();
+    const { addCustomer, editCustomer } = useCustomer();
+
     const {
         customerManagementForm,
         setCustomerManagementForm,
-        addCustomer,
-        editCustomer,
         isCustomerManagementFormEditMode,
         setCustomerManagementFormEditMode,
-    } = useCustomer();
+    } = useCustomerForm();
 
     const handleSubmitButtonClick = useCallback(() => {
         const { idx, customerName, phoneNumber, address, request } = customerManagementForm;
@@ -175,8 +176,8 @@ const Modals = () => {
 
 export const CustomerManagementPage = () => {
     const classes = useStyles();
-    const { customers, customerManagementForm, setCustomerManagementForm } = useCustomer();
-
+    const { customers } = useCustomer();
+    const { customerManagementForm, setCustomerManagementForm } = useCustomerForm();
     return (
         <>
             <Paper className={classes.root}>

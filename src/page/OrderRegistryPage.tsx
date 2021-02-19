@@ -6,7 +6,7 @@ import ProductList from "component/ProductLIst";
 import CustomerInfo from "component/CustomerInfo";
 import OrderInfo from "component/OrderInfo";
 import SubmitOrder from "component/SubmitOrder";
-import useCustomer from "hook/useCustomer";
+import useCustomerForm from "hook/useCustomerForm";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -27,7 +27,8 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const OrderRegistryPage = () => {
     const classes = useStyles();
-    const { customerOrderForm, setCustomerOrderForm } = useCustomer();
+    const { customerOrderForm, setCustomerOrderForm } = useCustomerForm();
+
     return (
         <Paper className={classes.root}>
             <Box display="flex">

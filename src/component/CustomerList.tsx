@@ -13,7 +13,8 @@ import Button from "@material-ui/core/Button";
 import Modal from "component/Modal";
 import clsx from "clsx";
 import { Customer } from "module/customer";
-import useComstomer from "hook/useCustomer";
+import useCustomer from "hook/useCustomer";
+import useCustomerForm from "hook/useCustomerForm";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -104,7 +105,8 @@ interface CustomerListProp {
 
 const CustomerList = ({ customers }: CustomerListProp) => {
     const classes = useStyles();
-    const { removeCustomer, setCustomerManagementForm, setCustomerManagementFormEditMode } = useComstomer();
+    const { removeCustomer } = useCustomer();
+    const { setCustomerManagementForm, setCustomerManagementFormEditMode } = useCustomerForm();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [clickedCustomer, setClickedCustomer] = useState<Customer>();
 
