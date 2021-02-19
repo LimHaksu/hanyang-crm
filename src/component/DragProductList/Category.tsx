@@ -7,11 +7,12 @@ import Grid from "@material-ui/core/Grid";
 import Edit from "@material-ui/icons/Edit";
 import Delete from "@material-ui/icons/Delete";
 import Modal from "component/Modal";
+import Box from "@material-ui/core/Box";
+import Button from "@material-ui/core/Button";
 import clsx from "clsx";
 import { Product } from "module/product";
 import useProduct from "hook/useProduct";
-import Box from "@material-ui/core/Box";
-import Button from "@material-ui/core/Button";
+import useCategoryForm from "hook/useCategoryForm";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -63,7 +64,8 @@ interface CategoryProps {
 
 const Category = ({ categoryIdx, name, lexoRank, products, index }: CategoryProps) => {
     const classes = useStyles();
-    const { removeCategory, setCategoryForm, setCategoryEditMode } = useProduct();
+    const { removeCategory } = useProduct();
+    const { setCategoryForm, setCategoryEditMode } = useCategoryForm();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [clickedCategory, setClickedCategory] = useState({ name: "", idx: -1 });
 
@@ -75,10 +77,13 @@ const Category = ({ categoryIdx, name, lexoRank, products, index }: CategoryProp
         [setCategoryForm, categoryIdx, name, lexoRank, setCategoryEditMode]
     );
 
-    const handleDeleteClick = useCallback((e) => {
-        setClickedCategory({ idx: categoryIdx, name });
-        setIsModalOpen(true);
-    }, []);
+    const handleDeleteClick = useCallback(
+        (e) => {
+            setClickedCategory({ idx: categoryIdx, name });
+            setIsModalOpen(true);
+        },
+        [categoryIdx, name]
+    );
 
     const handleDeleteOkClick = useCallback(() => {
         removeCategory(clickedCategory.idx);

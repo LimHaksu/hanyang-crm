@@ -1,29 +1,21 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "module/index";
 import {
-    moveCategoryAction,
     removeCategoryAction,
     addProductAction,
     editProductAction,
     moveProductAction,
     removeProductAction,
-    setCategoryFormAction,
     setProductFormAction,
-    setCategoryEditModeAction,
     setProductEditModeAction,
-    setLastCategoryIdxAction,
-    setLastProductIdxAction,
 } from "module/product";
 import { useCallback } from "react";
-import { addCategoryAsync, editCategoryAsync } from "module/product/saga";
+import { addCategoryAsync, editCategoryAsync, moveCategoryAsync } from "module/product/saga";
 
 const useProduct = () => {
     const categories = useSelector((state: RootState) => state.product.categories.data);
-    const categoryForm = useSelector((state: RootState) => state.product.categoryForm);
     const productForm = useSelector((state: RootState) => state.product.productForm);
-    const isCategoryEditMode = useSelector((state: RootState) => state.product.isCategoryEditMode);
     const isProductEditMode = useSelector((state: RootState) => state.product.isProductEditMode);
-
     const dispatch = useDispatch();
 
     const addCategory = useCallback((name: string) => dispatch(addCategoryAsync.request(name)), [dispatch]);
@@ -34,7 +26,7 @@ const useProduct = () => {
     );
 
     const moveCategory = useCallback(
-        (srcIdx: number, destIdx: number) => dispatch(moveCategoryAction(srcIdx, destIdx)),
+        (srcIdx: number, destIdx: number) => dispatch(moveCategoryAsync.request({ srcIdx, destIdx })),
         [dispatch]
     );
 
@@ -59,32 +51,19 @@ const useProduct = () => {
 
     const removeProduct = useCallback((idx: number) => dispatch(removeProductAction(idx)), [dispatch]);
 
-    const setCategoryForm = useCallback(
-        (idx: number, name: string, lexoRank: string) => dispatch(setCategoryFormAction(idx, name, lexoRank)),
-        [dispatch]
-    );
-
     const setProductForm = useCallback(
         (idx: number, categoryIdx: string, name: string, price: string) =>
             dispatch(setProductFormAction(idx, categoryIdx, name, price)),
         [dispatch]
     );
 
-    const setCategoryEditMode = useCallback((isEditMode: boolean) => dispatch(setCategoryEditModeAction(isEditMode)), [
-        dispatch,
-    ]);
     const setProductEditMode = useCallback((isEditMode: boolean) => dispatch(setProductEditModeAction(isEditMode)), [
         dispatch,
     ]);
 
-    const setLastCategoryIdx = useCallback((idx: number) => dispatch(setLastCategoryIdxAction(idx)), [dispatch]);
-    const setLastProductIdx = useCallback((idx: number) => dispatch(setLastProductIdxAction(idx)), [dispatch]);
-
     return {
         categories,
-        categoryForm,
         productForm,
-        isCategoryEditMode,
         isProductEditMode,
         addCategory,
         editCategory,
@@ -94,12 +73,8 @@ const useProduct = () => {
         editProduct,
         moveProduct,
         removeProduct,
-        setCategoryForm,
         setProductForm,
-        setCategoryEditMode,
         setProductEditMode,
-        setLastCategoryIdx,
-        setLastProductIdx,
     };
 };
 

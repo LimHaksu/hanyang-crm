@@ -6,6 +6,7 @@ import Button from "@material-ui/core/Button";
 import Box from "@material-ui/core/Box";
 import useProduct from "hook/useProduct";
 import { StyledTextField } from "./index";
+import useCategoryForm from "hook/useCategoryForm";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -32,14 +33,8 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const CategoryForm = () => {
     const classes = useStyles();
-    const {
-        categoryForm,
-        setCategoryForm,
-        addCategory,
-        editCategory,
-        isCategoryEditMode,
-        setCategoryEditMode,
-    } = useProduct();
+    const { addCategory, editCategory } = useProduct();
+    const { categoryForm, setCategoryForm, isCategoryEditMode, setCategoryEditMode } = useCategoryForm();
 
     const handleAddCategoryClick = useCallback(() => {
         if (isCategoryEditMode) {
