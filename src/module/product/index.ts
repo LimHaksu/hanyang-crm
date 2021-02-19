@@ -43,7 +43,10 @@ export const ADD_PRODUCT = "product/ADD_PRODUCT";
 export const ADD_PRODUCT_SUCCESS = "product/ADD_PRODUCT_SUCCESS";
 export const ADD_PRODUCT_ERROR = "product/ADD_PRODUCT_ERROR";
 
-const EDIT_PRODUCT = "product/EDIT_PRODUCT";
+export const EDIT_PRODUCT = "product/EDIT_PRODUCT";
+export const EDIT_PRODUCT_SUCCESS = "product/EDIT_PRODUCT_SUCCESS";
+export const EDIT_PRODUCT_ERROR = "product/EDIT_PRODUCT_ERROR";
+
 const MOVE_PRODUCT = "product/MOVE_PRODUCT";
 const REMOVE_PRODUCT = "product/REMOVE_PRODUCT";
 
@@ -87,15 +90,8 @@ export const addProduct = createAction(ADD_PRODUCT)();
 export const addProductSuccess = createAction(ADD_PRODUCT_SUCCESS)<Product>();
 export const addProductError = createAction(ADD_PRODUCT_ERROR)<Error>();
 
-export const editProductAction = createAction(
-    EDIT_PRODUCT,
-    (idx: number, categoryIdx: number, name: string, price: number) => ({
-        idx,
-        categoryIdx,
-        name,
-        price,
-    })
-)();
+export const editProductSuccess = createAction(EDIT_PRODUCT_SUCCESS)<Product>();
+export const editProductError = createAction(EDIT_PRODUCT_ERROR)<Error>();
 
 export const moveProductAction = createAction(
     MOVE_PRODUCT,
@@ -117,7 +113,13 @@ export const setCategoryFormAction = createAction(SET_CATEGORY_FORM, (idx: numbe
 
 export const setProductFormAction = createAction(
     SET_PRODUCT_FORM,
-    (idx: number, categoryIdx: string, name: string, price: string) => ({ idx, categoryIdx, name, price })
+    (idx: number, categoryIdx: string, name: string, price: string, lexoRank: string) => ({
+        idx,
+        categoryIdx,
+        name,
+        price,
+        lexoRank,
+    })
 )();
 
 export const setCategoryEditModeAction = createAction(SET_CATEGORY_EDIT_MODE, (isEditMode: boolean) => isEditMode)();
@@ -148,7 +150,9 @@ const actions = {
     addProductSuccess,
     addProductError,
 
-    editProductAction,
+    editProductSuccess,
+    editProductError,
+
     moveProductAction,
     removeProductAction,
     setCategoryFormAction,
@@ -160,7 +164,7 @@ const actions = {
 interface ProductState {
     categories: { loading: boolean; error: Error | null; data: Category[] };
     categoryForm: { idx: number; name: string; lexoRank: string };
-    productForm: { idx: number; categoryIdx: string; name: string; price: string };
+    productForm: { idx: number; categoryIdx: string; name: string; price: string; lexoRank: string };
     isCategoryEditMode: boolean;
     isProductEditMode: boolean;
 }
@@ -172,7 +176,7 @@ const initialState: ProductState = {
         data: [],
     },
     categoryForm: { idx: -1, name: "", lexoRank: "" },
-    productForm: { idx: -1, categoryIdx: "", name: "", price: "" },
+    productForm: { idx: -1, categoryIdx: "", name: "", price: "", lexoRank: "" },
     isCategoryEditMode: false,
     isProductEditMode: false,
 };
@@ -274,18 +278,22 @@ const product = createReducer<ProductState, ProductAction>(initialState, {
             draft.categories.error = error;
         }),
 
-    [EDIT_PRODUCT]: (state, { payload: { idx, categoryIdx, name, price } }) =>
+    [EDIT_PRODUCT_SUCCESS]: (state, { payload: { idx, categoryIdx, name, price } }) =>
         produce(state, (draft) => {
-            draft.categories.data.forEach((category) => {
-                if (category.idx === categoryIdx) {
-                    const foundProduct = category.products.find((product) => product.idx === idx);
-                    if (foundProduct) {
-                        foundProduct.name = name;
-                        foundProduct.price = price;
-                    }
+            const products = draft.categories.data.find((category) => category.idx === categoryIdx)?.products;
+            if (products) {
+                const product = products.find((product) => product.idx === idx);
+                if (product) {
+                    product.name = name;
+                    product.price = price;
                 }
-            });
+            }
         }),
+    [EDIT_PRODUCT_ERROR]: (state, { payload: error }) =>
+        produce(state, (draft) => {
+            //TODO... 에러 핸들링 로직
+        }),
+
     [MOVE_PRODUCT]: (state, { payload: { currentIdx, nextIdx, srcIdx, destIdx } }) =>
         produce(state, (draft) => {
             const categories = draft.categories;

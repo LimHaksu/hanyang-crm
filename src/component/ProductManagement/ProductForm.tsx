@@ -94,14 +94,14 @@ const ProductForm = () => {
     } = useProduct();
 
     const resetProductForm = useCallback(() => {
-        setProductForm(-1, "", "", "");
+        setProductForm(-1, "", "", "", "");
         setProductEditMode(false);
     }, [setProductForm, setProductEditMode]);
 
     const handleAddProductClick = useCallback(() => {
-        const { idx, categoryIdx, name, price } = productForm;
+        const { idx, categoryIdx, name, price, lexoRank } = productForm;
         if (isProductEditMode) {
-            editProduct(+idx, +categoryIdx, name, +price);
+            editProduct(+idx, +categoryIdx, name, +price, lexoRank);
         } else {
             addProduct(name, +price, +productForm.categoryIdx);
         }
@@ -114,16 +114,22 @@ const ProductForm = () => {
 
     const handleCategoryNameChange = useCallback(
         (e) => {
-            setProductForm(productForm.idx, e.target.value, productForm.name, productForm.price);
+            setProductForm(productForm.idx, e.target.value, productForm.name, productForm.price, productForm.lexoRank);
         },
-        [setProductForm, productForm.idx, productForm.name, productForm.price]
+        [setProductForm, productForm.idx, productForm.name, productForm.price, productForm.lexoRank]
     );
 
     const handleProductNameChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
-            setProductForm(productForm.idx, productForm.categoryIdx, e.target.value, productForm.price);
+            setProductForm(
+                productForm.idx,
+                productForm.categoryIdx,
+                e.target.value,
+                productForm.price,
+                productForm.lexoRank
+            );
         },
-        [setProductForm, productForm.idx, productForm.categoryIdx, productForm.price]
+        [setProductForm, productForm.idx, productForm.categoryIdx, productForm.price, productForm.lexoRank]
     );
 
     const handleProductPriceChange = useCallback(
@@ -132,10 +138,11 @@ const ProductForm = () => {
                 productForm.idx,
                 productForm.categoryIdx,
                 productForm.name,
-                e.target.value.replace(/,/g, "")
+                e.target.value.replace(/,/g, ""),
+                productForm.lexoRank
             );
         },
-        [setProductForm, productForm.idx, productForm.categoryIdx, productForm.name]
+        [setProductForm, productForm.idx, productForm.categoryIdx, productForm.name, productForm.lexoRank]
     );
 
     const getPriceLocale = useCallback((price: string) => {

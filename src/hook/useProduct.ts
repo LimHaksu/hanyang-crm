@@ -1,13 +1,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "module/index";
-import {
-    editProductAction,
-    moveProductAction,
-    removeProductAction,
-    setProductFormAction,
-    setProductEditModeAction,
-} from "module/product";
-import { addProductAsync } from "module/product/saga";
+import { moveProductAction, removeProductAction, setProductFormAction, setProductEditModeAction } from "module/product";
+import { addProductAsync, editProductAsync } from "module/product/saga";
 import { useCallback } from "react";
 
 const useProduct = () => {
@@ -22,8 +16,8 @@ const useProduct = () => {
     );
 
     const editProduct = useCallback(
-        (idx: number, categoryIdx: number, name: string, price: number) =>
-            dispatch(editProductAction(idx, categoryIdx, name, price)),
+        (idx: number, categoryIdx: number, name: string, price: number, lexoRank: string) =>
+            dispatch(editProductAsync.request({ idx, categoryIdx, name, price, lexoRank })),
         [dispatch]
     );
 
@@ -36,8 +30,8 @@ const useProduct = () => {
     const removeProduct = useCallback((idx: number) => dispatch(removeProductAction(idx)), [dispatch]);
 
     const setProductForm = useCallback(
-        (idx: number, categoryIdx: string, name: string, price: string) =>
-            dispatch(setProductFormAction(idx, categoryIdx, name, price)),
+        (idx: number, categoryIdx: string, name: string, price: string, lexoRank: string) =>
+            dispatch(setProductFormAction(idx, categoryIdx, name, price, lexoRank)),
         [dispatch]
     );
 

@@ -60,8 +60,8 @@ const Product = ({ product, isDragging, provided }: ProductProps) => {
 
     const handleEditClick = useCallback(
         (e) => {
-            const { idx, categoryidx, name, price } = e.currentTarget.dataset;
-            setProductForm(idx, categoryidx, name, price);
+            const { idx, categoryidx, name, price, lexorank } = e.currentTarget.dataset;
+            setProductForm(idx, categoryidx, name, price, lexorank);
             setProductEditMode(true);
         },
         [setProductForm, setProductEditMode]
@@ -75,7 +75,7 @@ const Product = ({ product, isDragging, provided }: ProductProps) => {
 
     const handleDeleteOkClick = useCallback(() => {
         removeProduct(clickedProduct.idx);
-        setProductForm(-1, "", "", "");
+        setProductForm(-1, "", "", "", "");
         setProductEditMode(false);
     }, [removeProduct, clickedProduct.idx, setProductForm, setProductEditMode]);
 
@@ -101,6 +101,7 @@ const Product = ({ product, isDragging, provided }: ProductProps) => {
                         data-categoryidx={product.categoryIdx}
                         data-name={product.name}
                         data-price={product.price}
+                        data-lexorank={product.lexoRank}
                         onClick={handleEditClick}
                     >
                         <Edit />

@@ -26,6 +26,9 @@ import {
     ADD_PRODUCT,
     ADD_PRODUCT_SUCCESS,
     ADD_PRODUCT_ERROR,
+    EDIT_PRODUCT,
+    EDIT_PRODUCT_SUCCESS,
+    EDIT_PRODUCT_ERROR,
 } from "module/product";
 
 // createAsyncAction : request, success, failure, cancel arg를 넣으면
@@ -62,6 +65,12 @@ export const removeCategoryAsync = createAsyncAction(REMOVE_CATEGORY, REMOVE_CAT
 
 export const addProductAsync = createAsyncAction(ADD_PRODUCT, ADD_PRODUCT_SUCCESS, ADD_PRODUCT_ERROR)<
     { name: string; price: number; categoryIdx: number },
+    Product,
+    Error
+>();
+
+export const editProductAsync = createAsyncAction(EDIT_PRODUCT, EDIT_PRODUCT_SUCCESS, EDIT_PRODUCT_ERROR)<
+    Product,
     Product,
     Error
 >();
@@ -258,6 +267,16 @@ function* addProductSaga(action: ReturnType<typeof addProductAsync.request>) {
     }
 }
 
+function* editProductSaga(action: ReturnType<typeof editProductAsync.request>) {
+    try {
+        const { idx, name, price, lexoRank } = action.payload;
+        yield call(editProduct, idx, name, price, lexoRank);
+        yield put(editProductAsync.success(action.payload));
+    } catch (e) {
+        yield put(editProductAsync.failure(e));
+    }
+}
+
 export function* productSaga() {
     yield takeLatest(GET_CATEGORIES, getCategoriesSaga);
     yield takeEvery(ADD_CATEGORY, addCategorySaga);
@@ -265,4 +284,5 @@ export function* productSaga() {
     yield takeEvery(MOVE_CATEGORY, moveCategorySaga);
     yield takeEvery(REMOVE_CATEGORY, removeCategorySaga);
     yield takeEvery(ADD_PRODUCT, addProductSaga);
+    yield takeEvery(EDIT_PRODUCT, editProductSaga);
 }

@@ -67,7 +67,7 @@ const DragProductList = () => {
                 // 상품 옮기기
                 const currentIdx = categories.findIndex((category) => category.name === source.droppableId);
                 const nextIdx = categories.findIndex((category) => category.name === destination.droppableId);
-                setProductForm(-1, "", "", "");
+                setProductForm(-1, "", "", "", "");
                 setProductEditMode(false);
                 moveProduct(currentIdx, nextIdx, source.index, destination.index);
             }
