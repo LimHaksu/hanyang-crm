@@ -37,6 +37,11 @@ const useStyles = makeStyles((theme: Theme) =>
                 cursor: "pointer",
             },
         },
+        noItems: {
+            textAlign: "center",
+            marginBottom: 10,
+            fontSize: "1rem",
+        },
     })
 );
 
@@ -84,6 +89,9 @@ const CategoryRow = ({ category, isOpen, setIsOpen }: Props) => {
                                         <TableCell align="right">{product.price.toLocaleString()}</TableCell>
                                     </TableRow>
                                 ))}
+                                {category.products.length === 0 && (
+                                    <div className={classes.noItems}>등록된 상품이 없습니다</div>
+                                )}
                             </TableBody>
                         </Table>
                     </Collapse>
