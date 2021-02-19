@@ -144,10 +144,7 @@ const initialState: CustomerState = {
     customers: {
         loading: false,
         error: null,
-        data: [
-            { idx: 1, customerName: "손님1", phoneNumber: "010-1234-5678", address: "주소1", request: "안전한 배달" },
-            { idx: 2, customerName: "손님2", phoneNumber: "02-1234-5678", address: "주소2", request: "수저X" },
-        ],
+        data: [],
     },
     customerOrderForm: { customerName: "", address: "", phoneNumber: "", request: "" },
     customerManagementForm: { customerName: "", address: "", phoneNumber: "", request: "" },
