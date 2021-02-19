@@ -156,10 +156,8 @@ function* moveCategorySaga(action: ReturnType<typeof moveCategoryAsync.request>)
 
         categories.sort((a, b) => (a.lexoRank < b.lexoRank ? -1 : 1));
         yield put(moveCategoryAsync.success(categories));
-    } catch (e) {
-        yield put(moveCategoryAsync.failure(e));
-    } finally {
-        // DB 수정 로직은 마지막(finally)에 함.
+
+        // DB 수정 로직은 마지막에 함.
         // try 부분에서 yield call을 호출하면 렌더링이 한번 되는 현상이 발생해서
         // 옮긴 위치로 정렬되기 전 리스트가 불필요하게 한 번 더 렌더링 됨.
         if (srcIdx < destIdx) {
@@ -181,6 +179,8 @@ function* moveCategorySaga(action: ReturnType<typeof moveCategoryAsync.request>)
                 yield call(editCategory, srcCategory.idx, srcCategory.name, newLexoRank);
             }
         }
+    } catch (e) {
+        yield put(moveCategoryAsync.failure(e));
     }
 }
 
