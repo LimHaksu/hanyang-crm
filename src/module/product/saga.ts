@@ -1,11 +1,13 @@
 import { select, call, put, takeEvery, takeLatest } from "redux-saga/effects";
 import { createAsyncAction } from "typesafe-actions";
-import { getCategories, addCategory, editCategory, removeCategory } from "db/product";
+import { getCategories, addCategory, editCategory, removeCategory, addProduct, editProduct } from "db/product";
 import { RootState } from "../index";
 import { getRankBetween, A_LEXO_RANK, Z_LEXO_RANK } from "util/lexoRank";
 import {
     Category,
+    Product,
     CHANGE_CATEGORY_LEXO_RANK,
+    CHANGE_PRODUCT_LEXO_RANK,
     GET_CATEGORIES,
     GET_CATEGORIES_SUCCESS,
     GET_CATEGORIES_ERROR,
@@ -21,6 +23,9 @@ import {
     REMOVE_CATEGORY,
     REMOVE_CATEGORY_SUCCESS,
     REMOVE_CATEGORY_ERROR,
+    ADD_PRODUCT,
+    ADD_PRODUCT_SUCCESS,
+    ADD_PRODUCT_ERROR,
 } from "module/product";
 
 // createAsyncAction : request, success, failure, cancel arg를 넣으면
@@ -52,6 +57,12 @@ export const moveCategoryAsync = createAsyncAction(MOVE_CATEGORY, MOVE_CATEGORY_
 export const removeCategoryAsync = createAsyncAction(REMOVE_CATEGORY, REMOVE_CATEGORY_SUCCESS, REMOVE_CATEGORY_ERROR)<
     number,
     number,
+    Error
+>();
+
+export const addProductAsync = createAsyncAction(ADD_PRODUCT, ADD_PRODUCT_SUCCESS, ADD_PRODUCT_ERROR)<
+    { name: string; price: number; categoryIdx: number },
+    Product,
     Error
 >();
 
@@ -194,10 +205,64 @@ function* removeCategorySaga(action: ReturnType<typeof removeCategoryAsync.reque
     }
 }
 
+function* addProductSaga(action: ReturnType<typeof addProductAsync.request>) {
+    try {
+        // lexoRank 생성 로직
+        const { categoryIdx, name, price } = action.payload;
+        const categories: Category[] = yield select((state: RootState) => state.product.categories.data);
+        const products = categories.find((category) => category.idx === categoryIdx)?.products;
+        if (products) {
+            const lastIdx = yield call(addProduct, name, price, categoryIdx, Z_LEXO_RANK);
+            const plen = products.length;
+            const lastProduct = products[plen - 1];
+
+            if (plen === 1) {
+                // 마지막 한칸 전이 없는경우(길이 1)에는 'a'* defaultLexoRankLength 와 마지막의 중간값
+                const newLexoRank = getRankBetween(A_LEXO_RANK, Z_LEXO_RANK);
+                // DB
+                yield call(editProduct, lastProduct.idx, lastProduct.name, lastProduct.price, newLexoRank);
+                // redux store
+                yield put({
+                    type: CHANGE_PRODUCT_LEXO_RANK,
+                    payload: { categoryIdx, index: plen - 1, lexoRank: newLexoRank },
+                });
+            } else if (plen !== 0) {
+                // 기존의 마지막 lexoRank는 마지막 한칸 전과 마지막의 중간 값
+                const newLexoRank = getRankBetween(products[plen - 2].lexoRank, Z_LEXO_RANK);
+                // DB
+                yield call(editProduct, lastProduct.idx, lastProduct.name, lastProduct.price, newLexoRank);
+                // redux store
+                yield put({
+                    type: CHANGE_PRODUCT_LEXO_RANK,
+                    payload: {
+                        categoryIdx,
+                        index: plen - 1,
+                        lexoRank: newLexoRank,
+                    },
+                });
+            }
+            // 새로운 lexoRank는 기존의 마지막 lexoRank (= 'z'* defaultLexoRankLength ),
+            yield put(
+                addProductAsync.success({
+                    idx: lastIdx,
+                    name,
+                    price,
+                    categoryIdx,
+                    lexoRank: Z_LEXO_RANK,
+                })
+            );
+        }
+    } catch (e) {
+        yield put(addProductAsync.failure(e));
+    } finally {
+    }
+}
+
 export function* productSaga() {
     yield takeLatest(GET_CATEGORIES, getCategoriesSaga);
     yield takeEvery(ADD_CATEGORY, addCategorySaga);
     yield takeEvery(EDIT_CATEGORY, editCategorySaga);
     yield takeEvery(MOVE_CATEGORY, moveCategorySaga);
     yield takeEvery(REMOVE_CATEGORY, removeCategorySaga);
+    yield takeEvery(ADD_PRODUCT, addProductSaga);
 }

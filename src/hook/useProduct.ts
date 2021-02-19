@@ -1,13 +1,13 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "module/index";
 import {
-    addProductAction,
     editProductAction,
     moveProductAction,
     removeProductAction,
     setProductFormAction,
     setProductEditModeAction,
 } from "module/product";
+import { addProductAsync } from "module/product/saga";
 import { useCallback } from "react";
 
 const useProduct = () => {
@@ -16,7 +16,8 @@ const useProduct = () => {
     const dispatch = useDispatch();
 
     const addProduct = useCallback(
-        (name: string, price: number, categoryIdx: number) => dispatch(addProductAction(name, price, categoryIdx)),
+        (name: string, price: number, categoryIdx: number) =>
+            dispatch(addProductAsync.request({ name, price, categoryIdx })),
         [dispatch]
     );
 

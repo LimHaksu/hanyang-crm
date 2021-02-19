@@ -96,7 +96,7 @@ const DragProductList = () => {
                                 lexoRank={category.lexoRank}
                                 products={category.products.map((product) => ({
                                     ...product,
-                                    categoryIdx: "" + category.idx,
+                                    categoryIdx: category.idx,
                                 }))}
                             />
                         );

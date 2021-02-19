@@ -7,7 +7,7 @@ export interface Product {
     name: string;
     price: number;
     lexoRank: string;
-    categoryIdx?: string;
+    categoryIdx: number;
 }
 
 export interface Category {
@@ -16,6 +16,8 @@ export interface Category {
     products: Product[];
     lexoRank: string;
 }
+export const CHANGE_CATEGORY_LEXO_RANK = "product/CHANGE_CATEGORY_LEXO_RANK";
+export const CHANGE_PRODUCT_LEXO_RANK = "product/CHANGE_PRODUCT_LEXO_RANK";
 
 export const GET_CATEGORIES = "product/GET_CATEGORIES";
 export const GET_CATEGORIES_SUCCESS = "product/GET_CATEGORIES_SUCCESS";
@@ -37,9 +39,10 @@ export const REMOVE_CATEGORY = "product/REMOVE_CATEGORY";
 export const REMOVE_CATEGORY_SUCCESS = "product/REMOVE_CATEGORY_SUCCESS";
 export const REMOVE_CATEGORY_ERROR = "product/REMOVE_CATEGORY_ERROR";
 
-export const CHANGE_CATEGORY_LEXO_RANK = "product/CHANGE_CATEGORY_LEXO_RANK";
+export const ADD_PRODUCT = "product/ADD_PRODUCT";
+export const ADD_PRODUCT_SUCCESS = "product/ADD_PRODUCT_SUCCESS";
+export const ADD_PRODUCT_ERROR = "product/ADD_PRODUCT_ERROR";
 
-const ADD_PRODUCT = "product/ADD_PRODUCT";
 const EDIT_PRODUCT = "product/EDIT_PRODUCT";
 const MOVE_PRODUCT = "product/MOVE_PRODUCT";
 const REMOVE_PRODUCT = "product/REMOVE_PRODUCT";
@@ -54,6 +57,14 @@ const changeCategoryLexoRank = createAction(CHANGE_CATEGORY_LEXO_RANK, (index: n
     index,
     lexoRank,
 }))();
+const changeProductLexoRank = createAction(
+    CHANGE_PRODUCT_LEXO_RANK,
+    (categoryIdx: number, index: number, lexoRank: string) => ({
+        categoryIdx,
+        index,
+        lexoRank,
+    })
+)();
 
 export const getCategories = createAction(GET_CATEGORIES)();
 export const getCategoriesSuccess = createAction(GET_CATEGORIES_SUCCESS)<Category[]>();
@@ -72,11 +83,9 @@ export const moveCategoryError = createAction(MOVE_CATEGORY_ERROR)<Error>();
 export const removeCategorySuccess = createAction(REMOVE_CATEGORY_SUCCESS)<number>();
 export const removeCategoryError = createAction(REMOVE_CATEGORY_ERROR)<Error>();
 
-export const addProductAction = createAction(ADD_PRODUCT, (name: string, price: number, categoryIdx: number) => ({
-    name,
-    price,
-    categoryIdx,
-}))();
+export const addProduct = createAction(ADD_PRODUCT)();
+export const addProductSuccess = createAction(ADD_PRODUCT_SUCCESS)<Product>();
+export const addProductError = createAction(ADD_PRODUCT_ERROR)<Error>();
 
 export const editProductAction = createAction(
     EDIT_PRODUCT,
@@ -116,6 +125,7 @@ export const setProductEditModeAction = createAction(SET_PRODUCT_EDIT_MODE, (isE
 
 const actions = {
     changeCategoryLexoRank,
+    changeProductLexoRank,
 
     getCategories,
     getCategoriesSuccess,
@@ -134,7 +144,10 @@ const actions = {
     removeCategorySuccess,
     removeCategoryError,
 
-    addProductAction,
+    addProduct,
+    addProductSuccess,
+    addProductError,
+
     editProductAction,
     moveProductAction,
     removeProductAction,
@@ -170,6 +183,13 @@ const product = createReducer<ProductState, ProductAction>(initialState, {
     [CHANGE_CATEGORY_LEXO_RANK]: (state, { payload: { index, lexoRank } }) =>
         produce(state, (draft) => {
             draft.categories.data[index].lexoRank = lexoRank;
+        }),
+    [CHANGE_PRODUCT_LEXO_RANK]: (state, { payload: { categoryIdx, index, lexoRank } }) =>
+        produce(state, (draft) => {
+            const products = draft.categories.data.find((category) => category.idx === categoryIdx)?.products;
+            if (products) {
+                products[index].lexoRank = lexoRank;
+            }
         }),
 
     [GET_CATEGORIES]: (state) =>
@@ -235,22 +255,25 @@ const product = createReducer<ProductState, ProductAction>(initialState, {
             //TODO... 에러 핸들링 로직
         }),
 
-    [ADD_PRODUCT]: (state, { payload: { name, price, categoryIdx } }) =>
+    [ADD_PRODUCT]: (state) =>
         produce(state, (draft) => {
-            const products = draft.categories.data.find((category) => category.idx === categoryIdx)?.products;
+            draft.categories.loading = true;
+            draft.categories.error = null;
+        }),
+    [ADD_PRODUCT_SUCCESS]: (state, { payload: product }) =>
+        produce(state, (draft) => {
+            draft.categories.loading = false;
+            const products = draft.categories.data.find((category) => category.idx === product.categoryIdx)?.products;
             if (products) {
-                const plen = products.length;
-                if (plen === 1) {
-                    // 마지막 한칸 전이 없는경우(길이 1)에는 'a'* defaultLexoRankLength 와 마지막의 중간값
-                    products[plen - 1].lexoRank = getRankBetween(A_LEXO_RANK, Z_LEXO_RANK);
-                } else if (plen !== 0) {
-                    // 기존의 마지막 lexoRank는 마지막 한칸 전과 마지막의 중간 값
-                    products[plen - 1].lexoRank = getRankBetween(products[plen - 2].lexoRank, Z_LEXO_RANK);
-                }
-                // 새로운 lexoRank는 기존의 마지막 lexoRank (= 'z'* defaultLexoRankLength ),
-                products.push({ idx: 100, name, price, lexoRank: Z_LEXO_RANK });
+                products.push(product);
             }
         }),
+    [ADD_PRODUCT_ERROR]: (state, { payload: error }) =>
+        produce(state, (draft) => {
+            draft.categories.loading = false;
+            draft.categories.error = error;
+        }),
+
     [EDIT_PRODUCT]: (state, { payload: { idx, categoryIdx, name, price } }) =>
         produce(state, (draft) => {
             draft.categories.data.forEach((category) => {
