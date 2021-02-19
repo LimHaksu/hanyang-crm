@@ -17,6 +17,10 @@ export interface Category {
     lexoRank: string;
 }
 
+export const GET_CATEGORIES = "product/GET_CATEGORIES";
+export const GET_CATEGORIES_SUCCESS = "product/GET_CATEGORIES_SUCCESS";
+export const GET_CATEGORIES_ERROR = "product/GET_CATEGORIES_ERROR";
+
 export const ADD_CATEGORY = "product/ADD_CATEGORY";
 export const ADD_CATEGORY_SUCCESS = "product/ADD_CATEGORY_SUCCESS";
 export const ADD_CATEGORY_ERROR = "product/ADD_CATEGORY_ERROR";
@@ -50,6 +54,10 @@ const changeCategoryLexoRank = createAction(CHANGE_CATEGORY_LEXO_RANK, (index: n
     index,
     lexoRank,
 }))();
+
+export const getCategories = createAction(GET_CATEGORIES)();
+export const getCategoriesSuccess = createAction(GET_CATEGORIES_SUCCESS)<Category[]>();
+export const getCategoriesError = createAction(GET_CATEGORIES_ERROR)<Error>();
 
 export const addCategory = createAction(ADD_CATEGORY)();
 export const addCategorySuccess = createAction(ADD_CATEGORY_SUCCESS)<Category>();
@@ -109,6 +117,10 @@ export const setProductEditModeAction = createAction(SET_PRODUCT_EDIT_MODE, (isE
 const actions = {
     changeCategoryLexoRank,
 
+    getCategories,
+    getCategoriesSuccess,
+    getCategoriesError,
+
     addCategory,
     addCategorySuccess,
     addCategoryError,
@@ -158,6 +170,22 @@ const product = createReducer<ProductState, ProductAction>(initialState, {
     [CHANGE_CATEGORY_LEXO_RANK]: (state, { payload: { index, lexoRank } }) =>
         produce(state, (draft) => {
             draft.categories.data[index].lexoRank = lexoRank;
+        }),
+
+    [GET_CATEGORIES]: (state) =>
+        produce(state, (draft) => {
+            draft.categories.loading = true;
+            draft.categories.error = null;
+        }),
+    [GET_CATEGORIES_SUCCESS]: (state, { payload: categories }) =>
+        produce(state, (draft) => {
+            draft.categories.loading = false;
+            draft.categories.data = categories;
+        }),
+    [GET_CATEGORIES_ERROR]: (state, { payload: error }) =>
+        produce(state, (draft) => {
+            draft.categories.loading = false;
+            draft.categories.error = error;
         }),
 
     [ADD_CATEGORY]: (state) =>

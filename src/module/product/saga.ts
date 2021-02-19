@@ -1,11 +1,14 @@
-import { select, call, put, takeEvery } from "redux-saga/effects";
+import { select, call, put, takeEvery, takeLatest } from "redux-saga/effects";
 import { createAsyncAction } from "typesafe-actions";
-import { addCategory, editCategory, removeCategory } from "db/product";
+import { getCategories, addCategory, editCategory, removeCategory } from "db/product";
 import { RootState } from "../index";
 import { getRankBetween, A_LEXO_RANK, Z_LEXO_RANK } from "util/lexoRank";
 import {
     Category,
     CHANGE_CATEGORY_LEXO_RANK,
+    GET_CATEGORIES,
+    GET_CATEGORIES_SUCCESS,
+    GET_CATEGORIES_ERROR,
     ADD_CATEGORY,
     ADD_CATEGORY_SUCCESS,
     ADD_CATEGORY_ERROR,
@@ -22,6 +25,12 @@ import {
 
 // createAsyncAction : request, success, failure, cancel arg를 넣으면
 // asyncAction을 만들어줌
+export const getCategoriesAsync = createAsyncAction(GET_CATEGORIES, GET_CATEGORIES_SUCCESS, GET_CATEGORIES_ERROR)<
+    undefined,
+    Category[],
+    Error
+>();
+
 export const addCategoryAsync = createAsyncAction(ADD_CATEGORY, ADD_CATEGORY_SUCCESS, ADD_CATEGORY_ERROR)<
     string,
     Category,
@@ -45,6 +54,16 @@ export const removeCategoryAsync = createAsyncAction(REMOVE_CATEGORY, REMOVE_CAT
     number,
     Error
 >();
+
+function* getCategoriesSaga(action: ReturnType<typeof getCategoriesAsync.request>) {
+    try {
+        const categories: Category[] = yield call(getCategories);
+        categories.sort((a, b) => (a.lexoRank < b.lexoRank ? -1 : 1));
+        yield put(getCategoriesAsync.success(categories));
+    } catch (e) {
+        yield put(getCategoriesAsync.failure(e));
+    }
+}
 
 function* addCategorySaga(action: ReturnType<typeof addCategoryAsync.request>) {
     try {
@@ -176,6 +195,7 @@ function* removeCategorySaga(action: ReturnType<typeof removeCategoryAsync.reque
 }
 
 export function* productSaga() {
+    yield takeLatest(GET_CATEGORIES, getCategoriesSaga);
     yield takeEvery(ADD_CATEGORY, addCategorySaga);
     yield takeEvery(EDIT_CATEGORY, editCategorySaga);
     yield takeEvery(MOVE_CATEGORY, moveCategorySaga);

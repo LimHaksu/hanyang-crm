@@ -1,11 +1,19 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "module/index";
 import { useCallback } from "react";
-import { addCategoryAsync, editCategoryAsync, moveCategoryAsync, removeCategoryAsync } from "module/product/saga";
+import {
+    getCategoriesAsync,
+    addCategoryAsync,
+    editCategoryAsync,
+    moveCategoryAsync,
+    removeCategoryAsync,
+} from "module/product/saga";
 
 const useCategory = () => {
     const categories = useSelector((state: RootState) => state.product.categories.data);
     const dispatch = useDispatch();
+
+    const getCategories = useCallback(() => dispatch(getCategoriesAsync.request()), [dispatch]);
 
     const addCategory = useCallback((name: string) => dispatch(addCategoryAsync.request(name)), [dispatch]);
 
@@ -23,6 +31,7 @@ const useCategory = () => {
 
     return {
         categories,
+        getCategories,
         addCategory,
         editCategory,
         moveCategory,

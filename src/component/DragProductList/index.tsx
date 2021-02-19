@@ -4,7 +4,6 @@ import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
-import { Category as CategoryType } from "module/product";
 import useCategory from "hook/useCategory";
 import useProduct from "hook/useProduct";
 import useCategoryForm from "hook/useCategoryForm";

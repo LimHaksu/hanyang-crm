@@ -1,4 +1,5 @@
 import { insert, select, update, deleteQuery, Category, Product } from "./db";
+import { changePropertyFromSnakeToCamel } from "util/db";
 
 /**
  * 새로운 카테고리 저장, 마지막 카테고리 lexoRank의 다음 문자열을 lexoRank로 받음
@@ -37,7 +38,7 @@ export const getCategories = async () => {
                 return { ...category, products };
             })
         );
-        return categoriesWithProducts;
+        return changePropertyFromSnakeToCamel(categoriesWithProducts);
     } catch (e) {
         throw e;
     }
