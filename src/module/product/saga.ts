@@ -1,6 +1,14 @@
 import { select, call, put, takeEvery, takeLatest } from "redux-saga/effects";
 import { createAsyncAction } from "typesafe-actions";
-import { getCategories, addCategory, editCategory, removeCategory, addProduct, editProduct } from "db/product";
+import {
+    getCategories,
+    addCategory,
+    editCategory,
+    removeCategory,
+    addProduct,
+    editProduct,
+    removeProduct,
+} from "db/product";
 import { RootState } from "../index";
 import { getRankBetween, A_LEXO_RANK, Z_LEXO_RANK } from "util/lexoRank";
 import {
@@ -32,8 +40,10 @@ import {
     MOVE_PRODUCT,
     MOVE_PRODUCT_SUCCESS,
     MOVE_PRODUCT_ERROR,
+    REMOVE_PRODUCT,
+    REMOVE_PRODUCT_SUCCESS,
+    REMOVE_PRODUCT_ERROR,
 } from "module/product";
-import { sr } from "date-fns/locale";
 
 // createAsyncAction : request, success, failure, cancel arg를 넣으면
 // asyncAction을 만들어줌
@@ -82,6 +92,12 @@ export const editProductAsync = createAsyncAction(EDIT_PRODUCT, EDIT_PRODUCT_SUC
 export const moveProductAsync = createAsyncAction(MOVE_PRODUCT, MOVE_PRODUCT_SUCCESS, MOVE_PRODUCT_ERROR)<
     { currentIndex: number; nextIndex: number; srcIdx: number; destIdx: number },
     Category[],
+    Error
+>();
+
+export const removeProductAsync = createAsyncAction(REMOVE_PRODUCT, REMOVE_PRODUCT_SUCCESS, REMOVE_PRODUCT_ERROR)<
+    number,
+    number,
     Error
 >();
 
@@ -477,6 +493,17 @@ function* moveProductSaga(action: ReturnType<typeof moveProductAsync.request>) {
     }
 }
 
+function* removeProductSaga(action: ReturnType<typeof removeProductAsync.request>) {
+    try {
+        const idx = action.payload;
+        yield call(removeProduct, idx);
+        yield put(removeProductAsync.success(idx));
+    } catch (e) {
+        console.error(e);
+        yield put(removeProductAsync.failure(e));
+    }
+}
+
 export function* productSaga() {
     yield takeLatest(GET_CATEGORIES, getCategoriesSaga);
     yield takeEvery(ADD_CATEGORY, addCategorySaga);
@@ -486,4 +513,5 @@ export function* productSaga() {
     yield takeEvery(ADD_PRODUCT, addProductSaga);
     yield takeEvery(EDIT_PRODUCT, editProductSaga);
     yield takeEvery(MOVE_PRODUCT, moveProductSaga);
+    yield takeEvery(REMOVE_PRODUCT, removeProductSaga);
 }

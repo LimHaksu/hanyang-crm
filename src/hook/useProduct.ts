@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "module/index";
-import { removeProductAction, setProductFormAction, setProductEditModeAction } from "module/product";
-import { addProductAsync, editProductAsync, moveProductAsync } from "module/product/saga";
+import { setProductFormAction, setProductEditModeAction } from "module/product";
+import { addProductAsync, editProductAsync, moveProductAsync, removeProductAsync } from "module/product/saga";
 import { useCallback } from "react";
 
 const useProduct = () => {
@@ -27,7 +27,7 @@ const useProduct = () => {
         [dispatch]
     );
 
-    const removeProduct = useCallback((idx: number) => dispatch(removeProductAction(idx)), [dispatch]);
+    const removeProduct = useCallback((idx: number) => dispatch(removeProductAsync.request(idx)), [dispatch]);
 
     const setProductForm = useCallback(
         (idx: number, categoryIdx: string, name: string, price: string, lexoRank: string) =>

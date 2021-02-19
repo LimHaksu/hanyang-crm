@@ -1,6 +1,5 @@
 import { createAction, ActionType, createReducer } from "typesafe-actions";
 import produce from "immer";
-import { getRankBetween, A_LEXO_RANK, Z_LEXO_RANK } from "util/lexoRank";
 
 export interface Product {
     idx: number;
@@ -51,7 +50,9 @@ export const MOVE_PRODUCT = "product/MOVE_PRODUCT";
 export const MOVE_PRODUCT_SUCCESS = "product/MOVE_PRODUCT_SUCCESS";
 export const MOVE_PRODUCT_ERROR = "product/MOVE_PRODUCT_ERROR";
 
-const REMOVE_PRODUCT = "product/REMOVE_PRODUCT";
+export const REMOVE_PRODUCT = "product/REMOVE_PRODUCT";
+export const REMOVE_PRODUCT_SUCCESS = "product/REMOVE_PRODUCT_SUCCESS";
+export const REMOVE_PRODUCT_ERROR = "product/REMOVE_PRODUCT_ERROR";
 
 const SET_CATEGORY_FORM = "product/SET_CATEGORY_FORM";
 const SET_PRODUCT_FORM = "product/SET_PRODUCT_FORM";
@@ -99,7 +100,8 @@ export const editProductError = createAction(EDIT_PRODUCT_ERROR)<Error>();
 export const moveProductSuccess = createAction(MOVE_PRODUCT_SUCCESS)<Category[]>();
 export const moveProductError = createAction(MOVE_PRODUCT_ERROR)<Error>();
 
-export const removeProductAction = createAction(REMOVE_PRODUCT, (idx: number) => idx)();
+export const removeProductSuccess = createAction(REMOVE_PRODUCT_SUCCESS)<number>();
+export const removeProductError = createAction(REMOVE_PRODUCT_ERROR)<Error>();
 
 export const setCategoryFormAction = createAction(SET_CATEGORY_FORM, (idx: number, name: string, lexoRank: string) => ({
     idx,
@@ -152,7 +154,9 @@ const actions = {
     moveProductSuccess,
     moveProductError,
 
-    removeProductAction,
+    removeProductSuccess,
+    removeProductError,
+
     setCategoryFormAction,
     setProductFormAction,
     setCategoryEditModeAction,
@@ -300,8 +304,10 @@ const product = createReducer<ProductState, ProductAction>(initialState, {
         produce(state, (draft) => {
             // TODO... 에러 핸들링 로직
         }),
-    [REMOVE_PRODUCT]: (state, { payload: idx }) =>
+
+    [REMOVE_PRODUCT_SUCCESS]: (state, { payload: idx }) =>
         produce(state, (draft) => {
+            console.log("여기옴");
             draft.categories.data.forEach((category) => {
                 const foundProductIdx = category.products.findIndex((product) => product.idx === idx);
                 if (foundProductIdx >= 0) {
@@ -309,6 +315,11 @@ const product = createReducer<ProductState, ProductAction>(initialState, {
                 }
             });
         }),
+    [REMOVE_PRODUCT_ERROR]: (state, { payload: error }) =>
+        produce(state, (draft) => {
+            // TODO... 에러 핸들링 로직
+        }),
+
     [SET_CATEGORY_FORM]: (state, { payload: categoryForm }) => ({ ...state, categoryForm }),
     [SET_PRODUCT_FORM]: (state, { payload: productForm }) => ({ ...state, productForm }),
     [SET_CATEGORY_EDIT_MODE]: (state, { payload: isEditMode }) => ({ ...state, isCategoryEditMode: isEditMode }),
