@@ -5,6 +5,7 @@ import order from "./order";
 import product from "./product";
 import customer from "./customer";
 import { customerSaga } from "./customer/saga";
+import { productSaga } from "./product/saga";
 
 const rootReducer = combineReducers({
     phone,
@@ -16,7 +17,7 @@ const rootReducer = combineReducers({
 export type RootState = ReturnType<typeof rootReducer>;
 
 export function* rootSaga() {
-    yield all([customerSaga()]);
+    yield all([customerSaga(), productSaga()]);
 }
 
 export default rootReducer;

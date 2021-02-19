@@ -1,6 +1,7 @@
 import { createAction, ActionType, createReducer } from "typesafe-actions";
 import produce from "immer";
-import { getRankBetween } from "util/lexoRank";
+import { getRankBetween, A_LEXO_RANK, Z_LEXO_RANK } from "util/lexoRank";
+import { ADD_CATEGORY, ADD_CATEGORY_SUCCESS, ADD_CATEGORY_ERROR } from "./saga";
 
 export interface Product {
     idx: number;
@@ -17,11 +18,8 @@ export interface Category {
     lexoRank: string;
 }
 
-const DEFAULT_LEXORANK_LENGTH = 8;
-const A_LEXO_RANK = "a".repeat(DEFAULT_LEXORANK_LENGTH);
-const Z_LEXO_RANK = "z".repeat(DEFAULT_LEXORANK_LENGTH);
+export const CHANGE_CATEGORY_LEXO_RANK = "product/CHANGE_CATEGORY_LEXO_RANK";
 
-const ADD_CATEGORY = "product/ADD_CATEGORY";
 const EDIT_CATEGORY = "product/EDIT_CATEGORY";
 const MOVE_CATEGORY = "product/MOVE_CATEGORY";
 const REMOVE_CATEGORY = "product/REMOVE_CATEGORY";
@@ -40,10 +38,14 @@ const SET_PRODUCT_EDIT_MODE = "product/SET_EDIT_MODE";
 const SET_LAST_CATEGORY_IDX = "product/SET_LAST_CATEGORY_IDX";
 const SET_LAST_PRODUCT_IDX = "product/SET_LAST_PRODUCT_IDX";
 
-export const addCategoryAction = createAction(ADD_CATEGORY, (name: string) => ({
-    name,
-    products: [] as Product[],
+const changeCategoryLexoRank = createAction(CHANGE_CATEGORY_LEXO_RANK, (index: number, lexoRank: string) => ({
+    index,
+    lexoRank,
 }))();
+
+export const addCategory = createAction(ADD_CATEGORY)();
+export const addCategorySuccess = createAction(ADD_CATEGORY_SUCCESS)<Category>();
+export const addCategoryError = createAction(ADD_CATEGORY_ERROR)<Error>();
 
 export const editCategoryAction = createAction(EDIT_CATEGORY, (idx: number, name: string) => ({
     idx,
@@ -99,7 +101,10 @@ export const setLastCategoryIdxAction = createAction(SET_LAST_CATEGORY_IDX, (idx
 export const setLastProductIdxAction = createAction(SET_LAST_PRODUCT_IDX, (idx: number) => idx)();
 
 const actions = {
-    addCategoryAction,
+    changeCategoryLexoRank,
+    addCategory,
+    addCategorySuccess,
+    addCategoryError,
     editCategoryAction,
     moveCategoryAction,
     removeCategoryAction,
@@ -116,7 +121,7 @@ const actions = {
 };
 
 interface ProductState {
-    categories: Category[];
+    categories: { loading: boolean; error: Error | null; data: Category[] };
     categoryForm: { idx: number; name: string };
     productForm: { idx: number; categoryIdx: string; name: string; price: string };
     isCategoryEditMode: boolean;
@@ -126,44 +131,11 @@ interface ProductState {
 }
 
 const initialState: ProductState = {
-    categories: [
-        {
-            idx: 0,
-            name: "족발",
-            products: [
-                { idx: 0, name: "1인족발", price: 20000, lexoRank: "a" },
-                { idx: 1, name: "족발小", price: 30000, lexoRank: "b" },
-            ],
-            lexoRank: "gmzzzzmf",
-        },
-        {
-            idx: 1,
-            name: "보쌈",
-            products: [
-                { idx: 2, name: "1인보쌈", price: 20000, lexoRank: "a" },
-                { idx: 3, name: "보쌈小", price: 30000, lexoRank: "b" },
-            ],
-            lexoRank: "gmzzzzzz",
-        },
-        {
-            idx: 2,
-            name: "추가메뉴",
-            products: [
-                { idx: 4, name: "콜라", price: 3000, lexoRank: "a" },
-                { idx: 5, name: "사이다", price: 3000, lexoRank: "b" },
-            ],
-            lexoRank: "lzzzzzmf",
-        },
-        {
-            idx: 3,
-            name: "할인",
-            products: [
-                { idx: 6, name: "내방객", price: -3000, lexoRank: "a" },
-                { idx: 7, name: "쿠폰", price: -2000, lexoRank: "b" },
-            ],
-            lexoRank: "lzzzzzzk",
-        },
-    ],
+    categories: {
+        loading: false,
+        error: null,
+        data: [],
+    },
     categoryForm: { idx: -1, name: "" },
     productForm: { idx: -1, categoryIdx: "", name: "", price: "" },
     isCategoryEditMode: false,
@@ -175,30 +147,37 @@ const initialState: ProductState = {
 type ProductAction = ActionType<typeof actions>;
 
 const product = createReducer<ProductState, ProductAction>(initialState, {
-    [ADD_CATEGORY]: (state, { payload: category }) =>
+    [CHANGE_CATEGORY_LEXO_RANK]: (state, { payload: { index, lexoRank } }) =>
         produce(state, (draft) => {
-            const categories = draft.categories;
-            const clen = categories.length;
-            // 마지막 카테고리 인덱스 1 증가
-            draft.lastCategoryIdx += 1;
-            if (clen === 1) {
-                // 마지막 한칸 전이 없는경우(길이 1)에는 'a'* defaultLexoRankLength 와 마지막의 중간값
-                categories[clen - 1].lexoRank = getRankBetween(A_LEXO_RANK, Z_LEXO_RANK);
-            } else if (clen !== 0) {
-                // 기존의 마지막 lexoRank는 마지막 한칸 전과 마지막의 중간 값
-                categories[clen - 1].lexoRank = getRankBetween(categories[clen - 2].lexoRank, Z_LEXO_RANK);
-            }
-            // 새로운 lexoRank는 기존의 마지막 lexoRank (= 'z'* defaultLexoRankLength ),
-            categories.push({ ...category, idx: draft.lastCategoryIdx, lexoRank: Z_LEXO_RANK });
+            draft.categories.data[index].lexoRank = lexoRank;
+        }),
+
+    [ADD_CATEGORY]: (state) =>
+        produce(state, (draft) => {
+            draft.categories.loading = true;
+            draft.categories.error = null;
+        }),
+    [ADD_CATEGORY_SUCCESS]: (state, { payload: category }) =>
+        produce(state, (draft) => {
+            draft.categories.loading = false;
+            draft.categories.data.push(category);
+        }),
+    [ADD_CATEGORY_ERROR]: (state, { payload: error }) =>
+        produce(state, (draft) => {
+            draft.categories.loading = false;
+            draft.categories.error = error;
         }),
     [EDIT_CATEGORY]: (state, { payload: { idx, name } }) => ({
         ...state,
-        categories: state.categories.map((category) => {
-            if (category.idx !== idx) {
-                return category;
-            }
-            return { ...category, name };
-        }),
+        categories: {
+            ...state.categories,
+            data: state.categories.data.map((category) => {
+                if (category.idx !== idx) {
+                    return category;
+                }
+                return { ...category, name };
+            }),
+        },
     }),
     [MOVE_CATEGORY]: (state, { payload: { srcIdx, destIdx } }) =>
         produce(state, (draft) => {
@@ -206,42 +185,42 @@ const product = createReducer<ProductState, ProductAction>(initialState, {
             const categories = draft.categories;
 
             if (srcIdx < destIdx) {
-                if (destIdx === categories.length - 1) {
+                if (destIdx === categories.data.length - 1) {
                     // destCategory가 마지막 카테고리인 경우
-                    categories[srcIdx].lexoRank = Z_LEXO_RANK;
-                    categories[destIdx].lexoRank = getRankBetween(categories[destIdx].lexoRank, Z_LEXO_RANK);
+                    categories.data[srcIdx].lexoRank = Z_LEXO_RANK;
+                    categories.data[destIdx].lexoRank = getRankBetween(categories.data[destIdx].lexoRank, Z_LEXO_RANK);
                 } else {
                     // destCategory 뒤에 카테고리가 있는 경우
-                    categories[srcIdx].lexoRank = getRankBetween(
-                        categories[destIdx].lexoRank,
-                        categories[destIdx + 1].lexoRank
+                    categories.data[srcIdx].lexoRank = getRankBetween(
+                        categories.data[destIdx].lexoRank,
+                        categories.data[destIdx + 1].lexoRank
                     );
                 }
             } else {
                 if (destIdx === 0) {
                     // destCategory가 첫번째 카테고리인 경우
-                    categories[srcIdx].lexoRank = A_LEXO_RANK;
-                    categories[destIdx].lexoRank = getRankBetween(A_LEXO_RANK, categories[destIdx].lexoRank);
+                    categories.data[srcIdx].lexoRank = A_LEXO_RANK;
+                    categories.data[destIdx].lexoRank = getRankBetween(A_LEXO_RANK, categories.data[destIdx].lexoRank);
                 } else {
                     // destCategory 앞에 카테고리가 있는 경우
-                    categories[srcIdx].lexoRank = getRankBetween(
-                        categories[destIdx - 1].lexoRank,
-                        categories[destIdx].lexoRank
+                    categories.data[srcIdx].lexoRank = getRankBetween(
+                        categories.data[destIdx - 1].lexoRank,
+                        categories.data[destIdx].lexoRank
                     );
                 }
             }
 
             // 정렬
-            categories.sort((a, b) => (a.lexoRank < b.lexoRank ? -1 : 1));
+            categories.data.sort((a, b) => (a.lexoRank < b.lexoRank ? -1 : 1));
         }),
     [REMOVE_CATEGORY]: (state, { payload: idx }) => ({
         ...state,
-        categories: state.categories.filter((category) => category.idx !== idx),
+        categories: { ...state.categories, data: state.categories.data.filter((category) => category.idx !== idx) },
     }),
     [ADD_PRODUCT]: (state, { payload: { name, price, categoryIdx } }) =>
         produce(state, (draft) => {
             draft.lastProductIdx += 1;
-            const products = draft.categories.find((category) => category.idx === categoryIdx)?.products;
+            const products = draft.categories.data.find((category) => category.idx === categoryIdx)?.products;
             if (products) {
                 const plen = products.length;
                 if (plen === 1) {
@@ -257,7 +236,7 @@ const product = createReducer<ProductState, ProductAction>(initialState, {
         }),
     [EDIT_PRODUCT]: (state, { payload: { idx, categoryIdx, name, price } }) =>
         produce(state, (draft) => {
-            draft.categories.forEach((category) => {
+            draft.categories.data.forEach((category) => {
                 if (category.idx === categoryIdx) {
                     const foundProduct = category.products.find((product) => product.idx === idx);
                     if (foundProduct) {
@@ -273,7 +252,7 @@ const product = createReducer<ProductState, ProductAction>(initialState, {
 
             // 같은 카테고리 내에서 이동
             if (currentIdx === nextIdx) {
-                const products = categories[currentIdx].products;
+                const products = categories.data[currentIdx].products;
                 if (srcIdx < destIdx) {
                     if (destIdx === products.length - 1) {
                         // destProduct가 마지막 상품인 경우
@@ -303,8 +282,8 @@ const product = createReducer<ProductState, ProductAction>(initialState, {
                 products.sort((a, b) => (a.lexoRank < b.lexoRank ? -1 : 1));
             } else {
                 // 다른 카테고리로 이동
-                const [srcProduct] = categories[currentIdx].products.splice(srcIdx, 1);
-                const destProducts = categories[nextIdx].products;
+                const [srcProduct] = categories.data[currentIdx].products.splice(srcIdx, 1);
+                const destProducts = categories.data[nextIdx].products;
                 destProducts.push(srcProduct);
                 if (destProducts.length === 1) {
                     srcProduct.lexoRank = Z_LEXO_RANK;
@@ -324,7 +303,7 @@ const product = createReducer<ProductState, ProductAction>(initialState, {
         }),
     [REMOVE_PRODUCT]: (state, { payload: idx }) =>
         produce(state, (draft) => {
-            draft.categories.forEach((category) => {
+            draft.categories.data.forEach((category) => {
                 const foundProductIdx = category.products.findIndex((product) => product.idx === idx);
                 if (foundProductIdx >= 0) {
                     category.products.splice(foundProductIdx, 1);

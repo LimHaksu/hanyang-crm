@@ -10,8 +10,8 @@ export const addCategory = async (name: string, lexoRank: string) => {
         const query = `INSERT INTO
         category(name, lexo_rank)
         VALUES(?,?);`;
-        const lastId = await insert(query, name, lexoRank);
-        return lastId;
+        const lastIdx = await insert(query, name, lexoRank);
+        return lastIdx;
     } catch (e) {
         throw e;
     }
@@ -52,7 +52,7 @@ export const getCategories = async () => {
 export const editCategory = async (idx: number, name: string, lexoRank: string) => {
     try {
         const query = `UPDATE category
-        SET name = ? , lexoRank = ?
+        SET name = ? , lexo_rank = ?
         WHERE idx = ?;`;
         await update(query, name, lexoRank, idx);
     } catch (e) {

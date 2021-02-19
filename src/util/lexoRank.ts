@@ -1,4 +1,7 @@
 const ALPHABET_SIZE = 26;
+const DEFAULT_LEXORANK_LENGTH = 8;
+export const A_LEXO_RANK = "a".repeat(DEFAULT_LEXORANK_LENGTH);
+export const Z_LEXO_RANK = "z".repeat(DEFAULT_LEXORANK_LENGTH);
 
 /**
  * lexoRank 두개를 입력받으면 그 중간에 해당하는 lexoRank 반환

@@ -1,7 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "module/index";
 import {
-    addCategoryAction,
     editCategoryAction,
     moveCategoryAction,
     removeCategoryAction,
@@ -17,9 +16,10 @@ import {
     setLastProductIdxAction,
 } from "module/product";
 import { useCallback } from "react";
+import { addCategoryAsync } from "module/product/saga";
 
 const useProduct = () => {
-    const categories = useSelector((state: RootState) => state.product.categories);
+    const categories = useSelector((state: RootState) => state.product.categories.data);
     const categoryForm = useSelector((state: RootState) => state.product.categoryForm);
     const productForm = useSelector((state: RootState) => state.product.productForm);
     const isCategoryEditMode = useSelector((state: RootState) => state.product.isCategoryEditMode);
@@ -27,7 +27,7 @@ const useProduct = () => {
 
     const dispatch = useDispatch();
 
-    const addCategory = useCallback((name: string) => dispatch(addCategoryAction(name)), [dispatch]);
+    const addCategory = useCallback((name: string) => dispatch(addCategoryAsync.request(name)), [dispatch]);
 
     const editCategory = useCallback((idx: number, name: string) => dispatch(editCategoryAction(idx, name)), [
         dispatch,
