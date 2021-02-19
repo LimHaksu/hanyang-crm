@@ -1,17 +1,6 @@
 import { createAction, ActionType, createReducer } from "typesafe-actions";
 import produce from "immer";
 import { getRankBetween, A_LEXO_RANK, Z_LEXO_RANK } from "util/lexoRank";
-import {
-    ADD_CATEGORY,
-    ADD_CATEGORY_SUCCESS,
-    ADD_CATEGORY_ERROR,
-    EDIT_CATEGORY_SUCCESS,
-    EDIT_CATEGORY_ERROR,
-    MOVE_CATEGORY_SUCCESS,
-    MOVE_CATEGORY_ERROR,
-    REMOVE_CATEGORY_SUCCESS,
-    REMOVE_CATEGORY_ERROR,
-} from "./saga";
 
 export interface Product {
     idx: number;
@@ -28,6 +17,21 @@ export interface Category {
     lexoRank: string;
 }
 
+export const ADD_CATEGORY = "product/ADD_CATEGORY";
+export const ADD_CATEGORY_SUCCESS = "product/ADD_CATEGORY_SUCCESS";
+export const ADD_CATEGORY_ERROR = "product/ADD_CATEGORY_ERROR";
+
+export const EDIT_CATEGORY = "product/EDIT_CATEGORY";
+export const EDIT_CATEGORY_SUCCESS = "product/EDIT_CATEGORY_SUCCESS";
+export const EDIT_CATEGORY_ERROR = "product/EDIT_CATEGORY_ERROR";
+
+export const MOVE_CATEGORY = "product/MOVE_CATEGORY";
+export const MOVE_CATEGORY_SUCCESS = "product/MOVE_CATEGORY_SUCCESS";
+export const MOVE_CATEGORY_ERROR = "product/MOVE_CATEGORY_ERROR";
+
+export const REMOVE_CATEGORY = "product/REMOVE_CATEGORY";
+export const REMOVE_CATEGORY_SUCCESS = "product/REMOVE_CATEGORY_SUCCESS";
+export const REMOVE_CATEGORY_ERROR = "product/REMOVE_CATEGORY_ERROR";
 export const CHANGE_CATEGORY_LEXO_RANK = "product/CHANGE_CATEGORY_LEXO_RANK";
 
 const ADD_PRODUCT = "product/ADD_PRODUCT";
