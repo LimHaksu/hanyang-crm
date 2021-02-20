@@ -16,10 +16,11 @@ import FormControl from "@material-ui/core/FormControl";
 import Typography from "@material-ui/core/Typography";
 import clsx from "clsx";
 import Print from "@material-ui/icons/Print";
-import useOrder from "./../hook/useOrder";
+import useOrder from "hook/useOrder";
 import useCustomerForm from "hook/useCustomerForm";
 import { Product } from "module/product";
-import { PaymentMethod, Order } from "module/order";
+import { PaymentMethod, Order, OrderForm } from "module/order";
+import { CustomerForm } from "module/customer";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -111,6 +112,10 @@ const StyledRadio = (props: RadioProps & { label: string }) => {
             {...props}
         />
     );
+};
+
+const orderValidate = (customerOrderForm: CustomerForm, orderForm: OrderForm) => {
+    return customerOrderForm.phoneNumber && customerOrderForm.address && orderForm.products.length > 0;
 };
 
 type SelectedPayment = "cash" | "card" | "prePayment";
@@ -271,6 +276,7 @@ const SubmitOrder = () => {
                             variant="outlined"
                             color="primary"
                             onClick={handleSaveButtonClick}
+                            disabled={!orderValidate(customerOrderForm, orderForm)}
                         >
                             저장
                         </Button>
