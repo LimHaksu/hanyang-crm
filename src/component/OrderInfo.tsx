@@ -126,7 +126,7 @@ const OrderInfo = () => {
             case "name":
                 return product.name;
             case "price":
-                return product.amount;
+                return product.price.toLocaleString();
             case "amount":
                 return (
                     <TextField
