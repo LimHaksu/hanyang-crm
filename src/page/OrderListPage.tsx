@@ -192,7 +192,7 @@ const StyledTableRow = withStyles((theme: Theme) =>
 export const OrderListPage = () => {
     const classes = useStyles();
     const [selectedDate, handleDateChange] = useState<Date | null>(new Date());
-    const { orders, addOrder } = useOrder();
+    const { orders, submitOrder } = useOrder();
     const handleAccept = useCallback((date) => {
         handleDateChange(date);
     }, []);

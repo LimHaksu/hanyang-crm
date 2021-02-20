@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { makeStyles, createStyles, Theme, withStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Table from "@material-ui/core/Table";
@@ -6,7 +7,11 @@ import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
+import TextField from "@material-ui/core/TextField";
+import Delete from "@material-ui/icons/Delete";
 import clsx from "clsx";
+import useOrder from "hook/useOrder";
+import { Product } from "module/product";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -39,15 +44,14 @@ const useStyles = makeStyles((theme: Theme) =>
         clickableCell: {
             cursor: "pointer",
         },
+        amountTextField: {
+            width: 40,
+        },
     })
 );
 
-const isClickableCell = (id: string) => {
-    return id === "remove";
-};
-
 interface Column {
-    id: "idx" | "productName" | "price" | "amount" | "productTotalPrice" | "remove";
+    id: "idx" | "name" | "price" | "amount" | "productTotalPrice" | "remove";
     label: string;
     width?: number;
     minWidth?: number;
@@ -57,19 +61,10 @@ interface Column {
     formatPrice?: (price: number) => string;
 }
 
-interface Data {
-    idx: number;
-    productName: string;
-    price: number;
-    amount: number;
-    productTotalPrice: number;
-    remove: string;
-}
-
 const columns: Column[] = [
     { id: "idx", label: "순서", width: 40, minWidth: 40, align: "center" },
-    { id: "productName", label: "상품명", minWidth: 95, align: "center" },
-    { id: "price", label: "가격", minWidth: 95, align: "center", formatPrice: (price) => price.toLocaleString() },
+    { id: "name", label: "상품명", minWidth: 95, align: "center" },
+    { id: "price", label: "가격", minWidth: 95, align: "center" },
     {
         id: "amount",
         label: "수량",
@@ -81,7 +76,6 @@ const columns: Column[] = [
         label: "합계",
         minWidth: 95,
         align: "center",
-        formatPrice: (price) => price.toLocaleString(),
     },
     {
         id: "remove",
@@ -92,18 +86,9 @@ const columns: Column[] = [
     },
 ];
 
-function createData(
-    idx: number,
-    productName: string,
-    price: number,
-    amount: number,
-    productTotalPrice: number,
-    remove: string = "❌"
-): Data {
-    return { idx, productName, price, amount, productTotalPrice, remove };
-}
-
-const rows = [createData(1, "족발小", 30000, 1, 30000), createData(2, "1인보쌈", 20000, 2, 40000)];
+const isClickableCell = (id: string) => {
+    return id === "remove";
+};
 
 const StyledTableRow = withStyles((theme: Theme) =>
     createStyles({
@@ -117,6 +102,46 @@ const StyledTableRow = withStyles((theme: Theme) =>
 
 const OrderInfo = () => {
     const classes = useStyles();
+    const { orderForm, changeAmount, removeProduct } = useOrder();
+    const { products } = orderForm;
+
+    const handleAmountChange = useCallback(
+        (index) => (e: React.ChangeEvent<HTMLInputElement>) => {
+            changeAmount(index, +e.target.value);
+        },
+        [changeAmount]
+    );
+
+    const handleRemoveClick = useCallback(
+        (index: number) => () => {
+            removeProduct(index);
+        },
+        [removeProduct]
+    );
+
+    const cellContent = useCallback((columnId: string, product: Product & { amount: number }, index: number) => {
+        switch (columnId) {
+            case "idx":
+                return index + 1;
+            case "name":
+                return product.name;
+            case "price":
+                return product.amount;
+            case "amount":
+                return (
+                    <TextField
+                        className={classes.amountTextField}
+                        inputProps={{ style: { textAlign: "center" } }}
+                        onChange={handleAmountChange(index)}
+                        value={product.amount}
+                    />
+                );
+            case "productTotalPrice":
+                return (product.price * product.amount).toLocaleString();
+            case "remove":
+                return <Delete />;
+        }
+    }, []);
 
     return (
         <Paper className={classes.paper}>
@@ -138,12 +163,11 @@ const OrderInfo = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rows.map((row) => {
-                            return (
-                                <StyledTableRow hover role="checkbox" key={row.idx}>
-                                    {columns.map((column) => {
-                                        const value = row[column.id];
-                                        return (
+                        {products &&
+                            products.map((product, index) => {
+                                return (
+                                    <StyledTableRow hover role="checkbox" key={product.idx}>
+                                        {columns.map((column) => (
                                             <TableCell
                                                 className={clsx(
                                                     classes.cell,
@@ -151,16 +175,16 @@ const OrderInfo = () => {
                                                 )}
                                                 key={column.id}
                                                 align={column.align}
+                                                onClick={
+                                                    isClickableCell(column.id) ? handleRemoveClick(index) : () => {}
+                                                }
                                             >
-                                                {column.formatPrice && typeof value === "number"
-                                                    ? column.formatPrice(value)
-                                                    : value}
+                                                {cellContent(column.id, product, index)}
                                             </TableCell>
-                                        );
-                                    })}
-                                </StyledTableRow>
-                            );
-                        })}
+                                        ))}
+                                    </StyledTableRow>
+                                );
+                            })}
                     </TableBody>
                 </Table>
             </TableContainer>

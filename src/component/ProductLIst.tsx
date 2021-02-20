@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import Collapse from "@material-ui/core/Collapse";
@@ -10,6 +10,8 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import { Category } from "module/product";
 import useCategory from "hook/useCategory";
+import useOrder from "hook/useOrder";
+import { Product } from "module/product";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -31,6 +33,7 @@ const useStyles = makeStyles((theme: Theme) =>
             fontWeight: "bold",
         },
         row: {
+            userSelect: "none",
             "& > *": {
                 borderBottom: "unset",
                 fontSize: "1.1rem",
@@ -63,6 +66,20 @@ const setTrueOnlyOneCategory = (isOpen: IsOpen, categoryName: string) => {
 
 const CategoryRow = ({ category, isOpen, setIsOpen }: Props) => {
     const classes = useStyles();
+    const { orderForm, addProduct, changeAmount } = useOrder();
+
+    const handleProductClick = useCallback(
+        (product: Product) => () => {
+            const foundIndex = orderForm.products.findIndex((p) => p.idx === product.idx);
+            if (foundIndex >= 0) {
+                const prevAmount = orderForm.products[foundIndex].amount;
+                changeAmount(foundIndex, prevAmount + 1);
+            } else {
+                addProduct({ ...product, amount: 1 });
+            }
+        },
+        [addProduct, changeAmount, orderForm]
+    );
 
     return (
         <>
@@ -84,7 +101,12 @@ const CategoryRow = ({ category, isOpen, setIsOpen }: Props) => {
                         <Table aria-label="procuct">
                             <TableBody>
                                 {category.products.map((product) => (
-                                    <TableRow className={classes.row} key={product.idx} hover>
+                                    <TableRow
+                                        className={classes.row}
+                                        key={product.idx}
+                                        hover
+                                        onClick={handleProductClick(product)}
+                                    >
                                         <TableCell>{product.name}</TableCell>
                                         <TableCell align="right">{product.price.toLocaleString()}</TableCell>
                                     </TableRow>
