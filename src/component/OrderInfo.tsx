@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         container: {
             marginTop: "15px",
-            maxHeight: "calc(100vh - 532px)",
+            maxHeight: "calc(100vh - 527px)",
         },
         cell: {
             fontSize: "1.1rem",

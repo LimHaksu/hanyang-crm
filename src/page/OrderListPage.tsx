@@ -88,7 +88,7 @@ interface Column {
 
 const columns: Column[] = [
     { id: "idx", label: "순서", width: 40, minWidth: 40, align: "center" },
-    { id: "orderTime", label: "주문시각", width: 95, minWidth: 95, align: "center" },
+    { id: "orderTime", label: "주문시각", width: 110, minWidth: 110, align: "center" },
     {
         id: "customerName",
         label: "고객명",
