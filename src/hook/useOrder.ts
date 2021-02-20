@@ -2,11 +2,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../module";
 import {
     submitOrderAction,
-    setOrderFormAction,
     addProductAction,
     changeAmountAction,
     removeProductAction,
-    OrderForm,
+    changeOrderRequestAction,
+    changePaymentMethodAction,
     PaymentMethod,
 } from "module/order";
 import { Product } from "module/product";
@@ -17,8 +17,6 @@ const useOrder = () => {
     const orderForm = useSelector((state: RootState) => state.order.orderForm);
     const dispatch = useDispatch();
 
-    const setOrderForm = useCallback((orderForm: OrderForm) => dispatch(setOrderFormAction(orderForm)), [dispatch]);
-
     const addProduct = useCallback((product: Product & { amount: number }) => dispatch(addProductAction(product)), [
         dispatch,
     ]);
@@ -26,6 +24,13 @@ const useOrder = () => {
         dispatch,
     ]);
     const removeProduct = useCallback((index: number) => dispatch(removeProductAction(index)), [dispatch]);
+    const changeOrderRequest = useCallback((orderRequest: string) => dispatch(changeOrderRequestAction(orderRequest)), [
+        dispatch,
+    ]);
+    const changePaymentMethod = useCallback(
+        (paymentMethod: PaymentMethod) => dispatch(changePaymentMethodAction(paymentMethod)),
+        [dispatch]
+    );
 
     const submitOrder = useCallback(
         (
@@ -64,10 +69,11 @@ const useOrder = () => {
     return {
         orders,
         orderForm,
-        setOrderForm,
         submitOrder,
         addProduct,
         changeAmount,
+        changeOrderRequest,
+        changePaymentMethod,
         removeProduct,
     };
 };

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useRef } from "react";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Radio, { RadioProps } from "@material-ui/core/Radio";
@@ -16,6 +16,9 @@ import FormControl from "@material-ui/core/FormControl";
 import Typography from "@material-ui/core/Typography";
 import clsx from "clsx";
 import Print from "@material-ui/icons/Print";
+import useOrder from "./../hook/useOrder";
+import { Product } from "module/product";
+import { PaymentMethod } from "module/order";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -65,10 +68,10 @@ interface StyledTextFieldProp {
     icon?: React.ReactElement;
     className?: string;
     value?: string;
-    handlePhoneNumberChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const StyledTextField = ({ label, icon, className, value, handlePhoneNumberChange }: StyledTextFieldProp) => {
+const StyledTextField = ({ label, icon, className, value, onChange }: StyledTextFieldProp) => {
     return (
         <Grid container spacing={1} alignItems="flex-end">
             <Grid item>{icon}</Grid>
@@ -78,7 +81,7 @@ const StyledTextField = ({ label, icon, className, value, handlePhoneNumberChang
                     label={label}
                     className={className}
                     value={value}
-                    onChange={handlePhoneNumberChange}
+                    onChange={onChange}
                 />
             </Grid>
         </Grid>
@@ -109,19 +112,79 @@ const StyledRadio = (props: RadioProps & { label: string }) => {
     );
 };
 
-type SelectedPrepayment = "배민" | "요기요" | "쿠팡";
+type SelectedPrepayment = "Baemin" | "Yogiyo" | "Coupang";
+
+const paymentMap: { [key: string]: PaymentMethod } = {
+    cash: "현금",
+    card: "카드",
+    prePaymentBaemin: "선결제(배민)",
+    prePaymentYogiyo: "선결제(요기요)",
+    prePaymentCoupang: "선결제(쿠팡)",
+};
 
 const SubmitOrder = () => {
     const classes = useStyles();
-    const [selectedPrepayment, setSelectedPrepayment] = useState<SelectedPrepayment>("배민");
+    const { orderForm, changeOrderRequest, changePaymentMethod } = useOrder();
+    const { products, orderRequest, paymentMethod } = orderForm;
+    const [selectedPrepayment, setSelectedPrepayment] = useState<SelectedPrepayment>("Baemin");
+
+    const prePaymentRef = useRef<HTMLElement>(null);
+
+    const handleOrderRequestChange = useCallback(
+        (e) => {
+            changeOrderRequest(e.target.value);
+        },
+        [changeOrderRequest]
+    );
+
+    const handlePaymentMethodChange = useCallback(
+        (e) => {
+            let value = e.target.value;
+            if (value === "prePayment") {
+                value += selectedPrepayment;
+                setTimeout(() => {
+                    prePaymentRef.current?.click();
+                }, 0);
+            }
+            const paymentMethod = paymentMap[value];
+
+            changePaymentMethod(paymentMethod);
+        },
+        [changePaymentMethod, selectedPrepayment]
+    );
+
+    const handlePrePaymentChange = (e: React.ChangeEvent<{ name?: string | undefined; value: unknown }>) => {
+        const value = e.target.value as SelectedPrepayment;
+        setSelectedPrepayment(value);
+
+        const newPaymentMethod = paymentMap["prePayment" + value];
+        changePaymentMethod(newPaymentMethod);
+    };
+
+    const calculateTotalPrice = (products: (Product & { amount: number })[]) => {
+        return products.reduce((acc, { price, amount }) => acc + price * amount, 0);
+    };
+
     return (
         <Paper className={classes.submitPage}>
             <Box display="flex" flexWrap="wrap" justifyContent="flex-end">
                 <Box>
-                    <StyledTextField className={classes.request} label="주문 요청사항" icon={<Comment />} />
+                    <StyledTextField
+                        className={classes.request}
+                        label="주문 요청사항"
+                        icon={<Comment />}
+                        value={orderRequest}
+                        onChange={handleOrderRequestChange}
+                    />
                     <Box display="flex" flexWrap="wrap">
                         <Box flexGrow={1} className={classes.paymentMethod}>
-                            <RadioGroup row defaultValue="cash" aria-label="gender" name="customized-radios">
+                            <RadioGroup
+                                row
+                                defaultValue="cash"
+                                aria-label="gender"
+                                name="customized-radios"
+                                onChange={handlePaymentMethodChange}
+                            >
                                 <FormControlLabel value="cash" control={<StyledRadio label="현금" />} label="" />
                                 <FormControlLabel value="card" control={<StyledRadio label="카드" />} label="" />
                                 <FormControlLabel
@@ -131,27 +194,30 @@ const SubmitOrder = () => {
                                 />
                             </RadioGroup>
                         </Box>
-                        <FormControl variant="outlined" className={classes.formControl}>
-                            <InputLabel id="demo-simple-select-outlined-label">선결제</InputLabel>
+                        <FormControl
+                            variant="outlined"
+                            className={classes.formControl}
+                            disabled={paymentMethod === "현금" || paymentMethod === "카드"}
+                        >
+                            <InputLabel id="select-outlined-label">선결제</InputLabel>
                             <Select
-                                labelId="demo-simple-select-outlined-label"
+                                labelId="select-outlined-label"
                                 id="demo-simple-select-outlined"
                                 value={selectedPrepayment}
-                                onChange={(e: React.ChangeEvent<{ name?: string | undefined; value: unknown }>) => {
-                                    setSelectedPrepayment(e.target.value as SelectedPrepayment);
-                                }}
-                                label="배민"
+                                onChange={handlePrePaymentChange}
+                                label="선결제"
+                                ref={prePaymentRef}
                             >
-                                <MenuItem value="배민">배민</MenuItem>
-                                <MenuItem value="요기요">요기요</MenuItem>
-                                <MenuItem value="쿠팡">쿠팡</MenuItem>
+                                <MenuItem value="Baemin">배민</MenuItem>
+                                <MenuItem value="Yogiyo">요기요</MenuItem>
+                                <MenuItem value="Coupang">쿠팡</MenuItem>
                             </Select>
                         </FormControl>
                     </Box>
                 </Box>
                 <Box>
                     <Typography variant="h4" component="h2">
-                        총 결제금액 : <span id="total-price">{Number(70000).toLocaleString()}</span>원
+                        총 결제금액 : <span id="total-price">{calculateTotalPrice(products).toLocaleString()}</span>원
                     </Typography>
                     <Box display="flex" flexWrap="wrap">
                         <Box flexGrow={1}></Box>

@@ -39,29 +39,23 @@ export interface OrderFormInput {
     paymentMethod?: PaymentMethod;
 }
 
-const ADD_ORDER = "order/ADD_ORDER";
 const ADD_PRODUCT = "order/ADD_PRODUCT";
 const CHANGE_AMOUNT = "order/CHANGE_AMOUNT";
 const REMOVE_PRODUCT = "order/REMOVE_AMOUNT";
 
-const SUBMIT_ORDER = "order/SUBMIT_ORDER";
+const CHANGE_ORDER_REQUEST = "order/CHANGE_ORDER_REQUEST";
+const CHANGE_PAYMENT_METHOD = "order/CAHGNE_PAYMENT_METHOD";
 
-export const setOrderFormAction = createAction(
-    SET_ORDER_FORM,
-    ({ idx, orderTime, request, products, price, orderRequest, paymentMethod }: OrderFormInput) => ({
-        idx,
-        orderTime,
-        request,
-        products,
-        price,
-        orderRequest,
-        paymentMethod,
-    })
-)();
+const SUBMIT_ORDER = "order/SUBMIT_ORDER";
 
 export const addProductAction = createAction(ADD_PRODUCT, (product: Product & { amount: number }) => product)();
 export const changeAmountAction = createAction(CHANGE_AMOUNT, (index: number, amount: number) => ({ index, amount }))();
 export const removeProductAction = createAction(REMOVE_PRODUCT, (index: number) => index)();
+export const changeOrderRequestAction = createAction(CHANGE_ORDER_REQUEST, (orderRequest: string) => orderRequest)();
+export const changePaymentMethodAction = createAction(
+    CHANGE_PAYMENT_METHOD,
+    (paymentMethod: PaymentMethod) => paymentMethod
+)();
 
 export const submitOrderAction = createAction(
     SUBMIT_ORDER,
@@ -94,7 +88,14 @@ export const submitOrderAction = createAction(
     })
 )();
 
-const actions = { submitOrderAction, addProductAction, changeAmountAction, removeProductAction };
+const actions = {
+    submitOrderAction,
+    addProductAction,
+    changeAmountAction,
+    removeProductAction,
+    changeOrderRequestAction,
+    changePaymentMethodAction,
+};
 
 interface OrderState {
     orders: Order[];
@@ -132,6 +133,14 @@ const order = createReducer<OrderState, OrderAction>(initialState, {
     [REMOVE_PRODUCT]: (state, { payload: index }) =>
         produce(state, (draft) => {
             draft.orderForm.products.splice(index, 1);
+        }),
+    [CHANGE_ORDER_REQUEST]: (state, { payload: orderRequest }) =>
+        produce(state, (draft) => {
+            draft.orderForm.orderRequest = orderRequest;
+        }),
+    [CHANGE_PAYMENT_METHOD]: (state, { payload: paymentMethod }) =>
+        produce(state, (draft) => {
+            draft.orderForm.paymentMethod = paymentMethod;
         }),
 });
 
