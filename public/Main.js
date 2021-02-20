@@ -9,10 +9,12 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: true,
             enableRemoteModule: true,
+            nativeWindowOpen: true,
         },
     });
 
     win.maximize();
+    // win.setMenu(null); // 배포할때는 주석 해제
 
     const startUrl =
         process.env.ELECTRON_START_URL ||
@@ -23,6 +25,20 @@ function createWindow() {
         });
 
     win.loadURL(startUrl);
+
+    win.webContents.on("new-window", (event, url, frameName, disposition, options, additionalFeatures) => {
+        if (frameName === "PopupPhoneCall") {
+            // open window as modal
+            event.preventDefault();
+            Object.assign(options, {
+                modal: true,
+                parent: win,
+                frame: false,
+                alwaysOnTop: true,
+            });
+            event.newGuest = new BrowserWindow(options);
+        }
+    });
 }
 
 app.whenReady().then(createWindow);
