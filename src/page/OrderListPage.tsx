@@ -121,7 +121,7 @@ const columns: Column[] = [
     {
         id: "paymentMethod",
         label: "결제방법",
-        width: 80,
+        width: 120,
         minWidth: 80,
         align: "center",
     },
@@ -407,7 +407,10 @@ export const OrderListPage = () => {
                                     className={clsx(classes.cell, classes.head)}
                                     key={column.id}
                                     align={column.align}
-                                    style={{ width: column.width, minWidth: column.minWidth }}
+                                    style={{
+                                        width: column.width,
+                                        minWidth: column.minWidth,
+                                    }}
                                 >
                                     {column.label}
                                 </TableCell>
