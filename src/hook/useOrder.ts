@@ -11,7 +11,7 @@ import {
     OrderForm,
     Order,
 } from "module/order";
-import { submitOrderAsync, removeOrderAsync, editOrderAsync } from "module/order/saga";
+import { getOrdersAsync, submitOrderAsync, removeOrderAsync, editOrderAsync } from "module/order/saga";
 import { Product } from "module/product";
 import { useCallback } from "react";
 
@@ -37,6 +37,11 @@ const useOrder = () => {
         [dispatch]
     );
 
+    const getOrders = useCallback(
+        (year: number, month: number, date: number) => dispatch(getOrdersAsync.request({ year, month, date })),
+        [dispatch]
+    );
+
     const submitOrder = useCallback(
         (order: Omit<Order, "idx" | "customerIdx" | "orderTime">) => dispatch(submitOrderAsync.request(order)),
         [dispatch]
@@ -53,6 +58,7 @@ const useOrder = () => {
         changeOrderRequest,
         changePaymentMethod,
         removeProduct,
+        getOrders,
         submitOrder,
         editOrder,
         removeOrder,

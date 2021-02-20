@@ -25,6 +25,10 @@ export interface OrderForm {
     paymentMethod: PaymentMethod;
 }
 
+export const GET_ORDERS = "order/GET_ORDERS";
+export const GET_ORDERS_SUCCESS = "order/GET_ORDERS_SUCCESS";
+export const GET_ORDERS_ERROR = "order/GET_ORDERS_ERROR";
+
 const SET_ORDER_FORM = "order/SET_ORDER_FORM";
 
 const ADD_PRODUCT = "order/ADD_PRODUCT";
@@ -56,6 +60,9 @@ export const changePaymentMethodAction = createAction(
     (paymentMethod: PaymentMethod) => paymentMethod
 )();
 
+export const getOrdersSuccess = createAction(GET_ORDERS_SUCCESS)<Order[]>();
+export const getOrdersError = createAction(GET_ORDERS_ERROR)<Error>();
+
 export const submitOrderSuccess = createAction(SUBMIT_ORDER_SUCCESS)<Order>();
 export const submitOrderError = createAction(SUBMIT_ORDER_ERROR)<Error>();
 
@@ -72,6 +79,8 @@ const actions = {
     removeProductAction,
     changeOrderRequestAction,
     changePaymentMethodAction,
+    getOrdersSuccess,
+    getOrdersError,
     submitOrderSuccess,
     submitOrderError,
     editOrderSuccess,
@@ -86,23 +95,7 @@ interface OrderState {
 }
 
 const initialState: OrderState = {
-    orders: [
-        {
-            idx: 1,
-            customerIdx: 1,
-            orderTime: Date.now(),
-            customerName: "홍길동",
-            phoneNumber: "010-1234-5678",
-            address: "목동 한사랑 108-906",
-            customerRequest: "고객 요청사항 샘플",
-            orderRequest: "주문 요청사항 생픔",
-            paymentMethod: "현금",
-            products: [
-                { categoryIdx: 1, idx: 1, lexoRank: "aa", name: "족발", price: 2000, amount: 1 },
-                { categoryIdx: 1, idx: 2, lexoRank: "ab", name: "보쌈", price: 3000, amount: 2 },
-            ],
-        },
-    ],
+    orders: [],
     orderForm: {
         idx: -1,
         orderTime: -1,
@@ -137,6 +130,16 @@ const order = createReducer<OrderState, OrderAction>(initialState, {
             draft.orderForm.paymentMethod = paymentMethod;
         }),
 
+    [GET_ORDERS_SUCCESS]: (state, { payload: orders }) => ({
+        ...state,
+        orders,
+    }),
+
+    [GET_ORDERS_ERROR]: (state, { payload: error }) =>
+        produce(state, (draft) => {
+            // TODO... 에러 핸들링 로직
+        }),
+
     [SUBMIT_ORDER_SUCCESS]: (state, { payload: order }) =>
         produce(state, (draft) => {
             draft.orders.push(order);
@@ -144,7 +147,6 @@ const order = createReducer<OrderState, OrderAction>(initialState, {
     [SUBMIT_ORDER_ERROR]: (state, { payload: error }) =>
         produce(state, (draft) => {
             // TODO... 에러 핸들링 로직
-            console.error(error);
         }),
 
     [EDIT_ORDER_SUCCESS]: (state, { payload: order }) =>

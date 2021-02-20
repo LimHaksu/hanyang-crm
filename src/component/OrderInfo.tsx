@@ -169,7 +169,7 @@ const OrderInfo = () => {
                         {products &&
                             products.map((product, index) => {
                                 return (
-                                    <StyledTableRow hover role="checkbox" key={product.idx}>
+                                    <StyledTableRow hover role="checkbox" key={index}>
                                         {columns.map((column) => (
                                             <TableCell
                                                 className={clsx(

@@ -4,9 +4,9 @@
  * @param time 1970-01-01 기준의 milliseconds
  */
 export const getTimeWithOpeningHour = (time: number) => {
-    const savedTime = localStorage.getItem("openingHour");
+    const savedTime = localStorage.getItem("openingHours");
     if (savedTime) {
-        const savedTimeDate = JSON.parse(savedTime) as Date;
+        const savedTimeDate = new Date(JSON.parse(savedTime));
         const hour = savedTimeDate.getHours();
         const minute = savedTimeDate.getMinutes();
         return time + (hour * 60 + minute) * 60 * 1000;

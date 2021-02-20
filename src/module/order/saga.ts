@@ -1,6 +1,9 @@
-import { call, put, takeEvery } from "redux-saga/effects";
+import { call, put, takeEvery, takeLatest } from "redux-saga/effects";
 import { createAsyncAction } from "typesafe-actions";
 import {
+    GET_ORDERS,
+    GET_ORDERS_SUCCESS,
+    GET_ORDERS_ERROR,
     SUBMIT_ORDER,
     SUBMIT_ORDER_SUCCESS,
     SUBMIT_ORDER_ERROR,
@@ -12,10 +15,16 @@ import {
     REMOVE_ORDER_ERROR,
 } from "./index";
 import { Order } from "module/order";
-import { getOrderByIdx, addOrder, editOrder, removeOrder } from "db/order";
+import { getOrderByIdx, addOrder, editOrder, removeOrder, getOrdersByYearMonthDate } from "db/order";
 
 // createAsyncAction : request, success, failure, cancel arg를 넣으면
 // asyncAction을 만들어줌
+
+export const getOrdersAsync = createAsyncAction(GET_ORDERS, GET_ORDERS_SUCCESS, GET_ORDERS_ERROR)<
+    { year: number; month: number; date: number },
+    Order[],
+    Error
+>();
 
 export const submitOrderAsync = createAsyncAction(SUBMIT_ORDER, SUBMIT_ORDER_SUCCESS, SUBMIT_ORDER_ERROR)<
     Omit<Order, "idx" | "customerIdx" | "orderTime">,
@@ -34,6 +43,16 @@ export const removeOrderAsync = createAsyncAction(REMOVE_ORDER, REMOVE_ORDER_SUC
     number,
     Error
 >();
+
+function* getOrdersSaga(action: ReturnType<typeof getOrdersAsync.request>) {
+    try {
+        const { year, month, date } = action.payload;
+        const orders = yield call(getOrdersByYearMonthDate, year, month, date);
+        yield put(getOrdersAsync.success(orders));
+    } catch (e) {
+        yield put(getOrdersAsync.failure(e));
+    }
+}
 
 function* submitOrderSaga(action: ReturnType<typeof submitOrderAsync.request>) {
     try {
@@ -64,6 +83,7 @@ function* removeOrderSaga(action: ReturnType<typeof removeOrderAsync.request>) {
 }
 
 export function* orderSaga() {
+    yield takeLatest(GET_ORDERS, getOrdersSaga);
     yield takeEvery(SUBMIT_ORDER, submitOrderSaga);
     yield takeEvery(EDIT_ORDER, editOrderSaga);
     yield takeEvery(REMOVE_ORDER, removeOrderSaga);

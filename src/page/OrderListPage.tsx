@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { makeStyles, withStyles, Theme, createStyles } from "@material-ui/core/styles";
 import { PayloadAction } from "typesafe-actions";
 import Paper from "@material-ui/core/Paper";
@@ -91,13 +91,13 @@ const columns: Column[] = [
     {
         id: "customerName",
         label: "고객명",
-        minWidth: 95,
+        minWidth: 30,
         align: "center",
     },
     {
         id: "phoneNumber",
         label: "전화번호",
-        minWidth: 170,
+        minWidth: 100,
         align: "center",
     },
     {
@@ -238,20 +238,30 @@ const StyledModal = ({ open, setOpen, order, handleOkClick, message }: ModalProp
 export const OrderListPage = () => {
     const classes = useStyles();
     const [selectedDate, handleDateChange] = useState<Date | null>(new Date());
-    const { orders, submitOrder, setOrderForm, removeOrder } = useOrder();
+    const { orders, getOrders, setOrderForm, removeOrder } = useOrder();
     const { setCustomerOrderForm } = useCustomerForm();
     const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
     const [clickedOrder, setClickedOrder] = useState<Order>();
     const history = useHistory();
 
-    const handleAccept = useCallback((date) => {
-        handleDateChange(date);
-    }, []);
-
-    const [anchor, setAnchor] = React.useState<{ el: HTMLElement | null; message: string | undefined }>({
+    // anchor : 마우스 팝 오버할때 메세지가 위치할 element
+    const [anchor, setAnchor] = useState<{ el: HTMLElement | null; message: string | undefined }>({
         el: null,
         message: undefined,
     });
+
+    // 초기 렌더링할때 오늘 날짜 주문 가져오기
+    useEffect(() => {
+        const currentDate = new Date();
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const date = currentDate.getDate();
+        getOrders(year, month, date);
+    }, [getOrders, selectedDate]);
+
+    const handleAccept = useCallback((date) => {
+        handleDateChange(date);
+    }, []);
 
     const handlePopoverOpen = useCallback(
         (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
@@ -363,7 +373,7 @@ export const OrderListPage = () => {
                     break;
             }
         },
-        []
+        [history, setCustomerOrderForm, setOrderForm]
     );
 
     return (

@@ -488,7 +488,6 @@ function* moveProductSaga(action: ReturnType<typeof moveProductAsync.request>) {
             }
         }
     } catch (e) {
-        console.error(e);
         yield put(moveCategoryAsync.failure(e));
     }
 }
@@ -499,7 +498,6 @@ function* removeProductSaga(action: ReturnType<typeof removeProductAsync.request
         yield call(removeProduct, idx);
         yield put(removeProductAsync.success(idx));
     } catch (e) {
-        console.error(e);
         yield put(removeProductAsync.failure(e));
     }
 }
