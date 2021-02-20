@@ -38,6 +38,10 @@ export const SUBMIT_ORDER = "order/SUBMIT_ORDER";
 export const SUBMIT_ORDER_SUCCESS = "order/SUBMIT_ORDER_SUCCESS";
 export const SUBMIT_ORDER_ERROR = "order/SUBMIT_ORDER_ERROR";
 
+export const EDIT_ORDER = "order/EDIT_ORDER";
+export const EDIT_ORDER_SUCCESS = "order/EDIT_ORDER_SUCCESS";
+export const EDIT_ORDER_ERROR = "order/EDIT_ORDER_ERROR";
+
 export const REMOVE_ORDER = "order/REMOVE_ORDER";
 export const REMOVE_ORDER_SUCCESS = "order/REMOVE_ORDER_SUCCESS";
 export const REMOVE_ORDER_ERROR = "order/REMOVE_ORDER_ERROR";
@@ -55,6 +59,9 @@ export const changePaymentMethodAction = createAction(
 export const submitOrderSuccess = createAction(SUBMIT_ORDER_SUCCESS)<Order>();
 export const submitOrderError = createAction(SUBMIT_ORDER_ERROR)<Error>();
 
+export const editOrderSuccess = createAction(EDIT_ORDER_SUCCESS)<Order>();
+export const editOrderError = createAction(EDIT_ORDER_ERROR)<Error>();
+
 export const removeOrderSuccess = createAction(REMOVE_ORDER_SUCCESS)<number>();
 export const removeOrderError = createAction(REMOVE_ORDER_ERROR)<Error>();
 
@@ -67,6 +74,8 @@ const actions = {
     changePaymentMethodAction,
     submitOrderSuccess,
     submitOrderError,
+    editOrderSuccess,
+    editOrderError,
     removeOrderSuccess,
     removeOrderError,
 };
@@ -78,6 +87,21 @@ interface OrderState {
 
 const initialState: OrderState = {
     orders: [
+        {
+            idx: 1,
+            customerIdx: 1,
+            orderTime: Date.now(),
+            customerName: "홍길동",
+            phoneNumber: "010-1234-5678",
+            address: "목동 한사랑 108-906",
+            customerRequest: "고객 요청사항 샘플",
+            orderRequest: "주문 요청사항 생픔",
+            paymentMethod: "현금",
+            products: [
+                { categoryIdx: 1, idx: 1, lexoRank: "aa", name: "족발", price: 2000, amount: 1 },
+                { categoryIdx: 1, idx: 2, lexoRank: "ab", name: "보쌈", price: 3000, amount: 2 },
+            ],
+        },
     ],
     orderForm: {
         idx: -1,
@@ -112,6 +136,7 @@ const order = createReducer<OrderState, OrderAction>(initialState, {
         produce(state, (draft) => {
             draft.orderForm.paymentMethod = paymentMethod;
         }),
+
     [SUBMIT_ORDER_SUCCESS]: (state, { payload: order }) =>
         produce(state, (draft) => {
             draft.orders.push(order);
@@ -119,7 +144,21 @@ const order = createReducer<OrderState, OrderAction>(initialState, {
     [SUBMIT_ORDER_ERROR]: (state, { payload: error }) =>
         produce(state, (draft) => {
             // TODO... 에러 핸들링 로직
+            console.error(error);
         }),
+
+    [EDIT_ORDER_SUCCESS]: (state, { payload: order }) =>
+        produce(state, (draft) => {
+            const foundIndex = draft.orders.findIndex((o) => o.idx === order.idx);
+            if (foundIndex >= 0) {
+                draft.orders[foundIndex] = order;
+            }
+        }),
+    [EDIT_ORDER_ERROR]: (state, { payload: error }) =>
+        produce(state, (draft) => {
+            // TODO... 에러 핸들링 로직
+        }),
+
     [REMOVE_ORDER_SUCCESS]: (state, { payload: orderIdx }) => ({
         ...state,
         orders: state.orders.filter((order) => order.idx !== orderIdx),

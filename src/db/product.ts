@@ -9,7 +9,7 @@ import { changePropertyFromSnakeToCamel } from "util/db";
 export const addCategory = async (name: string, lexoRank: string) => {
     try {
         const query = `INSERT INTO
-        category(name, lexo_rank)
+        categories(name, lexo_rank)
         VALUES(?,?);`;
         const lastIdx = await insert(query, name, lexoRank);
         return lastIdx;
@@ -25,12 +25,12 @@ export const getCategories = async () => {
     try {
         // 카테고리 리스트 가져오기
         const querySelectCategory = `SELECT idx, name, lexo_rank
-        FROM category`;
+        FROM categories`;
         const categories = await select<Category>(querySelectCategory);
 
         // 카테고리 리스트의 각 카테고리에 대해서 상품 리스트 추가하기
         const querySelectProductByCategoryIdx = `SELECT idx, name, price, lexo_rank, category_idx
-        FROM product
+        FROM products
         WHERE category_idx = ?`;
         const categoriesWithProducts = await Promise.all(
             categories.map(async (category) => {
@@ -52,7 +52,7 @@ export const getCategories = async () => {
  */
 export const editCategory = async (idx: number, name: string, lexoRank: string) => {
     try {
-        const query = `UPDATE category
+        const query = `UPDATE categories
         SET name = ? , lexo_rank = ?
         WHERE idx = ?;`;
         await update(query, name, lexoRank, idx);
@@ -68,7 +68,7 @@ export const editCategory = async (idx: number, name: string, lexoRank: string) 
 export const removeCategory = async (idx: number) => {
     try {
         const query = `DELETE
-        FROM category
+        FROM categories
         WHERE idx = ?`;
         await deleteQuery(query, idx);
     } catch (e) {
@@ -86,7 +86,7 @@ export const removeCategory = async (idx: number) => {
 export const addProduct = async (name: string, price: number, categoryIdx: number, lexoRank: string) => {
     try {
         const query = `INSERT INTO
-        product(name, price, category_idx, lexo_rank)
+        products(name, price, category_idx, lexo_rank)
         VALUES(?,?,?,?);`;
         const lastId = await insert(query, name, price, categoryIdx, lexoRank);
         return lastId;
@@ -105,7 +105,7 @@ export const addProduct = async (name: string, price: number, categoryIdx: numbe
  */
 export const editProduct = async (idx: number, name: string, price: number, lexoRank: string, categoryIdx: number) => {
     try {
-        const query = `UPDATE product
+        const query = `UPDATE products
         SET name = ?, price = ?, lexo_rank = ?, category_idx = ?
         WHERE idx = ?;`;
         await update(query, name, price, lexoRank, categoryIdx, idx);
@@ -120,7 +120,7 @@ export const editProduct = async (idx: number, name: string, price: number, lexo
  */
 export const removeProduct = async (idx: number) => {
     try {
-        const query = `DELETE FROM product
+        const query = `DELETE FROM products
         WHERE idx = ?;`;
         await deleteQuery(query, idx);
     } catch (e) {

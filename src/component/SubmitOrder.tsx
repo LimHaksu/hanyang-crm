@@ -17,8 +17,9 @@ import Typography from "@material-ui/core/Typography";
 import clsx from "clsx";
 import Print from "@material-ui/icons/Print";
 import useOrder from "./../hook/useOrder";
+import useCustomerForm from "hook/useCustomerForm";
 import { Product } from "module/product";
-import { PaymentMethod } from "module/order";
+import { PaymentMethod, Order } from "module/order";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -124,7 +125,8 @@ const paymentMap: { [key: string]: PaymentMethod } = {
 
 const SubmitOrder = () => {
     const classes = useStyles();
-    const { orderForm, changeOrderRequest, changePaymentMethod } = useOrder();
+    const { customerOrderForm } = useCustomerForm();
+    const { orderForm, changeOrderRequest, changePaymentMethod, submitOrder } = useOrder();
     const { products, orderRequest, paymentMethod } = orderForm;
     const [selectedPrepayment, setSelectedPrepayment] = useState<SelectedPrepayment>("Baemin");
 
@@ -153,17 +155,36 @@ const SubmitOrder = () => {
         [changePaymentMethod, selectedPrepayment]
     );
 
-    const handlePrePaymentChange = (e: React.ChangeEvent<{ name?: string | undefined; value: unknown }>) => {
-        const value = e.target.value as SelectedPrepayment;
-        setSelectedPrepayment(value);
+    const handlePrePaymentChange = useCallback(
+        (e: React.ChangeEvent<{ name?: string | undefined; value: unknown }>) => {
+            const value = e.target.value as SelectedPrepayment;
+            setSelectedPrepayment(value);
 
-        const newPaymentMethod = paymentMap["prePayment" + value];
-        changePaymentMethod(newPaymentMethod);
-    };
+            const newPaymentMethod = paymentMap["prePayment" + value];
+            changePaymentMethod(newPaymentMethod);
+        },
+        []
+    );
 
-    const calculateTotalPrice = (products: (Product & { amount: number })[]) => {
+    const calculateTotalPrice = useCallback((products: (Product & { amount: number })[]) => {
         return products.reduce((acc, { price, amount }) => acc + price * amount, 0);
-    };
+    }, []);
+
+    const handleSaveButtonClick = useCallback(() => {
+        const { customerName, phoneNumber, address, request: customerRequest } = customerOrderForm;
+        const { products, orderRequest, paymentMethod } = orderForm;
+        // 주문 하는 순간에는 idx, orderTime, customerIdx 필요 없음
+        const order: Omit<Order, "idx" | "orderTime" | "customerIdx"> = {
+            customerName,
+            phoneNumber,
+            address,
+            customerRequest,
+            products,
+            orderRequest,
+            paymentMethod,
+        };
+        submitOrder(order);
+    }, [customerOrderForm, orderForm, submitOrder]);
 
     return (
         <Paper className={classes.submitPage}>
@@ -232,6 +253,7 @@ const SubmitOrder = () => {
                             className={clsx(classes.button, classes.submitButton)}
                             variant="outlined"
                             color="primary"
+                            onClick={handleSaveButtonClick}
                         >
                             저장
                         </Button>

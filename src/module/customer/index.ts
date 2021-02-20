@@ -27,7 +27,7 @@ export interface Customer {
 }
 
 export interface CustomerForm {
-    idx?: number;
+    idx: number;
     customerName: string;
     phoneNumber: string;
     address: string;
@@ -134,8 +134,8 @@ const initialState: CustomerState = {
         error: null,
         data: [],
     },
-    customerOrderForm: { customerName: "", address: "", phoneNumber: "", request: "" },
-    customerManagementForm: { customerName: "", address: "", phoneNumber: "", request: "" },
+    customerOrderForm: { idx: -1, customerName: "", address: "", phoneNumber: "", request: "" },
+    customerManagementForm: { idx: -1, customerName: "", address: "", phoneNumber: "", request: "" },
     isCustomerOrderFormEditMode: false,
     isCustomerManagementFormEditMode: false,
     addState: { loading: false, error: null, isSuccess: false },

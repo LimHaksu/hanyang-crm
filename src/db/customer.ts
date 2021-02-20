@@ -20,7 +20,7 @@ export const addCustomer = async ({
     request: string;
 }) => {
     try {
-        const query = `INSERT INTO customer(phone_number, name, address, request)
+        const query = `INSERT INTO customers(phone_number, name, address, request)
         VALUES(?,?,?,?);`;
         await insert(query, phoneNumber, name, address, request);
     } catch (e) {
@@ -42,7 +42,7 @@ export const getCustomers = async ({
 }) => {
     try {
         const query = `SELECT idx, phone_number, name, address, request
-        FROM customer
+        FROM customers
         WHERE ${getSnakeCaseString(searchBy)} like ?;`;
         const customers = await select<Customer>(query, `%${keyword}%`);
         return changePropertyFromSnakeToCamel(customers);
@@ -73,7 +73,7 @@ export const editCustomer = async ({
     request: string;
 }) => {
     try {
-        const query = `UPDATE customer
+        const query = `UPDATE customers
         SET phone_number = ?, name = ?, address = ?, request = ?
         WHERE idx = ?;`;
         await update(query, phoneNumber, customerName, address, request, idx);
@@ -88,7 +88,7 @@ export const editCustomer = async ({
  */
 export const removeCustomer = async (idx: number) => {
     try {
-        const query = `DELETE FROM customer
+        const query = `DELETE FROM customers
         WHERE idx = ?;`;
         await deleteQuery(query, idx);
     } catch (e) {

@@ -11,7 +11,7 @@ import { getTimeWithOpeningHour } from "util/time";
 export const addPhoneCallRecord = async (receivedDatetime: number, cidMachineIdx: number, phoneNumber: string) => {
     try {
         const query = `INSERT INTO 
-        phone_call_record(received_datetime, cid_machine_idx, phone_number)
+        phone_call_records(received_datetime, cid_machine_idx, phone_number)
         VALUES(?,?,?);`;
         const data = await insert(query, receivedDatetime, cidMachineIdx, phoneNumber);
         return data;
@@ -29,7 +29,7 @@ export const addPhoneCallRecord = async (receivedDatetime: number, cidMachineIdx
 export const getPhoneCallRecords = async (year: number, month: number, date: number) => {
     try {
         const query = `SELECT received_datetime, phone_number, cid_machine_idx, order_idx
-        FROM phone_call_record
+        FROM phone_call_records
         WHERE received_datetime between ? and ?;`;
         const searchedDate = getTimeWithOpeningHour(new Date(year, month, date).getTime());
         const nextDate = searchedDate + 86_400_000; // 24 * 60 * 60 * 1000
