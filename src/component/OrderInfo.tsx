@@ -47,6 +47,14 @@ const useStyles = makeStyles((theme: Theme) =>
         amountTextField: {
             width: 40,
         },
+        error: {
+            color: "#f44336",
+            fontSize: "0.75rem",
+            fontWeight: "normal",
+        },
+        dn: {
+            display: "none",
+        },
     })
 );
 
@@ -148,7 +156,12 @@ const OrderInfo = () => {
 
     return (
         <Paper className={classes.paper}>
-            <div className={classes.head}>주문정보</div>
+            <div className={classes.head}>
+                주문정보{" "}
+                <span className={clsx(classes.error, products.length > 0 && classes.dn)}>
+                    상품은 한 개 이상 선택해야 합니다.
+                </span>
+            </div>
             <TableContainer className={classes.container}>
                 <Table stickyHeader aria-label="sticky table">
                     <TableHead>

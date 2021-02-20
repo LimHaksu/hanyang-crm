@@ -249,6 +249,8 @@ const SubmitOrder = () => {
     }, [customerOrderForm, orderForm, isOrderEditMode, editOrder, submitOrder, handleCancelButtonClick]);
 
     const handlePrintSaveButtonClick = useCallback(() => {
+        // TODO... 출력 로직
+
         handleSaveButtonClick();
     }, [handleSaveButtonClick]);
 
@@ -315,7 +317,7 @@ const SubmitOrder = () => {
                             disabled={!orderValidate(customerOrderForm, orderForm)}
                             onClick={handlePrintSaveButtonClick}
                         >
-                            <Print className={classes.printIcon} /> 출력 저장
+                            <Print className={classes.printIcon} /> 출력 {isOrderEditMode ? "수정" : "저장"}
                         </Button>
                         <Button
                             className={clsx(classes.button, classes.submitButton)}
