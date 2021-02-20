@@ -113,6 +113,7 @@ const StyledRadio = (props: RadioProps & { label: string }) => {
     );
 };
 
+type SelectedPayment = "cash" | "card" | "prePayment";
 type SelectedPrepayment = "Baemin" | "Yogiyo" | "Coupang";
 
 const paymentMap: { [key: string]: PaymentMethod } = {
@@ -125,9 +126,19 @@ const paymentMap: { [key: string]: PaymentMethod } = {
 
 const SubmitOrder = () => {
     const classes = useStyles();
-    const { customerOrderForm } = useCustomerForm();
-    const { orderForm, changeOrderRequest, changePaymentMethod, submitOrder } = useOrder();
+    const { customerOrderForm, setCustomerOrderForm } = useCustomerForm();
+    const { orderForm, changeOrderRequest, changePaymentMethod, submitOrder, setOrderForm } = useOrder();
     const { products, orderRequest, paymentMethod } = orderForm;
+    const [selectedPayment, setSelectedPayment] = useState<SelectedPayment>(() => {
+        switch (orderForm.paymentMethod) {
+            case "현금":
+                return "cash";
+            case "카드":
+                return "card";
+            default:
+                return "prePayment";
+        }
+    });
     const [selectedPrepayment, setSelectedPrepayment] = useState<SelectedPrepayment>("Baemin");
 
     const prePaymentRef = useRef<HTMLElement>(null);
@@ -142,6 +153,7 @@ const SubmitOrder = () => {
     const handlePaymentMethodChange = useCallback(
         (e) => {
             let value = e.target.value;
+            setSelectedPayment(value);
             if (value === "prePayment") {
                 value += selectedPrepayment;
                 setTimeout(() => {
@@ -149,7 +161,6 @@ const SubmitOrder = () => {
                 }, 0);
             }
             const paymentMethod = paymentMap[value];
-
             changePaymentMethod(paymentMethod);
         },
         [changePaymentMethod, selectedPrepayment]
@@ -163,7 +174,7 @@ const SubmitOrder = () => {
             const newPaymentMethod = paymentMap["prePayment" + value];
             changePaymentMethod(newPaymentMethod);
         },
-        []
+        [changePaymentMethod]
     );
 
     const calculateTotalPrice = useCallback((products: (Product & { amount: number })[]) => {
@@ -186,6 +197,12 @@ const SubmitOrder = () => {
         submitOrder(order);
     }, [customerOrderForm, orderForm, submitOrder]);
 
+    const handleCancelButtonClick = useCallback(() => {
+        setSelectedPayment("cash");
+        setCustomerOrderForm({ idx: -1, address: "", customerName: "", phoneNumber: "", request: "" });
+        setOrderForm({ idx: -1, orderRequest: "", orderTime: -1, paymentMethod: "현금", products: [] });
+    }, [setCustomerOrderForm, setOrderForm]);
+
     return (
         <Paper className={classes.submitPage}>
             <Box display="flex" flexWrap="wrap" justifyContent="flex-end">
@@ -201,7 +218,7 @@ const SubmitOrder = () => {
                         <Box flexGrow={1} className={classes.paymentMethod}>
                             <RadioGroup
                                 row
-                                defaultValue="cash"
+                                value={selectedPayment}
                                 aria-label="gender"
                                 name="customized-radios"
                                 onChange={handlePaymentMethodChange}
@@ -261,6 +278,7 @@ const SubmitOrder = () => {
                             className={clsx(classes.button, classes.submitButton)}
                             variant="outlined"
                             color="primary"
+                            onClick={handleCancelButtonClick}
                         >
                             취소
                         </Button>
