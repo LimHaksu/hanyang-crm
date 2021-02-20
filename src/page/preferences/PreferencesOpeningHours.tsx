@@ -27,6 +27,13 @@ const useStyles = makeStyles((theme: Theme) =>
         emphasis: {
             fontWeight: "bold",
         },
+        time: {
+            "& label": {
+                fontSize: "1.4rem",
+                color: "#000",
+                fontWeight: "bold",
+            },
+        },
     })
 );
 
@@ -59,6 +66,7 @@ export const PreferencesOpeningHours = () => {
                         </div>
                         <div>
                             <TimePicker
+                                className={classes.time}
                                 value={selectedTime}
                                 onChange={handleTimeChange}
                                 label="영업 시작 시각"
