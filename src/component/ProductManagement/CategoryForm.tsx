@@ -58,6 +58,15 @@ const CategoryForm = () => {
         [setCategoryForm, categoryForm.idx, categoryForm.lexoRank]
     );
 
+    const handleEnter = useCallback(
+        (e) => {
+            if (e.key === "Enter") {
+                handleAddCategoryClick();
+            }
+        },
+        [handleAddCategoryClick]
+    );
+
     return (
         <Paper className={classes.category}>
             <div className={classes.title}>카테고리</div>
@@ -68,6 +77,7 @@ const CategoryForm = () => {
                     className={classes.textField}
                     value={categoryForm.name}
                     onChange={onCategoryNameChange}
+                    onKeyUp={handleEnter}
                 />
                 <Box display="flex">
                     <Box flexGrow={1}></Box>
