@@ -257,6 +257,18 @@ export const OrderListPage = () => {
         const month = currentDate.getMonth();
         const date = currentDate.getDate();
         getOrders(year, month, date);
+    }, [getOrders]);
+
+    useEffect(() => {
+        if (selectedDate) {
+            const time = selectedDate.getTime();
+            if (!isNaN(time)) {
+                const year = selectedDate.getFullYear();
+                const month = selectedDate.getMonth();
+                const date = selectedDate.getDate();
+                getOrders(year, month, date);
+            }
+        }
     }, [getOrders, selectedDate]);
 
     const handleAccept = useCallback((date) => {
