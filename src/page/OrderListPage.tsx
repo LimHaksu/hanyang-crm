@@ -21,6 +21,7 @@ import { Order, OrderForm } from "module/order";
 import useCustomerForm from "hook/useCustomerForm";
 import { CustomerForm } from "module/customer";
 import { useHistory } from "react-router-dom";
+import { getTimeMinusOpeningHour, timeToFormatString } from "util/time";
 
 const electron = window.require("electron");
 const { shell } = electron;
@@ -163,21 +164,6 @@ const StyledTableRow = withStyles((theme: Theme) =>
     })
 )(TableRow);
 
-const orderTimeToString = (orderTime: number) => {
-    const date = new Date(orderTime);
-    let hours = date.getHours();
-    const minutes = date.getMinutes();
-    const isMorning = hours < 12;
-    let prevStr = "";
-    if (isMorning) {
-        prevStr = "오전 ";
-    } else {
-        prevStr = "오후 ";
-        hours -= 12;
-    }
-    return `${prevStr} ${hours}:${minutes}`;
-};
-
 const getProductNames = (order: Order) => {
     const productNames = order.products.reduce(
         (acc, product) => `${acc}${product.name}${product.amount > 1 ? ` x ${product.amount}` : ``}, `,
@@ -213,7 +199,7 @@ const StyledModal = ({ open, setOpen, order, handleOkClick, message }: ModalProp
             <Box display="flex" flexDirection="column">
                 <div className={classes.modalMessage}>
                     <div className={classes.modalMessageEmphasize}>
-                        주문시각 : {order && orderTimeToString(order.orderTime)}
+                        주문시각 : {order && timeToFormatString(order.orderTime)}
                     </div>
                     {order && order.customerName} <br />
                     {order && order.phoneNumber} <br />
@@ -237,7 +223,11 @@ const StyledModal = ({ open, setOpen, order, handleOkClick, message }: ModalProp
 
 export const OrderListPage = () => {
     const classes = useStyles();
-    const [selectedDate, handleDateChange] = useState<Date | null>(new Date());
+    const [selectedDate, handleDateChange] = useState<Date | null>(() => {
+        // 환경설정에서 시작 시각 설정한 만큼 빼줘야 함
+        const correctedTime = getTimeMinusOpeningHour(Date.now());
+        return new Date(correctedTime);
+    });
     const { orders, getOrders, setOrderForm, removeOrder, setOrderEditMode } = useOrder();
     const { setCustomerOrderForm } = useCustomerForm();
     const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
@@ -249,15 +239,6 @@ export const OrderListPage = () => {
         el: null,
         message: undefined,
     });
-
-    // 초기 렌더링할때 오늘 날짜 주문 가져오기
-    useEffect(() => {
-        const currentDate = new Date();
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth();
-        const date = currentDate.getDate();
-        getOrders(year, month, date);
-    }, [getOrders]);
 
     useEffect(() => {
         if (selectedDate) {
@@ -311,7 +292,7 @@ export const OrderListPage = () => {
                 case "idx":
                     return index + 1;
                 case "orderTime":
-                    return orderTimeToString(order.orderTime);
+                    return timeToFormatString(order.orderTime);
                 case "customerName":
                     return order.customerName;
                 case "phoneNumber":

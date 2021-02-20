@@ -1,5 +1,5 @@
 import { insert, select, update, deleteQuery, Customer, Product } from "./db";
-import { getTimeWithOpeningHour } from "util/time";
+import { getTimePlusOpeningHour } from "util/time";
 import { changePropertyFromSnakeToCamel } from "util/db";
 import { Order } from "module/order";
 
@@ -127,7 +127,7 @@ export const getOrdersByYearMonthDate = async (year: number, month: number, date
         FROM orders as a join customers as b
         ON a.customer_idx = b.idx
         WHERE a.order_datetime BETWEEN ? AND ?;`;
-        const searchedDate = getTimeWithOpeningHour(new Date(year, month, date).getTime());
+        const searchedDate = getTimePlusOpeningHour(new Date(year, month, date).getTime());
         const nextDate = searchedDate + 86_400_000; // 24 * 60 * 60 * 1000
         const orders = await select<OrderForList>(querySelectOrder, searchedDate, nextDate);
 
