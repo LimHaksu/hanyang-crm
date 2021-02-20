@@ -6,6 +6,7 @@ import {
     setCustomerManagementFormAction,
     setCustomerOrderFormEditModeAction,
     setCustomerManagementFormEditModeAction,
+    CustomerForm,
 } from "module/customer";
 
 const useCustomerForm = () => {
@@ -19,14 +20,12 @@ const useCustomerForm = () => {
     const dispatch = useDispatch();
 
     const setCustomerOrderForm = useCallback(
-        (idx: number | undefined, customerName: string, phoneNumber: string, address: string, request: string) =>
-            dispatch(setCustomerOrderFormAction(idx, customerName, phoneNumber, address, request)),
+        (customerOrderForm: CustomerForm) => dispatch(setCustomerOrderFormAction(customerOrderForm)),
         [dispatch]
     );
 
     const setCustomerManagementForm = useCallback(
-        (idx: number | undefined, customerName: string, phoneNumber: string, address: string, request: string) =>
-            dispatch(setCustomerManagementFormAction(idx, customerName, phoneNumber, address, request)),
+        (customerManagementForm: CustomerForm) => dispatch(setCustomerManagementFormAction(customerManagementForm)),
         [dispatch]
     );
 

@@ -70,11 +70,7 @@ const StyledTextField = ({ label, icon, className, value, onChange, error, helpe
 interface CustomerInfoProp {
     customerForm: CustomerForm;
     setCustomerForm: (
-        idx: number | undefined,
-        customerName: string,
-        phoneNumber: string,
-        address: string,
-        request: string
+        customerForm: CustomerForm
     ) => PayloadAction<typeof SET_CUSTOMER_ORDER_FORM | typeof SET_CUSTOMER_MANAGEMENT_FORM, CustomerForm>;
 }
 
@@ -84,52 +80,52 @@ const CustomerInfo = ({ customerForm, setCustomerForm }: CustomerInfoProp) => {
     const handleCustomerNameChange = useCallback(
         (e) => {
             const customerName = e.target.value;
-            setCustomerForm(
-                customerForm.idx,
+            setCustomerForm({
+                idx: customerForm.idx,
+                address: customerForm.address,
                 customerName,
-                customerForm.phoneNumber,
-                customerForm.address,
-                customerForm.request
-            );
+                phoneNumber: customerForm.phoneNumber,
+                request: customerForm.request,
+            });
         },
         [setCustomerForm, customerForm.idx, customerForm.address, customerForm.phoneNumber, customerForm.request]
     );
     const handlePhoneNumberChange = useCallback(
         (e) => {
             const customerPhoneNumber = insertDashIntoPhoneNumber(e.target.value);
-            setCustomerForm(
-                customerForm.idx,
-                customerForm.customerName,
-                customerPhoneNumber,
-                customerForm.address,
-                customerForm.request
-            );
+            setCustomerForm({
+                idx: customerForm.idx,
+                address: customerForm.address,
+                customerName: customerForm.customerName,
+                phoneNumber: customerPhoneNumber,
+                request: customerForm.request,
+            });
         },
         [setCustomerForm, customerForm.idx, customerForm.address, customerForm.customerName, customerForm.request]
     );
     const handleAddressChange = useCallback(
         (e) => {
             const address = e.target.value;
-            setCustomerForm(
-                customerForm.idx,
-                customerForm.customerName,
-                customerForm.phoneNumber,
+            setCustomerForm({
+                idx: customerForm.idx,
                 address,
-                customerForm.request
-            );
+                customerName: customerForm.customerName,
+                phoneNumber: customerForm.phoneNumber,
+                request: customerForm.request,
+            });
         },
         [setCustomerForm, customerForm.idx, customerForm.customerName, customerForm.phoneNumber, customerForm.request]
     );
     const handleRequestChange = useCallback(
         (e) => {
             const request = e.target.value;
-            setCustomerForm(
-                customerForm.idx,
-                customerForm.customerName,
-                customerForm.phoneNumber,
-                customerForm.address,
-                request
-            );
+            setCustomerForm({
+                idx: customerForm.idx,
+                address: customerForm.address,
+                customerName: customerForm.customerName,
+                phoneNumber: customerForm.phoneNumber,
+                request,
+            });
         },
         [setCustomerForm, customerForm.idx, customerForm.customerName, customerForm.phoneNumber, customerForm.address]
     );

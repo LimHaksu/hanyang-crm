@@ -12,7 +12,7 @@ import Delete from "@material-ui/icons/Delete";
 import Button from "@material-ui/core/Button";
 import Modal from "component/Modal";
 import clsx from "clsx";
-import { Customer } from "module/customer";
+import { Customer, CustomerForm } from "module/customer";
 import useCustomer from "hook/useCustomer";
 import useCustomerForm from "hook/useCustomerForm";
 
@@ -111,8 +111,8 @@ const CustomerList = ({ customers }: CustomerListProp) => {
     const [clickedCustomer, setClickedCustomer] = useState<Customer>();
 
     const handleEditClick = useCallback(
-        (idx: number, customerName: string, phoneNumber: string, address: string, request: string) => () => {
-            setCustomerManagementForm(idx, customerName, phoneNumber, address, request);
+        (customerManagementForm: CustomerForm) => () => {
+            setCustomerManagementForm(customerManagementForm);
             setCustomerManagementFormEditMode(true);
         },
         [setCustomerManagementForm, setCustomerManagementFormEditMode]
@@ -128,7 +128,7 @@ const CustomerList = ({ customers }: CustomerListProp) => {
 
     const handleDeleteOkClick = useCallback(() => {
         removeCustomer(clickedCustomer?.idx!);
-        setCustomerManagementForm(-1, "", "", "", "");
+        setCustomerManagementForm({ idx: -1, address: "", customerName: "", phoneNumber: "", request: "" });
         setCustomerManagementFormEditMode(false);
         setIsModalOpen(false);
     }, [removeCustomer, clickedCustomer, setCustomerManagementForm, setCustomerManagementFormEditMode]);
@@ -177,13 +177,13 @@ const CustomerList = ({ customers }: CustomerListProp) => {
                                                 <TableCell
                                                     key="edit"
                                                     className={clsx(classes.cell, classes.clickableCell)}
-                                                    onClick={handleEditClick(
-                                                        idx!,
+                                                    onClick={handleEditClick({
+                                                        idx: idx!,
+                                                        address,
                                                         customerName,
                                                         phoneNumber,
-                                                        address,
-                                                        request
-                                                    )}
+                                                        request,
+                                                    })}
                                                 >
                                                     <Edit />
                                                 </TableCell>

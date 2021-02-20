@@ -6,15 +6,13 @@ export type PaymentMethod = "현금" | "카드" | "선결제(배민)" | "선결�
 
 export interface Order {
     idx: number;
+    customerIdx: number;
     orderTime: number;
-    productName: string;
-    request: string;
     customerName: string;
     phoneNumber: string;
     address: string;
     customerRequest: string;
-    products: Product[];
-    price: number;
+    products: (Product & { amount: number })[];
     orderRequest: string;
     paymentMethod: PaymentMethod;
 }
@@ -22,22 +20,12 @@ export interface Order {
 export interface OrderForm {
     idx: number;
     orderTime: number;
-    request: string;
     products: (Product & { amount: number })[];
-    price: number;
     orderRequest: string;
     paymentMethod: PaymentMethod;
 }
 
-export interface OrderFormInput {
-    idx?: number;
-    orderTime?: number;
-    request?: string;
-    products?: (Product & { amount: number })[];
-    price?: number;
-    orderRequest?: string;
-    paymentMethod?: PaymentMethod;
-}
+const SET_ORDER_FORM = "order/SET_ORDER_FORM";
 
 const ADD_PRODUCT = "order/ADD_PRODUCT";
 const CHANGE_AMOUNT = "order/CHANGE_AMOUNT";
@@ -46,8 +34,15 @@ const REMOVE_PRODUCT = "order/REMOVE_AMOUNT";
 const CHANGE_ORDER_REQUEST = "order/CHANGE_ORDER_REQUEST";
 const CHANGE_PAYMENT_METHOD = "order/CAHGNE_PAYMENT_METHOD";
 
-const SUBMIT_ORDER = "order/SUBMIT_ORDER";
+export const SUBMIT_ORDER = "order/SUBMIT_ORDER";
+export const SUBMIT_ORDER_SUCCESS = "order/SUBMIT_ORDER_SUCCESS";
+export const SUBMIT_ORDER_ERROR = "order/SUBMIT_ORDER_ERROR";
 
+export const REMOVE_ORDER = "order/REMOVE_ORDER";
+export const REMOVE_ORDER_SUCCESS = "order/REMOVE_ORDER_SUCCESS";
+export const REMOVE_ORDER_ERROR = "order/REMOVE_ORDER_ERROR";
+
+export const setOrderFormAction = createAction(SET_ORDER_FORM, (orderForm: OrderForm) => orderForm)();
 export const addProductAction = createAction(ADD_PRODUCT, (product: Product & { amount: number }) => product)();
 export const changeAmountAction = createAction(CHANGE_AMOUNT, (index: number, amount: number) => ({ index, amount }))();
 export const removeProductAction = createAction(REMOVE_PRODUCT, (index: number) => index)();
@@ -57,44 +52,23 @@ export const changePaymentMethodAction = createAction(
     (paymentMethod: PaymentMethod) => paymentMethod
 )();
 
-export const submitOrderAction = createAction(
-    SUBMIT_ORDER,
-    (
-        idx: number,
-        orderTime: number,
-        productName: string,
-        request: string,
-        customerName: string,
-        phoneNumber: string,
-        address: string,
-        customerRequest: string,
-        products: Product[],
-        price: number,
-        orderRequest: string,
-        paymentMethod: PaymentMethod
-    ) => ({
-        idx,
-        orderTime,
-        productName,
-        request,
-        customerName,
-        phoneNumber,
-        address,
-        customerRequest,
-        products,
-        price,
-        orderRequest,
-        paymentMethod,
-    })
-)();
+export const submitOrderSuccess = createAction(SUBMIT_ORDER_SUCCESS)<Order>();
+export const submitOrderError = createAction(SUBMIT_ORDER_ERROR)<Error>();
+
+export const removeOrderSuccess = createAction(REMOVE_ORDER_SUCCESS)<number>();
+export const removeOrderError = createAction(REMOVE_ORDER_ERROR)<Error>();
 
 const actions = {
-    submitOrderAction,
+    setOrderFormAction,
     addProductAction,
     changeAmountAction,
     removeProductAction,
     changeOrderRequestAction,
     changePaymentMethodAction,
+    submitOrderSuccess,
+    submitOrderError,
+    removeOrderSuccess,
+    removeOrderError,
 };
 
 interface OrderState {
@@ -103,13 +77,12 @@ interface OrderState {
 }
 
 const initialState: OrderState = {
-    orders: [],
+    orders: [
+    ],
     orderForm: {
         idx: -1,
         orderTime: -1,
-        request: "",
-        products: [{ idx: 1, name: "안녕", amount: 1, categoryIdx: 1, lexoRank: "aa", price: 10000 }],
-        price: 0,
+        products: [],
         orderRequest: "",
         paymentMethod: "현금",
     },
@@ -118,10 +91,7 @@ const initialState: OrderState = {
 type OrderAction = ActionType<typeof actions>;
 
 const order = createReducer<OrderState, OrderAction>(initialState, {
-    [SUBMIT_ORDER]: (state, { payload: order }) =>
-        produce(state, (draft) => {
-            draft.orders.push(order);
-        }),
+    [SET_ORDER_FORM]: (state, { payload: orderForm }) => ({ ...state, orderForm }),
     [ADD_PRODUCT]: (state, { payload: product }) =>
         produce(state, (draft) => {
             draft.orderForm.products.push(product);
@@ -141,6 +111,22 @@ const order = createReducer<OrderState, OrderAction>(initialState, {
     [CHANGE_PAYMENT_METHOD]: (state, { payload: paymentMethod }) =>
         produce(state, (draft) => {
             draft.orderForm.paymentMethod = paymentMethod;
+        }),
+    [SUBMIT_ORDER_SUCCESS]: (state, { payload: order }) =>
+        produce(state, (draft) => {
+            draft.orders.push(order);
+        }),
+    [SUBMIT_ORDER_ERROR]: (state, { payload: error }) =>
+        produce(state, (draft) => {
+            // TODO... 에러 핸들링 로직
+        }),
+    [REMOVE_ORDER_SUCCESS]: (state, { payload: orderIdx }) => ({
+        ...state,
+        orders: state.orders.filter((order) => order.idx !== orderIdx),
+    }),
+    [REMOVE_ORDER_ERROR]: (state, { payload: error }) =>
+        produce(state, (draft) => {
+            // TODO... 에러 핸들링 로직
         }),
 });
 

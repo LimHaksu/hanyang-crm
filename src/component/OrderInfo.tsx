@@ -119,29 +119,32 @@ const OrderInfo = () => {
         [removeProduct]
     );
 
-    const cellContent = useCallback((columnId: string, product: Product & { amount: number }, index: number) => {
-        switch (columnId) {
-            case "idx":
-                return index + 1;
-            case "name":
-                return product.name;
-            case "price":
-                return product.price.toLocaleString();
-            case "amount":
-                return (
-                    <TextField
-                        className={classes.amountTextField}
-                        inputProps={{ style: { textAlign: "center" } }}
-                        onChange={handleAmountChange(index)}
-                        value={product.amount}
-                    />
-                );
-            case "productTotalPrice":
-                return (product.price * product.amount).toLocaleString();
-            case "remove":
-                return <Delete />;
-        }
-    }, []);
+    const cellContent = useCallback(
+        (columnId: string, product: Product & { amount: number }, index: number) => {
+            switch (columnId) {
+                case "idx":
+                    return index + 1;
+                case "name":
+                    return product.name;
+                case "price":
+                    return product.price.toLocaleString();
+                case "amount":
+                    return (
+                        <TextField
+                            className={classes.amountTextField}
+                            inputProps={{ style: { textAlign: "center" } }}
+                            onChange={handleAmountChange(index)}
+                            value={product.amount}
+                        />
+                    );
+                case "productTotalPrice":
+                    return (product.price * product.amount).toLocaleString();
+                case "remove":
+                    return <Delete />;
+            }
+        },
+        [classes.amountTextField, handleAmountChange]
+    );
 
     return (
         <Paper className={classes.paper}>

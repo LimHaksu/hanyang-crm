@@ -1,14 +1,17 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../module";
 import {
-    submitOrderAction,
+    setOrderFormAction,
     addProductAction,
     changeAmountAction,
     removeProductAction,
     changeOrderRequestAction,
     changePaymentMethodAction,
     PaymentMethod,
+    OrderForm,
+    Order,
 } from "module/order";
+import { submitOrderAsync, removeOrderAsync } from "module/order/saga";
 import { Product } from "module/product";
 import { useCallback } from "react";
 
@@ -16,6 +19,8 @@ const useOrder = () => {
     const orders = useSelector((state: RootState) => state.order.orders);
     const orderForm = useSelector((state: RootState) => state.order.orderForm);
     const dispatch = useDispatch();
+
+    const setOrderForm = useCallback((orderForm: OrderForm) => dispatch(setOrderFormAction(orderForm)), [dispatch]);
 
     const addProduct = useCallback((product: Product & { amount: number }) => dispatch(addProductAction(product)), [
         dispatch,
@@ -32,49 +37,20 @@ const useOrder = () => {
         [dispatch]
     );
 
-    const submitOrder = useCallback(
-        (
-            idx: number,
-            orderTime: number,
-            customerName: string,
-            phoneNumber: string,
-            address: string,
-            productName: string,
-            products: Product[],
-            request: string,
-            customerRequest: string,
-            orderRequest: string,
-            paymentMethod: PaymentMethod,
-            price: number
-        ) =>
-            dispatch(
-                submitOrderAction(
-                    idx,
-                    orderTime,
-                    productName,
-                    request,
-                    customerName,
-                    phoneNumber,
-                    address,
-                    customerRequest,
-                    products,
-                    price,
-                    orderRequest,
-                    paymentMethod
-                )
-            ),
-        [dispatch]
-    );
+    const submitOrder = useCallback((order: Order) => dispatch(submitOrderAsync.request(order)), [dispatch]);
+    const removeOrder = useCallback((orderIdx: number) => dispatch(removeOrderAsync.request(orderIdx)), [dispatch]);
 
     return {
         orders,
         orderForm,
-        submitOrder,
+        setOrderForm,
         addProduct,
         changeAmount,
         changeOrderRequest,
         changePaymentMethod,
         removeProduct,
+        submitOrder,
+        removeOrder,
     };
 };
 

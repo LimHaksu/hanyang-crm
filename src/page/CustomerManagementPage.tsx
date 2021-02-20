@@ -76,7 +76,7 @@ const SubmitCustomer = () => {
         } else {
             addCustomer(customerName, phoneNumber, address, request);
         }
-        setCustomerManagementForm(-1, "", "", "", "");
+        setCustomerManagementForm({ idx: -1, address: "", customerName: "", phoneNumber: "", request: "" });
     }, [
         setCustomerManagementForm,
         editCustomer,
@@ -87,7 +87,7 @@ const SubmitCustomer = () => {
     ]);
 
     const handleCancelButtonClick = useCallback(() => {
-        setCustomerManagementForm(-1, "", "", "", "");
+        setCustomerManagementForm({ idx: -1, address: "", customerName: "", phoneNumber: "", request: "" });
         setCustomerManagementFormEditMode(false);
     }, [setCustomerManagementForm, setCustomerManagementFormEditMode]);
 

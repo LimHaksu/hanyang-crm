@@ -60,24 +60,12 @@ export const removeCustomerError = createAction(REMOVE_CUSTOMER_ERROR)<Error>();
 
 export const setCustomerOrderFormAction = createAction(
     SET_CUSTOMER_ORDER_FORM,
-    (idx: number | undefined, customerName: string, phoneNumber: string, address: string, request: string) => ({
-        idx,
-        customerName,
-        phoneNumber,
-        address,
-        request,
-    })
+    (customerOrderForm: CustomerForm) => customerOrderForm
 )();
 
 export const setCustomerManagementFormAction = createAction(
     SET_CUSTOMER_MANAGEMENT_FORM,
-    (idx: number | undefined, customerName: string, phoneNumber: string, address: string, request: string) => ({
-        idx,
-        customerName,
-        phoneNumber,
-        address,
-        request,
-    })
+    (customerManagementForm: CustomerForm) => customerManagementForm
 )();
 
 export const setCustomerOrderFormEditModeAction = createAction(

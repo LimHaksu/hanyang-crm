@@ -1,11 +1,12 @@
 import { insert, select, update, deleteQuery, Customer, Product } from "./db";
 import { getTimeWithOpeningHour } from "util/time";
+import { Order } from "module/order";
 
 // UnitOfWork 패턴 transaction 적용하기
 
 /**
  * 주문정보를 입력하면 해당 주문의 고객정보, 주문정보를 저장
- * @param orderDatetime 주문시각 1970-01-01 기준 milliseconds
+ * @param orderTime 주문시각 1970-01-01 기준 milliseconds
  * @param customerName 고객명
  * @param phoneNumber 고객 전화번호 dash(-) 포함 문자열
  * @param address 고객 주소
@@ -14,16 +15,17 @@ import { getTimeWithOpeningHour } from "util/time";
  * @param orderRequest 주문 요청사항
  * @param paymentMethod 결제 수단
  */
-export const addOrder = async (
-    orderDatetime: number,
-    customerName: string,
-    phoneNumber: string,
-    address: string,
-    customerRequest: string,
-    products: (Product & { count: number })[],
-    orderRequest: string,
-    paymentMethod: "현금" | "카드" | "선결제(배민)" | "선결제(요기요)" | "선결제(쿠팡)"
-) => {
+export const addOrder = async (order: Order) => {
+    const {
+        orderTime,
+        customerName,
+        phoneNumber,
+        address,
+        customerRequest,
+        products,
+        orderRequest,
+        paymentMethod,
+    } = order;
     // order_datetime, customer_idx, payment_method, request
     // 고객정보 : 이름, 전화, 주소, 단골 요청사항
     // 주문정보 : 상품명, 가격, 수량
@@ -56,13 +58,15 @@ export const addOrder = async (
             const queryInsertOrder = `INSERT INTO
             order(order_datetime, customer_idx, payment_method, request)
             values(?,?,?,?);`;
-            const orderIdx = await insert(queryInsertOrder, orderDatetime, customerIdx, paymentMethod, orderRequest);
+            const orderIdx = await insert(queryInsertOrder, orderTime, customerIdx, paymentMethod, orderRequest);
 
             // order_idx와 product_idx, product_count로 order_product 생성
             const queryInsertOrderProduct = `INSERT INTO
             order_product(order_idx, product_idx, product_count)
             values(?,?,?);`;
-            await Promise.all(products.map(({ idx, count }) => insert(queryInsertOrderProduct, orderIdx, idx, count)));
+            await Promise.all(
+                products.map(({ idx, amount }) => insert(queryInsertOrderProduct, orderIdx, idx, amount))
+            );
         }
     } catch (e) {
         throw e;
