@@ -4,7 +4,6 @@ import produce from "immer";
 export interface PhoneCallRecord {
     idx: number;
     orderTime: string;
-    cidMachineIdx: number;
     customerName: string;
     phoneNumber: string;
     address: string;
@@ -18,12 +17,11 @@ export const addPhoneCallRecordAction = createAction(
     (
         idx: number,
         orderTime: string,
-        cidMachineIdx: number,
         customerName: string,
         phoneNumber: string,
         address: string,
         registerProduct: "작성" | "완료"
-    ) => ({ idx, orderTime, cidMachineIdx, customerName, phoneNumber, address, registerProduct })
+    ) => ({ idx, orderTime, customerName, phoneNumber, address, registerProduct })
 )();
 
 const actions = { addPhoneCallRecordAction };

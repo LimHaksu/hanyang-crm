@@ -4,16 +4,15 @@ import { getTimePlusOpeningHour } from "util/time";
 /**
  * 전화 수신 신호가 오면 이 함수를 호출하여 DB에 전화 수신 기록 저장
  * @param receivedDatetime 1970-01-01 기준 milliseconds 값
- * @param cidMachineIdx USB 목록에서 선택한 항목의 순서(가장위가 0번)
  * @param phoneNumber dash(-)포함한 문자열
  * @return 새로 추가된 자료의 행 번호 (1부터 시작)
  */
-export const addPhoneCallRecord = async (receivedDatetime: number, cidMachineIdx: number, phoneNumber: string) => {
+export const addPhoneCallRecord = async (receivedDatetime: number, phoneNumber: string) => {
     try {
         const query = `INSERT INTO 
-        phone_call_records(received_datetime, cid_machine_idx, phone_number)
+        phone_call_records(received_datetime, phone_number)
         VALUES(?,?,?);`;
-        const data = await insert(query, receivedDatetime, cidMachineIdx, phoneNumber);
+        const data = await insert(query, receivedDatetime, phoneNumber);
         return data;
     } catch (e) {
         throw e;
@@ -28,7 +27,7 @@ export const addPhoneCallRecord = async (receivedDatetime: number, cidMachineIdx
  */
 export const getPhoneCallRecords = async (year: number, month: number, date: number) => {
     try {
-        const query = `SELECT received_datetime, phone_number, cid_machine_idx, order_idx
+        const query = `SELECT received_datetime, phone_number, order_idx
         FROM phone_call_records
         WHERE received_datetime between ? and ?;`;
         const searchedDate = getTimePlusOpeningHour(new Date(year, month, date).getTime());

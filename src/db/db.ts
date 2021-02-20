@@ -12,11 +12,6 @@ export interface Category {
     lexo_rank: string;
 }
 
-export interface CidMachine {
-    idx: number;
-    name: string;
-}
-
 export interface Customer {
     idx: number;
     phone_number: string;
@@ -42,7 +37,6 @@ export interface OrderProduct {
 export interface PhoneCallRecord {
     received_datetime: number;
     phone_number: string;
-    cid_machine_idx: number;
     order_idx: number | null;
 }
 

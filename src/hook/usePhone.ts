@@ -11,23 +11,11 @@ const usePhone = () => {
         (
             idx: number,
             orderTime: string,
-            cidMachineIdx: number,
             customerName: string,
             phoneNumber: string,
             address: string,
             registerProduct: "작성" | "완료"
-        ) =>
-            dispatch(
-                addPhoneCallRecordAction(
-                    idx,
-                    orderTime,
-                    cidMachineIdx,
-                    customerName,
-                    phoneNumber,
-                    address,
-                    registerProduct
-                )
-            ),
+        ) => dispatch(addPhoneCallRecordAction(idx, orderTime, customerName, phoneNumber, address, registerProduct)),
         [dispatch]
     );
 

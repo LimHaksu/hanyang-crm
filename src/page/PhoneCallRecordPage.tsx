@@ -44,7 +44,7 @@ const isClickableCell = (id: string) => {
 };
 
 interface Column {
-    id: "idx" | "orderTime" | "cidMachineIdx" | "customerName" | "phoneNumber" | "address" | "registerProduct";
+    id: "idx" | "orderTime" | "customerName" | "phoneNumber" | "address" | "registerProduct";
     label: string;
     width?: number;
     minWidth?: number;
@@ -56,7 +56,6 @@ interface Column {
 const columns: Column[] = [
     { id: "idx", label: "순서", width: 40, minWidth: 40, align: "center" },
     { id: "orderTime", label: "수신시각", width: 95, minWidth: 95, align: "center" },
-    { id: "cidMachineIdx", label: "수신기기", width: 95, minWidth: 95, align: "center" },
     {
         id: "customerName",
         label: "고객명",
@@ -105,7 +104,6 @@ export function PhoneCallRecordPage() {
         addPhoneCallRecord(
             1,
             "오전 11:12",
-            1,
             "손님",
             "010-1234-5678",
             "중구 선화동 123-456번지 선화아파트 101동 1001호",
@@ -114,13 +112,12 @@ export function PhoneCallRecordPage() {
         addPhoneCallRecord(
             2,
             "오전 11:12",
-            2,
             "손님",
             "010-1234-5678",
             "중구 선화동 123-456번지 선화아파트 101동 1001호",
             "작성"
         );
-    }, []);
+    }, [addPhoneCallRecord]);
 
     const handleAccept = useCallback((date) => {
         handleDateChange(date);
