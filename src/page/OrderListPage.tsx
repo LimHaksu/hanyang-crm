@@ -33,7 +33,7 @@ const useStyles = makeStyles(
             height: "calc(100vh - 64px)",
         },
         container: {
-            maxHeight: "calc(100vh - 122px)",
+            maxHeight: "calc(100vh - 130px)",
         },
         head: {
             fontWeight: "bold",

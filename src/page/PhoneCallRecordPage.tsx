@@ -20,7 +20,7 @@ const useStyles = makeStyles({
         margin: "5px 0 5px 20px",
     },
     container: {
-        maxHeight: "calc(100vh - 122px)",
+        maxHeight: "calc(100vh - 130px)",
     },
     head: {
         fontWeight: "bold",
