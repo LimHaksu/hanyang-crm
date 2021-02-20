@@ -307,7 +307,6 @@ const product = createReducer<ProductState, ProductAction>(initialState, {
 
     [REMOVE_PRODUCT_SUCCESS]: (state, { payload: idx }) =>
         produce(state, (draft) => {
-            console.log("여기옴");
             draft.categories.data.forEach((category) => {
                 const foundProductIdx = category.products.findIndex((product) => product.idx === idx);
                 if (foundProductIdx >= 0) {

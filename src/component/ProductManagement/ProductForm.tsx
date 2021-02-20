@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useRef } from "react";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -62,9 +62,10 @@ interface StyleSelectProp {
           ) => void)
         | undefined;
     readOnly?: boolean;
+    selectRef?: ((instance: unknown) => void) | React.RefObject<unknown> | null | undefined;
 }
 
-const StyledSelect = ({ label, icon, className, value, children, onChange, readOnly }: StyleSelectProp) => {
+const StyledSelect = ({ label, icon, className, value, children, onChange, readOnly, selectRef }: StyleSelectProp) => {
     const classes = useStyles();
     return (
         <Grid container spacing={1} alignItems="flex-end">
@@ -72,7 +73,14 @@ const StyledSelect = ({ label, icon, className, value, children, onChange, readO
             <Grid item>
                 <FormControl className={classes.formControl}>
                     <InputLabel id="demo-simple-select-outlined-label">카테고리</InputLabel>
-                    <Select label={label} className={className} value={value} onChange={onChange} readOnly={readOnly}>
+                    <Select
+                        label={label}
+                        className={className}
+                        value={value}
+                        onChange={onChange}
+                        readOnly={readOnly}
+                        ref={selectRef}
+                    >
                         {children}
                     </Select>
                 </FormControl>
@@ -92,6 +100,7 @@ const ProductForm = () => {
         isProductEditMode,
         setProductEditMode,
     } = useProduct();
+    const categorySelectRef = useRef<HTMLElement>(null);
 
     const resetProductForm = useCallback(() => {
         setProductForm(-1, "", "", "", "");
@@ -106,7 +115,17 @@ const ProductForm = () => {
             addProduct(name, +price, +productForm.categoryIdx);
         }
         resetProductForm();
+        categorySelectRef.current?.click();
     }, [addProduct, editProduct, productForm, resetProductForm, isProductEditMode]);
+
+    const handleEnter = useCallback(
+        (e) => {
+            if (e.key === "Enter") {
+                handleAddProductClick();
+            }
+        },
+        [handleAddProductClick]
+    );
 
     const handleCancelProductClick = useCallback(() => {
         resetProductForm();
@@ -180,6 +199,7 @@ const ProductForm = () => {
                     onChange={handleCategoryNameChange}
                     value={isProductEditMode ? productForm.categoryIdx : productForm.categoryIdx}
                     readOnly={isProductEditMode}
+                    selectRef={categorySelectRef}
                 >
                     {categories.map((category, idx) => (
                         <MenuItem key={idx} value={category.idx}>
@@ -199,6 +219,7 @@ const ProductForm = () => {
                     icon={<Money />}
                     value={getPriceLocale(productForm.price)}
                     onChange={handleProductPriceChange}
+                    onKeyUp={handleEnter}
                 />
                 <Box display="flex">
                     <Box flexGrow={1}></Box>

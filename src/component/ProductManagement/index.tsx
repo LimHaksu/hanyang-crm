@@ -21,14 +21,15 @@ interface StyledTextFieldProp {
     className?: string;
     value?: string;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onKeyUp?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
-export const StyledTextField = ({ label, icon, className, value, onChange }: StyledTextFieldProp) => {
+export const StyledTextField = ({ label, icon, className, value, onChange, onKeyUp }: StyledTextFieldProp) => {
     return (
         <Grid container spacing={1} alignItems="flex-end">
             <Grid item>{icon}</Grid>
             <Grid item>
-                <TextField label={label} className={className} value={value} onChange={onChange} />
+                <TextField label={label} className={className} value={value} onChange={onChange} onKeyUp={onKeyUp} />
             </Grid>
         </Grid>
     );
