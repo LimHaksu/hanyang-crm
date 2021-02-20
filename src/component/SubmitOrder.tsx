@@ -132,7 +132,16 @@ const paymentMap: { [key: string]: PaymentMethod } = {
 const SubmitOrder = () => {
     const classes = useStyles();
     const { customerOrderForm, setCustomerOrderForm } = useCustomerForm();
-    const { orderForm, changeOrderRequest, changePaymentMethod, submitOrder, setOrderForm } = useOrder();
+    const {
+        orderForm,
+        changeOrderRequest,
+        changePaymentMethod,
+        submitOrder,
+        editOrder,
+        setOrderForm,
+        isOrderEditMode,
+        setOrderEditMode,
+    } = useOrder();
     const { products, orderRequest, paymentMethod } = orderForm;
     const [selectedPayment, setSelectedPayment] = useState<SelectedPayment>(() => {
         switch (orderForm.paymentMethod) {
@@ -144,7 +153,18 @@ const SubmitOrder = () => {
                 return "prePayment";
         }
     });
-    const [selectedPrepayment, setSelectedPrepayment] = useState<SelectedPrepayment>("Baemin");
+    const [selectedPrepayment, setSelectedPrepayment] = useState<SelectedPrepayment>(() => {
+        switch (orderForm.paymentMethod) {
+            case "선결제(배민)":
+                return "Baemin";
+            case "선결제(요기요)":
+                return "Yogiyo";
+            case "선결제(쿠팡)":
+                return "Coupang";
+            default:
+                return "Baemin";
+        }
+    });
 
     const prePaymentRef = useRef<HTMLElement>(null);
 
@@ -186,27 +206,51 @@ const SubmitOrder = () => {
         return products.reduce((acc, { price, amount }) => acc + price * amount, 0);
     }, []);
 
-    const handleSaveButtonClick = useCallback(() => {
-        const { customerName, phoneNumber, address, request: customerRequest } = customerOrderForm;
-        const { products, orderRequest, paymentMethod } = orderForm;
-        // 주문 하는 순간에는 idx, orderTime, customerIdx 필요 없음
-        const order: Omit<Order, "idx" | "orderTime" | "customerIdx"> = {
-            customerName,
-            phoneNumber,
-            address,
-            customerRequest,
-            products,
-            orderRequest,
-            paymentMethod,
-        };
-        submitOrder(order);
-    }, [customerOrderForm, orderForm, submitOrder]);
-
     const handleCancelButtonClick = useCallback(() => {
         setSelectedPayment("cash");
+        setSelectedPrepayment("Baemin");
+        setOrderEditMode(false);
         setCustomerOrderForm({ idx: -1, address: "", customerName: "", phoneNumber: "", request: "" });
         setOrderForm({ idx: -1, orderRequest: "", orderTime: -1, paymentMethod: "현금", products: [] });
-    }, [setCustomerOrderForm, setOrderForm]);
+    }, [setCustomerOrderForm, setOrderForm, setOrderEditMode]);
+
+    const handleSaveButtonClick = useCallback(() => {
+        const { customerName, phoneNumber, address, request: customerRequest, idx: customerIdx } = customerOrderForm;
+        const { products, orderRequest, paymentMethod, idx, orderTime } = orderForm;
+        if (isOrderEditMode) {
+            // 주문 수정
+            const order: Order = {
+                idx,
+                address,
+                customerIdx,
+                customerName,
+                customerRequest,
+                orderRequest,
+                orderTime,
+                paymentMethod,
+                phoneNumber,
+                products,
+            };
+            editOrder(order);
+        } else {
+            // 새로운 주문을 하는 순간에는 idx, orderTime, customerIdx 필요 없음
+            const order: Omit<Order, "idx" | "orderTime" | "customerIdx"> = {
+                customerName,
+                phoneNumber,
+                address,
+                customerRequest,
+                products,
+                orderRequest,
+                paymentMethod,
+            };
+            submitOrder(order);
+        }
+        handleCancelButtonClick();
+    }, [customerOrderForm, orderForm, isOrderEditMode, editOrder, submitOrder, handleCancelButtonClick]);
+
+    const handlePrintSaveButtonClick = useCallback(() => {
+        handleSaveButtonClick();
+    }, [handleSaveButtonClick]);
 
     return (
         <Paper className={classes.submitPage}>
@@ -268,6 +312,8 @@ const SubmitOrder = () => {
                             className={clsx(classes.button, classes.submitButton)}
                             variant="contained"
                             color="primary"
+                            disabled={!orderValidate(customerOrderForm, orderForm)}
+                            onClick={handlePrintSaveButtonClick}
                         >
                             <Print className={classes.printIcon} /> 출력 저장
                         </Button>
@@ -278,7 +324,7 @@ const SubmitOrder = () => {
                             onClick={handleSaveButtonClick}
                             disabled={!orderValidate(customerOrderForm, orderForm)}
                         >
-                            저장
+                            {isOrderEditMode ? "수정" : "저장"}
                         </Button>
                         <Button
                             className={clsx(classes.button, classes.submitButton)}

@@ -131,7 +131,7 @@ export const getOrdersByYearMonthDate = async (year: number, month: number, date
         const nextDate = searchedDate + 86_400_000; // 24 * 60 * 60 * 1000
         const orders = await select<OrderForList>(querySelectOrder, searchedDate, nextDate);
 
-        const querySelectOrderProduct = `SELECT name, price, product_count as amount
+        const querySelectOrderProduct = `SELECT idx, name, price, product_count as amount
         FROM orders_products as a join products as b
         on a.product_idx = b.idx
         where order_idx = ?;`;

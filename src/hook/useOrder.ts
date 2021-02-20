@@ -7,6 +7,7 @@ import {
     removeProductAction,
     changeOrderRequestAction,
     changePaymentMethodAction,
+    setOrderEditModeAction,
     PaymentMethod,
     OrderForm,
     Order,
@@ -18,6 +19,8 @@ import { useCallback } from "react";
 const useOrder = () => {
     const orders = useSelector((state: RootState) => state.order.orders);
     const orderForm = useSelector((state: RootState) => state.order.orderForm);
+    const isOrderEditMode = useSelector((state: RootState) => state.order.isOrderEditMode);
+
     const dispatch = useDispatch();
 
     const setOrderForm = useCallback((orderForm: OrderForm) => dispatch(setOrderFormAction(orderForm)), [dispatch]);
@@ -49,9 +52,14 @@ const useOrder = () => {
     const editOrder = useCallback((order: Order) => dispatch(editOrderAsync.request(order)), [dispatch]);
     const removeOrder = useCallback((orderIdx: number) => dispatch(removeOrderAsync.request(orderIdx)), [dispatch]);
 
+    const setOrderEditMode = useCallback((isEditMode: boolean) => dispatch(setOrderEditModeAction(isEditMode)), [
+        dispatch,
+    ]);
+
     return {
         orders,
         orderForm,
+        isOrderEditMode,
         setOrderForm,
         addProduct,
         changeAmount,
@@ -62,6 +70,7 @@ const useOrder = () => {
         submitOrder,
         editOrder,
         removeOrder,
+        setOrderEditMode,
     };
 };
 

@@ -50,6 +50,8 @@ export const REMOVE_ORDER = "order/REMOVE_ORDER";
 export const REMOVE_ORDER_SUCCESS = "order/REMOVE_ORDER_SUCCESS";
 export const REMOVE_ORDER_ERROR = "order/REMOVE_ORDER_ERROR";
 
+const SET_ORDER_EDIT_MODE = "order/SET_ORDER_EDIT_MODE";
+
 export const setOrderFormAction = createAction(SET_ORDER_FORM, (orderForm: OrderForm) => orderForm)();
 export const addProductAction = createAction(ADD_PRODUCT, (product: Product & { amount: number }) => product)();
 export const changeAmountAction = createAction(CHANGE_AMOUNT, (index: number, amount: number) => ({ index, amount }))();
@@ -72,6 +74,8 @@ export const editOrderError = createAction(EDIT_ORDER_ERROR)<Error>();
 export const removeOrderSuccess = createAction(REMOVE_ORDER_SUCCESS)<number>();
 export const removeOrderError = createAction(REMOVE_ORDER_ERROR)<Error>();
 
+export const setOrderEditModeAction = createAction(SET_ORDER_EDIT_MODE, (isEditMode: boolean) => isEditMode)();
+
 const actions = {
     setOrderFormAction,
     addProductAction,
@@ -87,11 +91,13 @@ const actions = {
     editOrderError,
     removeOrderSuccess,
     removeOrderError,
+    setOrderEditModeAction,
 };
 
 interface OrderState {
     orders: Order[];
     orderForm: OrderForm;
+    isOrderEditMode: boolean;
 }
 
 const initialState: OrderState = {
@@ -103,6 +109,7 @@ const initialState: OrderState = {
         orderRequest: "",
         paymentMethod: "현금",
     },
+    isOrderEditMode: false,
 };
 
 type OrderAction = ActionType<typeof actions>;
@@ -169,6 +176,8 @@ const order = createReducer<OrderState, OrderAction>(initialState, {
         produce(state, (draft) => {
             // TODO... 에러 핸들링 로직
         }),
+
+    [SET_ORDER_EDIT_MODE]: (state, { payload: isOrderEditMode }) => ({ ...state, isOrderEditMode }),
 });
 
 export default order;

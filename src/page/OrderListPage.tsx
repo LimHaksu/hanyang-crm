@@ -238,7 +238,7 @@ const StyledModal = ({ open, setOpen, order, handleOkClick, message }: ModalProp
 export const OrderListPage = () => {
     const classes = useStyles();
     const [selectedDate, handleDateChange] = useState<Date | null>(new Date());
-    const { orders, getOrders, setOrderForm, removeOrder } = useOrder();
+    const { orders, getOrders, setOrderForm, removeOrder, setOrderEditMode } = useOrder();
     const { setCustomerOrderForm } = useCustomerForm();
     const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
     const [clickedOrder, setClickedOrder] = useState<Order>();
@@ -379,13 +379,14 @@ export const OrderListPage = () => {
                     };
                     setCustomerOrderForm(customerForm);
                     setOrderForm(orderForm);
+                    setOrderEditMode(true);
                     history.push("/order-registry");
                     break;
                 default:
                     break;
             }
         },
-        [history, setCustomerOrderForm, setOrderForm]
+        [history, setCustomerOrderForm, setOrderForm, setOrderEditMode]
     );
 
     return (
