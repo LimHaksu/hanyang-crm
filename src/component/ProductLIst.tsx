@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 interface IsOpen {
-    [key: string]: boolean;
+    [key: number]: boolean;
 }
 
 interface Props {
@@ -58,9 +58,9 @@ interface Props {
     setIsOpen: (value: React.SetStateAction<{}>) => void;
 }
 
-const setTrueOnlyOneCategory = (isOpen: IsOpen, categoryName: string) => {
+const setTrueOnlyOneCategory = (isOpen: IsOpen, categoryIdx: number) => {
     const newIsOpen: IsOpen = Object.keys(isOpen).reduce((acc, key) => ({ ...acc, [key]: false }), {});
-    newIsOpen[categoryName] = true;
+    newIsOpen[categoryIdx] = true;
     return newIsOpen;
 };
 
@@ -87,7 +87,7 @@ const CategoryRow = ({ category, isOpen, setIsOpen }: Props) => {
                 <TableCell
                     className={classes.category}
                     onClick={() => {
-                        const newIsOpen = setTrueOnlyOneCategory(isOpen, category.name);
+                        const newIsOpen = setTrueOnlyOneCategory(isOpen, category.idx);
                         setIsOpen(newIsOpen);
                     }}
                     colSpan={2}
@@ -97,7 +97,7 @@ const CategoryRow = ({ category, isOpen, setIsOpen }: Props) => {
             </TableRow>
             <TableRow>
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={2}>
-                    <Collapse in={isOpen[category.name]} timeout="auto" unmountOnExit>
+                    <Collapse in={isOpen[category.idx]} timeout="auto" unmountOnExit>
                         <Table aria-label="procuct">
                             <TableBody>
                                 {category.products.map((product) => (
@@ -112,7 +112,9 @@ const CategoryRow = ({ category, isOpen, setIsOpen }: Props) => {
                                     </TableRow>
                                 ))}
                                 {category.products.length === 0 && (
-                                    <div className={classes.noItems}>등록된 상품이 없습니다</div>
+                                    <TableRow>
+                                        <TableCell className={classes.noItems}>등록된 상품이 없습니다</TableCell>
+                                    </TableRow>
                                 )}
                             </TableBody>
                         </Table>
@@ -127,7 +129,7 @@ const ProductList = () => {
     const classes = useStyles();
     const { categories } = useCategory();
     const [isOpen, setIsOpen] = useState<IsOpen>(
-        categories.reduce((acc, category) => ({ ...acc, [category.name]: false }), {})
+        categories.reduce((acc, category) => ({ ...acc, [category.idx]: false }), {})
     );
 
     return (
@@ -141,7 +143,7 @@ const ProductList = () => {
                 </TableHead>
                 <TableBody>
                     {categories.map((category) => (
-                        <CategoryRow key={category.name} category={category} isOpen={isOpen} setIsOpen={setIsOpen} />
+                        <CategoryRow key={category.idx} category={category} isOpen={isOpen} setIsOpen={setIsOpen} />
                     ))}
                 </TableBody>
             </Table>
