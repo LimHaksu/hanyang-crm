@@ -96,7 +96,7 @@ const Category = ({ categoryIdx, name, lexoRank, products, index }: CategoryProp
     }, []);
 
     return (
-        <Draggable draggableId={name} index={index}>
+        <Draggable draggableId={"" + categoryIdx} index={index}>
             {(provided, snapshot) => (
                 <>
                     <Paper

@@ -1,5 +1,5 @@
 const ALPHABET_SIZE = 26;
-const DEFAULT_LEXORANK_LENGTH = 8;
+const DEFAULT_LEXORANK_LENGTH = 10;
 export const A_LEXO_RANK = "a".repeat(DEFAULT_LEXORANK_LENGTH);
 export const Z_LEXO_RANK = "z".repeat(DEFAULT_LEXORANK_LENGTH);
 
