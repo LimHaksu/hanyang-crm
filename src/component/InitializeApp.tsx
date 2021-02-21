@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import useCategory from "hook/useCategory";
 import usePhone from "hook/usePhone";
-import { getPhoneNumberFromDataByDevice } from "util/cid/device";
+import { getPhoneNumberFromDataByDevice, getValidDeviceName } from "util/cid/device";
 import { getCustomers } from "db/customer";
 import { Customer } from "module/customer";
 import { createPhonCallPopup } from "util/phone";
@@ -29,7 +29,7 @@ const InitializeApp = () => {
         registeredPhoneDevices.forEach(({ device, hid }) => {
             hid.on("data", async (data) => {
                 const phoneCallTime = Date.now();
-                const deviceName = device.product ? device.product : "" + device.productId;
+                const deviceName = getValidDeviceName(device);
                 try {
                     const phoneNumber = getPhoneNumberFromDataByDevice(deviceName, data);
                     // 전화번호로 db에 유저 있는지 조회하기
@@ -48,6 +48,7 @@ const InitializeApp = () => {
                             customerRequest = customer.request;
                         }
                         createPhonCallPopup({ phoneCallTime, phoneNumber, customerName, address, customerRequest });
+                        // TODO... 전화 수신 기록 페이지에 데이터를 저장하는 로직
                     }
                 } catch (e) {
                     alert(e);

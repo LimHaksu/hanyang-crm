@@ -1,4 +1,5 @@
 import pccallVer1 from "./PCCALL_VER-1.0";
+import { Device } from "node-hid";
 
 type callbackType = (data: Uint8Array) => string | undefined;
 
@@ -23,4 +24,13 @@ export const getPhoneNumberFromDataByDevice = (deviceName: string, data: Uint8Ar
         return func(data);
     }
     return pccallVer1(data);
+};
+
+/**
+ * 기기 정보를 받아오면 기기의 이름을 리턴함.
+ * 기기 이름이 없는 경우에는 기기ID(숫자)를 문자열 형식으로 리턴함
+ * @param device node-hid 에서 받아온 기기 정보
+ */
+export const getValidDeviceName = (device: Device) => {
+    return device.product ? device.product.trim() : "" + device.productId;
 };

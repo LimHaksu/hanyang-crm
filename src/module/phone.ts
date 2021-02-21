@@ -1,6 +1,7 @@
 import { createAction, ActionType, createReducer } from "typesafe-actions";
 import produce from "immer";
 import { HID as HIDType, Device } from "node-hid";
+import { getValidDeviceName } from "util/cid/device";
 const HID = window.require("node-hid");
 
 export interface PhoneCallRecord {
@@ -63,7 +64,7 @@ const phone = createReducer<PhoneState, PhoneAction>(initialState, {
                 device.hid.close();
             });
             draft.registeredPhoneDevices = selectedDevices.map((device) => ({
-                device: { ...device, product: device.product ? device.product.trim() : "" + device.productId },
+                device: { ...device, product: getValidDeviceName(device) },
                 hid: new HID.HID(device.path!),
             }));
         }),

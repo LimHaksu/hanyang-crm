@@ -5,6 +5,7 @@ import Button from "@material-ui/core/Button";
 import Box from "@material-ui/core/Box";
 import clsx from "clsx";
 import { getDevices } from "util/cid";
+import { getValidDeviceName } from "util/cid/device";
 import { Device } from "node-hid";
 import InnerList from "./InnerList";
 import usePhone from "hook/usePhone";
@@ -41,7 +42,7 @@ const CidList = () => {
             .filter(
                 (registeredPhoneDevice) =>
                     !!devices.find(
-                        (device) => device.product && device.product.trim() === registeredPhoneDevice.device.product
+                        (device) => getValidDeviceName(device) === getValidDeviceName(registeredPhoneDevice.device)
                     )
             )
             .map((phone) => phone.device);

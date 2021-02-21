@@ -2,7 +2,7 @@ import { insertDashIntoPhoneNumber } from "util/phone";
 
 const getPhoneNumberFromData = (data: Uint8Array) => {
     // CID : PC-CALL Ver-1.0
-    // Uint8Array(28)
+    // 인풋 : Uint8Array(28)
     // 예제
     // 010-1234-5678
     // 02-1234-5678
