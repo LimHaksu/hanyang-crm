@@ -18,8 +18,7 @@ import {
 export type SearchBy = "name" | "phoneNumber" | "address";
 
 export interface Customer {
-    idx?: number;
-    name?: string;
+    idx: number;
     customerName: string;
     phoneNumber: string;
     address: string;
@@ -152,7 +151,7 @@ const customer = createReducer<CustomerState, CustomerAction>(initialState, {
         customers: {
             loading: false,
             error: null,
-            data: searchResults.map((row) => ({ ...row, customerName: row.name! })),
+            data: searchResults.map((row) => row),
         },
     }),
     [SEARCH_CUSTOMERS_ERROR]: (state, { payload: searchResults }) => ({

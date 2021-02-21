@@ -4,8 +4,10 @@ import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 import Box from "@material-ui/core/Box";
 import clsx from "clsx";
-import { getDevices, deviceType } from "util/cid";
+import { getDevices } from "util/cid";
+import { Device } from "node-hid";
 import InnerList from "./InnerList";
+import usePhone from "hook/usePhone";
 
 const useStyles = makeStyles((theme: Theme) => ({
     root: {
@@ -27,21 +29,22 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const CidList = () => {
     const classes = useStyles();
-    const [devices, setDevices] = useState<deviceType[]>(() => getDevices());
+    const [devices, setDevices] = useState<Device[]>(() => getDevices());
     const [selectedIdxes, setSelectedIdxes] = useState([] as number[]);
-    const [selectedDevices, setSelectedDevices] = useState<deviceType[]>(() => {
-        const savedDevices = localStorage.getItem("selectedDevices");
-        if (savedDevices) {
-            return JSON.parse(savedDevices);
-        }
-        return [];
-    });
 
+    const { registeredPhoneDevices, setRegisteredPhoneDevices } = usePhone();
+
+    // 등록된 기기가 현재 연결돼 있지 않으면 제거하는 로직
     useEffect(() => {
-        // selectedDevices에 있지만 devices에 없으면 localStorage에서 제거
-        const newSelectedDevices = selectedDevices.filter(
-            (selectedDevice) => !!devices.find((device) => device.product === selectedDevice.product)
-        );
+        // selectedDevices에 있지만 devices(현재 검색된 목록)에 없으면 localStorage에서 제거
+        const newSelectedDevices = registeredPhoneDevices
+            .filter(
+                (registeredPhoneDevice) =>
+                    !!devices.find(
+                        (device) => device.product && device.product.trim() === registeredPhoneDevice.device.product
+                    )
+            )
+            .map((phone) => phone.device);
         localStorage.setItem("selectedDevices", JSON.stringify(newSelectedDevices));
 
         // devices에 있는 device의 path와 selectedDevices에 있는 device의 path가 같으면 selectedIdxes에 추가
@@ -54,14 +57,7 @@ const CidList = () => {
             });
         });
         setSelectedIdxes(selectedIdxes);
-    }, [devices]);
-
-    useEffect(() => {
-        const selectedDevices = devices.filter((device, idx) => selectedIdxes.includes(idx));
-        const jsonData = JSON.stringify(selectedDevices);
-        localStorage.setItem("selectedDevices", jsonData);
-        setSelectedDevices(selectedDevices);
-    }, [selectedIdxes]);
+    }, [devices, registeredPhoneDevices]);
 
     const handleSearchClick = useCallback(() => {
         setDevices(getDevices());
@@ -71,15 +67,19 @@ const CidList = () => {
         (idx: number) => () => {
             const currentIdx = selectedIdxes.indexOf(idx);
             const newSelectedIdxes = [...selectedIdxes];
-
             if (currentIdx === -1) {
                 newSelectedIdxes.push(idx);
             } else {
                 newSelectedIdxes.splice(currentIdx, 1);
             }
+
+            const selectedDevices = devices.filter((device, idx) => newSelectedIdxes.includes(idx));
+            const jsonData = JSON.stringify(selectedDevices);
+            localStorage.setItem("selectedDevices", jsonData);
+            setRegisteredPhoneDevices(selectedDevices);
             setSelectedIdxes(newSelectedIdxes);
         },
-        [selectedIdxes]
+        [devices, selectedIdxes, setRegisteredPhoneDevices]
     );
 
     return (

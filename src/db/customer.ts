@@ -41,7 +41,7 @@ export const getCustomers = async ({
     keyword: string;
 }) => {
     try {
-        const query = `SELECT idx, phone_number, name, address, request
+        const query = `SELECT idx, phone_number, name customer_name, address, request
         FROM customers
         WHERE ${getSnakeCaseString(searchBy)} like ?;`;
         const customers = await select<Customer>(query, `%${keyword}%`);

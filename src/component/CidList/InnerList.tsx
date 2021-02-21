@@ -4,7 +4,8 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import Checkbox from "@material-ui/core/Checkbox";
 import clsx from "clsx";
-import { supportedDevices, deviceType } from "util/cid";
+import { Device } from "node-hid";
+import { supportedDevices } from "util/cid";
 
 const useStyles = makeStyles((theme: Theme) => ({
     list: {
@@ -27,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface InnserListProps {
-    devices: deviceType[];
+    devices: Device[];
     handleItemClick: (idx: number) => () => void;
     selectedIdxes: number[];
 }
@@ -42,11 +43,11 @@ const InnerList = ({ devices, handleItemClick, selectedIdxes }: InnserListProps)
                     <ListItemIcon>
                         <Checkbox checked={selectedIdxes.includes(idx)} />
                     </ListItemIcon>
-                    <div>{device.product ? device.product : "(이름없는 기기)"}</div>
+                    <div>{device.product ? device.product.trim() : "(이름없는 기기)"}</div>
                     <div
                         className={clsx(
                             classes.supportedDevices,
-                            !supportedDevices.includes(device.product) && classes.dn
+                            device.product && !supportedDevices.includes(device.product.trim()) && classes.dn
                         )}
                     >
                         지원 장치

@@ -25,7 +25,6 @@ export const getTimeMinusOpeningHour = (time: number) => {
         const savedTimeDate = new Date(JSON.parse(savedTime));
         const hour = savedTimeDate.getHours();
         const minute = savedTimeDate.getMinutes();
-        console.log(hour, minute);
         return time - (hour * 60 + minute) * 60 * 1000;
     }
     return time;
