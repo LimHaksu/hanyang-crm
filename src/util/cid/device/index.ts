@@ -16,7 +16,6 @@ const deviceFunctionMap: deviceFunctionMapType = {
  * @param deviceName 기기의 이름
  * @param data 기기에서 수신한 데이터
  * @returns phoneNumber -(dash) 포함 문자열, 예)'010-1234-5678'
- * @throws Error('지원하지 않는 CID 장치입니다.')
  */
 export const getPhoneNumberFromDataByDevice = (deviceName: string, data: Uint8Array) => {
     const func = deviceFunctionMap[deviceName];
