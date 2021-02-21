@@ -80,7 +80,7 @@
     "main": "public/Main.js",
     "homepage": "./",
     "build": {
-        "extraResources": [
+        "extraFiles": [
             "database.db"
         ],
         "win": {
