@@ -73,35 +73,35 @@ const changeProductLexoRank = createAction(
     })
 )();
 
-export const getCategories = createAction(GET_CATEGORIES)();
-export const getCategoriesSuccess = createAction(GET_CATEGORIES_SUCCESS)<Category[]>();
-export const getCategoriesError = createAction(GET_CATEGORIES_ERROR)<Error>();
+const getCategories = createAction(GET_CATEGORIES)();
+const getCategoriesSuccess = createAction(GET_CATEGORIES_SUCCESS)<Category[]>();
+const getCategoriesError = createAction(GET_CATEGORIES_ERROR)<Error>();
 
-export const addCategory = createAction(ADD_CATEGORY)();
-export const addCategorySuccess = createAction(ADD_CATEGORY_SUCCESS)<Category>();
-export const addCategoryError = createAction(ADD_CATEGORY_ERROR)<Error>();
+const addCategory = createAction(ADD_CATEGORY)();
+const addCategorySuccess = createAction(ADD_CATEGORY_SUCCESS)<Category>();
+const addCategoryError = createAction(ADD_CATEGORY_ERROR)<Error>();
 
-export const editCategorySuccess = createAction(EDIT_CATEGORY_SUCCESS)<Omit<Category, "products" | "lexoRank">>();
-export const editCategoryError = createAction(EDIT_CATEGORY_ERROR)<Error>();
+const editCategorySuccess = createAction(EDIT_CATEGORY_SUCCESS)<Omit<Category, "products" | "lexoRank">>();
+const editCategoryError = createAction(EDIT_CATEGORY_ERROR)<Error>();
 
-export const moveCategorySuccess = createAction(MOVE_CATEGORY_SUCCESS)<Category[]>();
-export const moveCategoryError = createAction(MOVE_CATEGORY_ERROR)<Error>();
+const moveCategorySuccess = createAction(MOVE_CATEGORY_SUCCESS)<Category[]>();
+const moveCategoryError = createAction(MOVE_CATEGORY_ERROR)<Error>();
 
-export const removeCategorySuccess = createAction(REMOVE_CATEGORY_SUCCESS)<number>();
-export const removeCategoryError = createAction(REMOVE_CATEGORY_ERROR)<Error>();
+const removeCategorySuccess = createAction(REMOVE_CATEGORY_SUCCESS)<number>();
+const removeCategoryError = createAction(REMOVE_CATEGORY_ERROR)<Error>();
 
-export const addProduct = createAction(ADD_PRODUCT)();
-export const addProductSuccess = createAction(ADD_PRODUCT_SUCCESS)<Product>();
-export const addProductError = createAction(ADD_PRODUCT_ERROR)<Error>();
+const addProduct = createAction(ADD_PRODUCT)();
+const addProductSuccess = createAction(ADD_PRODUCT_SUCCESS)<Product>();
+const addProductError = createAction(ADD_PRODUCT_ERROR)<Error>();
 
-export const editProductSuccess = createAction(EDIT_PRODUCT_SUCCESS)<Product>();
-export const editProductError = createAction(EDIT_PRODUCT_ERROR)<Error>();
+const editProductSuccess = createAction(EDIT_PRODUCT_SUCCESS)<Product>();
+const editProductError = createAction(EDIT_PRODUCT_ERROR)<Error>();
 
-export const moveProductSuccess = createAction(MOVE_PRODUCT_SUCCESS)<Category[]>();
-export const moveProductError = createAction(MOVE_PRODUCT_ERROR)<Error>();
+const moveProductSuccess = createAction(MOVE_PRODUCT_SUCCESS)<Category[]>();
+const moveProductError = createAction(MOVE_PRODUCT_ERROR)<Error>();
 
-export const removeProductSuccess = createAction(REMOVE_PRODUCT_SUCCESS)<number>();
-export const removeProductError = createAction(REMOVE_PRODUCT_ERROR)<Error>();
+const removeProductSuccess = createAction(REMOVE_PRODUCT_SUCCESS)<number>();
+const removeProductError = createAction(REMOVE_PRODUCT_ERROR)<Error>();
 
 export const setCategoryFormAction = createAction(SET_CATEGORY_FORM, (idx: number, name: string, lexoRank: string) => ({
     idx,
