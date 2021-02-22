@@ -49,6 +49,9 @@ const useStyles = makeStyles({
         display: "flex",
         justifyContent: "center",
     },
+    emphasis: {
+        fontWeight: "bold",
+    },
 });
 
 interface Column {
@@ -105,7 +108,7 @@ const PhoneCallRecordTableBody = () => {
     const classes = useStyles();
     const { setCustomerOrderForm } = useCustomerForm();
     const { setOrderForm, setOrderEditMode } = useOrder();
-    const { phoneCallRecords, getPhoneCallRecords } = usePhone();
+    const { phoneCallRecords } = usePhone();
 
     const handleCreateButtonClick = useCallback(
         ({
@@ -158,7 +161,7 @@ const PhoneCallRecordTableBody = () => {
                                         align={column.align}
                                     >
                                         {row.orderIdx ? (
-                                            <div className={classes.button}>
+                                            <div className={clsx(classes.button, classes.emphasis)}>
                                                 <DoneIcon /> 완료
                                             </div>
                                         ) : (
