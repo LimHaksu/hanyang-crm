@@ -1,6 +1,7 @@
 import { createAction, ActionType, createReducer } from "typesafe-actions";
 import produce from "immer";
 import { Product } from "module/product";
+import { getTimeMinusOpeningHour } from "util/time";
 
 export type PaymentMethod = "현금" | "카드" | "선결제(배민)" | "선결제(요기요)" | "선결제(쿠팡)";
 
@@ -15,6 +16,7 @@ export interface Order {
     products: (Product & { amount: number })[];
     orderRequest: string;
     paymentMethod: PaymentMethod;
+    phoneCallRecordIdx: number;
 }
 
 export interface OrderForm {
@@ -23,6 +25,7 @@ export interface OrderForm {
     products: (Product & { amount: number })[];
     orderRequest: string;
     paymentMethod: PaymentMethod;
+    phoneCallRecordIdx: number;
 }
 
 export const GET_ORDERS = "order/GET_ORDERS";
@@ -50,6 +53,7 @@ export const REMOVE_ORDER = "order/REMOVE_ORDER";
 export const REMOVE_ORDER_SUCCESS = "order/REMOVE_ORDER_SUCCESS";
 export const REMOVE_ORDER_ERROR = "order/REMOVE_ORDER_ERROR";
 
+const SET_SELECTED_DATE = "order/SET_SELECTED_DATE";
 const SET_ORDER_EDIT_MODE = "order/SET_ORDER_EDIT_MODE";
 
 export const setOrderFormAction = createAction(SET_ORDER_FORM, (orderForm: OrderForm) => orderForm)();
@@ -62,18 +66,19 @@ export const changePaymentMethodAction = createAction(
     (paymentMethod: PaymentMethod) => paymentMethod
 )();
 
-export const getOrdersSuccess = createAction(GET_ORDERS_SUCCESS)<Order[]>();
-export const getOrdersError = createAction(GET_ORDERS_ERROR)<Error>();
+const getOrdersSuccess = createAction(GET_ORDERS_SUCCESS)<Order[]>();
+const getOrdersError = createAction(GET_ORDERS_ERROR)<Error>();
 
-export const submitOrderSuccess = createAction(SUBMIT_ORDER_SUCCESS)<Order>();
-export const submitOrderError = createAction(SUBMIT_ORDER_ERROR)<Error>();
+const submitOrderSuccess = createAction(SUBMIT_ORDER_SUCCESS)<Order>();
+const submitOrderError = createAction(SUBMIT_ORDER_ERROR)<Error>();
 
-export const editOrderSuccess = createAction(EDIT_ORDER_SUCCESS)<Order>();
-export const editOrderError = createAction(EDIT_ORDER_ERROR)<Error>();
+const editOrderSuccess = createAction(EDIT_ORDER_SUCCESS)<Order>();
+const editOrderError = createAction(EDIT_ORDER_ERROR)<Error>();
 
-export const removeOrderSuccess = createAction(REMOVE_ORDER_SUCCESS)<number>();
-export const removeOrderError = createAction(REMOVE_ORDER_ERROR)<Error>();
+const removeOrderSuccess = createAction(REMOVE_ORDER_SUCCESS)<number>();
+const removeOrderError = createAction(REMOVE_ORDER_ERROR)<Error>();
 
+export const setSelectedDateAction = createAction(SET_SELECTED_DATE, (selectedDate: Date | null) => selectedDate)();
 export const setOrderEditModeAction = createAction(SET_ORDER_EDIT_MODE, (isEditMode: boolean) => isEditMode)();
 
 const actions = {
@@ -91,16 +96,19 @@ const actions = {
     editOrderError,
     removeOrderSuccess,
     removeOrderError,
+    setSelectedDateAction,
     setOrderEditModeAction,
 };
 
 interface OrderState {
+    selectedDate: Date | null;
     orders: Order[];
     orderForm: OrderForm;
     isOrderEditMode: boolean;
 }
 
 const initialState: OrderState = {
+    selectedDate: new Date(getTimeMinusOpeningHour(Date.now())),
     orders: [],
     orderForm: {
         idx: -1,
@@ -108,6 +116,7 @@ const initialState: OrderState = {
         products: [],
         orderRequest: "",
         paymentMethod: "현금",
+        phoneCallRecordIdx: -1,
     },
     isOrderEditMode: false,
 };
@@ -177,6 +186,7 @@ const order = createReducer<OrderState, OrderAction>(initialState, {
             // TODO... 에러 핸들링 로직
         }),
 
+    [SET_SELECTED_DATE]: (state, { payload: selectedDate }) => ({ ...state, selectedDate }),
     [SET_ORDER_EDIT_MODE]: (state, { payload: isOrderEditMode }) => ({ ...state, isOrderEditMode }),
 });
 

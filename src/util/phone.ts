@@ -18,20 +18,20 @@ export const insertDashIntoPhoneNumber = (phoneNumber: string) => {
 
 /**
  * 이 함수를 호출하면 전화 알람 팝업창이 뜹니다.
- * @param phoneCallTime 1970-01-01 기준 millisecond
+ * @param receivedDatetime 1970-01-01 기준 millisecond
  * @param phoneNumber -(dash) 포함 전화 문자열
  * @param customerName (DB에 저장돼있는 경우) 고객명 - optional
  * @param address (DB에 저장돼있는 경우) 주소 - optional
  * @param customerRequest (DB에 저장돼있는경우) 단골 요청사항 - optional
  */
 export const createPhonCallPopup = ({
-    phoneCallTime,
+    receivedDatetime,
     phoneNumber,
     customerName,
     address,
     customerRequest,
 }: {
-    phoneCallTime: number;
+    receivedDatetime: number;
     phoneNumber: string;
     customerName?: string;
     address?: string;
@@ -44,7 +44,7 @@ export const createPhonCallPopup = ({
         }
     };
     if (popup) {
-        const formatTime = timeToFormatString(phoneCallTime);
+        const formatTime = timeToFormatString(receivedDatetime);
         const prevDiv = popup.document.body.querySelector("div");
         if (prevDiv) {
             prevDiv.remove();

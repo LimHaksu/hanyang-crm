@@ -7,9 +7,16 @@ import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
+import CreateIcon from "@material-ui/icons/Create";
+import DoneIcon from "@material-ui/icons/Done";
 import DatePicker from "component/DatePicker";
 import clsx from "clsx";
+import { PhoneCallRecord } from "module/phone";
+import { useHistory } from "react-router-dom";
 import usePhone from "hook/usePhone";
+import useCustomerForm from "hook/useCustomerForm";
+import useOrder from "hook/useOrder";
+import { timeToFormatString, timeToYearMonthDate } from "util/time";
 
 const useStyles = makeStyles({
     root: {
@@ -33,29 +40,29 @@ const useStyles = makeStyles({
         borderStyle: "solid",
         padding: "15px 0",
         userSelect: "none",
+        textAlign: "center",
     },
     clickableCell: {
         cursor: "pointer",
     },
+    button: {
+        display: "flex",
+        justifyContent: "center",
+    },
 });
 
-const isClickableCell = (id: string) => {
-    return id === "registerProduct";
-};
-
 interface Column {
-    id: "idx" | "orderTime" | "customerName" | "phoneNumber" | "address" | "registerProduct";
+    id: "idx" | "receivedDatetime" | "customerName" | "phoneNumber" | "address" | "orderIdx";
     label: string;
     width?: number;
     minWidth?: number;
     align?: "center";
     priceAlign?: "right";
-    getRegistryTextWithEmoji?: (value: string) => string;
 }
 
 const columns: Column[] = [
     { id: "idx", label: "순서", width: 40, minWidth: 40, align: "center" },
-    { id: "orderTime", label: "수신시각", width: 95, minWidth: 95, align: "center" },
+    { id: "receivedDatetime", label: "수신시각", width: 105, minWidth: 105, align: "center" },
     {
         id: "customerName",
         label: "고객명",
@@ -75,12 +82,11 @@ const columns: Column[] = [
         align: "center",
     },
     {
-        id: "registerProduct",
+        id: "orderIdx",
         label: "주문작성",
         minWidth: 100,
         width: 100,
         align: "center",
-        getRegistryTextWithEmoji: (value) => (value === "완료" ? `✔️${value}` : `📝${value}`),
     },
 ];
 
@@ -94,34 +100,123 @@ const StyledTableRow = withStyles((theme: Theme) =>
     })
 )(TableRow);
 
+const PhoneCallRecordTableBody = () => {
+    const history = useHistory();
+    const classes = useStyles();
+    const { setCustomerOrderForm } = useCustomerForm();
+    const { setOrderForm, setOrderEditMode } = useOrder();
+    const { phoneCallRecords, getPhoneCallRecords } = usePhone();
+
+    const handleCreateButtonClick = useCallback(
+        ({
+            idx,
+            customerName,
+            phoneNumber,
+            address,
+            request,
+        }: Pick<PhoneCallRecord, "idx" | "customerName" | "phoneNumber" | "address" | "request">) => () => {
+            setCustomerOrderForm({
+                idx: -1,
+                customerName,
+                phoneNumber,
+                address,
+                request,
+            });
+            setOrderForm({
+                idx: -1,
+                orderRequest: "",
+                orderTime: Date.now(),
+                paymentMethod: "현금",
+                products: [],
+                phoneCallRecordIdx: idx,
+            });
+            setOrderEditMode(false);
+            history.push("/order-registry");
+        },
+        [history, setCustomerOrderForm, setOrderEditMode, setOrderForm]
+    );
+
+    return (
+        <TableBody>
+            {phoneCallRecords.map((row, index) => {
+                const { idx, customerName, phoneNumber, address, request } = row;
+                return (
+                    <StyledTableRow hover role="checkbox" key={row.idx}>
+                        {columns.map((column) => {
+                            if (column.id === "idx") {
+                                return (
+                                    <TableCell className={classes.cell} key={column.id} align={column.align}>
+                                        {index + 1}
+                                    </TableCell>
+                                );
+                            }
+                            if (column.id === "orderIdx") {
+                                return (
+                                    <TableCell
+                                        className={clsx(classes.cell, !row.orderIdx && classes.clickableCell)}
+                                        key={column.id}
+                                        align={column.align}
+                                    >
+                                        {row.orderIdx ? (
+                                            <div className={classes.button}>
+                                                <DoneIcon /> 완료
+                                            </div>
+                                        ) : (
+                                            <div
+                                                className={classes.button}
+                                                onClick={handleCreateButtonClick({
+                                                    idx,
+                                                    customerName,
+                                                    phoneNumber,
+                                                    address,
+                                                    request,
+                                                })}
+                                            >
+                                                <CreateIcon /> 작성
+                                            </div>
+                                        )}
+                                    </TableCell>
+                                );
+                            }
+                            const value = row[column.id];
+                            return (
+                                <TableCell className={classes.cell} key={column.id} align={column.align}>
+                                    {column.id === "receivedDatetime" && typeof value === "number"
+                                        ? timeToFormatString(value)
+                                        : value}
+                                </TableCell>
+                            );
+                        })}
+                    </StyledTableRow>
+                );
+            })}
+        </TableBody>
+    );
+};
+
 export function PhoneCallRecordPage() {
     const classes = useStyles();
-    const [selectedDate, handleDateChange] = useState<Date | null>(new Date());
-
-    const { addPhoneCallRecord, phoneCallRecords } = usePhone();
+    const { selectedDate, setSelectedDate, getPhoneCallRecords } = usePhone();
 
     useEffect(() => {
-        addPhoneCallRecord(
-            1,
-            "오전 11:12",
-            "손님",
-            "010-1234-5678",
-            "중구 선화동 123-456번지 선화아파트 101동 1001호",
-            "완료"
-        );
-        addPhoneCallRecord(
-            2,
-            "오전 11:12",
-            "손님",
-            "010-1234-5678",
-            "중구 선화동 123-456번지 선화아파트 101동 1001호",
-            "작성"
-        );
-    }, [addPhoneCallRecord]);
+        if (selectedDate) {
+            getPhoneCallRecords(timeToYearMonthDate(selectedDate));
+        }
+    }, [getPhoneCallRecords, selectedDate]);
 
-    const handleAccept = useCallback((date) => {
-        handleDateChange(date);
-    }, []);
+    const handleDateChange = useCallback(
+        (date) => {
+            setSelectedDate(date);
+        },
+        [setSelectedDate]
+    );
+
+    const handleAccept = useCallback(
+        (date) => {
+            handleDateChange(date);
+        },
+        [handleDateChange]
+    );
 
     return (
         <Paper className={classes.root}>
@@ -142,31 +237,7 @@ export function PhoneCallRecordPage() {
                             ))}
                         </TableRow>
                     </TableHead>
-                    <TableBody>
-                        {phoneCallRecords.map((row) => {
-                            return (
-                                <StyledTableRow hover role="checkbox" key={row.idx}>
-                                    {columns.map((column) => {
-                                        const value = row[column.id];
-                                        return (
-                                            <TableCell
-                                                className={clsx(
-                                                    classes.cell,
-                                                    isClickableCell(column.id) && classes.clickableCell
-                                                )}
-                                                key={column.id}
-                                                align={column.align}
-                                            >
-                                                {column.getRegistryTextWithEmoji && typeof value === "string"
-                                                    ? column.getRegistryTextWithEmoji(value)
-                                                    : value}
-                                            </TableCell>
-                                        );
-                                    })}
-                                </StyledTableRow>
-                            );
-                        })}
-                    </TableBody>
+                    <PhoneCallRecordTableBody />
                 </Table>
             </TableContainer>
         </Paper>

@@ -2,7 +2,7 @@ import { RunResult } from "sqlite3";
 const path = window.require("path");
 const { remote } = window.require("electron");
 const sqlite3 = window.require("sqlite3").verbose();
-const dbFile = path.join(remote.app.getPath("userData"), path.sep + "database.db");
+const dbFile = path.join(remote.app.getAppPath(), path.sep + "database.db");
 const db = new sqlite3.Database(dbFile);
 export default db;
 
@@ -26,6 +26,7 @@ export interface Order {
     customer_idx: number;
     payment_method: string;
     request: string;
+    phone_call_record_idx: number;
 }
 
 export interface OrderProduct {
@@ -35,8 +36,11 @@ export interface OrderProduct {
 }
 
 export interface PhoneCallRecord {
+    idx: number;
     received_datetime: number;
+    customer_name: string | null;
     phone_number: string;
+    address: string | null;
     order_idx: number | null;
 }
 

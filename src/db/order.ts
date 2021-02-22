@@ -15,9 +15,19 @@ import { Order } from "module/order";
  * @param products 주문 상품 리스트
  * @param orderRequest 주문 요청사항
  * @param paymentMethod 결제 수단
+ * @param phoneCallRecordIdx 전화 수신 기록 idx - optional
  */
 export const addOrder = async (order: Omit<Order, "idx" | "customerIdx" | "orderTime">) => {
-    const { customerName, phoneNumber, address, customerRequest, products, orderRequest, paymentMethod } = order;
+    const {
+        customerName,
+        phoneNumber,
+        address,
+        customerRequest,
+        products,
+        orderRequest,
+        paymentMethod,
+        phoneCallRecordIdx,
+    } = order;
     // order_datetime, customer_idx, payment_method, request
     // 고객정보 : 이름, 전화, 주소, 단골 요청사항
     // 주문정보 : 상품명, 가격, 수량
@@ -48,9 +58,16 @@ export const addOrder = async (order: Omit<Order, "idx" | "customerIdx" | "order
         if (customerIdx !== -1) {
             // order_datetime = 현재시각, customer_idx = 고객id, payment_method, request 로 order 생성 -> order_idx 리턴
             const queryInsertOrder = `INSERT INTO
-            orders(order_datetime, customer_idx, payment_method, request)
-            VALUES(?,?,?,?);`;
-            const orderIdx = await insert(queryInsertOrder, Date.now(), customerIdx, paymentMethod, orderRequest);
+            orders(order_datetime, customer_idx, payment_method, request, phone_call_record_idx)
+            VALUES(?,?,?,?,?);`;
+            const orderIdx = await insert(
+                queryInsertOrder,
+                Date.now(),
+                customerIdx,
+                paymentMethod,
+                orderRequest,
+                phoneCallRecordIdx
+            );
 
             // order_idx와 product_idx, product_count로 order_product 생성
             const queryInsertOrderProduct = `INSERT INTO

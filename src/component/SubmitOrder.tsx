@@ -18,6 +18,7 @@ import clsx from "clsx";
 import Print from "@material-ui/icons/Print";
 import useOrder from "hook/useOrder";
 import useCustomerForm from "hook/useCustomerForm";
+import usePhone from "hook/usePhone";
 import { Product } from "module/product";
 import { PaymentMethod, Order, OrderForm } from "module/order";
 import { CustomerForm } from "module/customer";
@@ -142,6 +143,7 @@ const SubmitOrder = () => {
         isOrderEditMode,
         setOrderEditMode,
     } = useOrder();
+    const { appendOrderIdxToPhoneCallRecord } = usePhone();
     const { products, orderRequest, paymentMethod } = orderForm;
     const [selectedPayment, setSelectedPayment] = useState<SelectedPayment>(() => {
         switch (orderForm.paymentMethod) {
@@ -211,16 +213,23 @@ const SubmitOrder = () => {
         setSelectedPrepayment("Baemin");
         setOrderEditMode(false);
         setCustomerOrderForm({ idx: -1, address: "", customerName: "", phoneNumber: "", request: "" });
-        setOrderForm({ idx: -1, orderRequest: "", orderTime: -1, paymentMethod: "현금", products: [] });
+        setOrderForm({
+            idx: -1,
+            orderRequest: "",
+            orderTime: -1,
+            paymentMethod: "현금",
+            products: [],
+            phoneCallRecordIdx: -1,
+        });
     }, [setCustomerOrderForm, setOrderForm, setOrderEditMode]);
 
     const handleSaveButtonClick = useCallback(() => {
         const { customerName, phoneNumber, address, request: customerRequest, idx: customerIdx } = customerOrderForm;
-        const { products, orderRequest, paymentMethod, idx, orderTime } = orderForm;
+        const { products, orderRequest, paymentMethod, idx: orderIdx, orderTime, phoneCallRecordIdx } = orderForm;
         if (isOrderEditMode) {
             // 주문 수정
             const order: Order = {
-                idx,
+                idx: orderIdx,
                 address,
                 customerIdx,
                 customerName,
@@ -230,6 +239,7 @@ const SubmitOrder = () => {
                 paymentMethod,
                 phoneNumber,
                 products,
+                phoneCallRecordIdx,
             };
             editOrder(order);
         } else {
@@ -242,11 +252,25 @@ const SubmitOrder = () => {
                 products,
                 orderRequest,
                 paymentMethod,
+                phoneCallRecordIdx,
             };
             submitOrder(order);
         }
+        // 전화 기록에서 주문 추가한 경우
+        if (phoneCallRecordIdx >= 0) {
+            appendOrderIdxToPhoneCallRecord(phoneCallRecordIdx, orderIdx);
+        }
+        // 주문 폼 초기화
         handleCancelButtonClick();
-    }, [customerOrderForm, orderForm, isOrderEditMode, editOrder, submitOrder, handleCancelButtonClick]);
+    }, [
+        customerOrderForm,
+        orderForm,
+        isOrderEditMode,
+        handleCancelButtonClick,
+        editOrder,
+        submitOrder,
+        appendOrderIdxToPhoneCallRecord,
+    ]);
 
     const handlePrintSaveButtonClick = useCallback(() => {
         // TODO... 출력 로직

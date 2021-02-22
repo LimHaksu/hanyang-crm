@@ -223,12 +223,15 @@ const StyledModal = ({ open, setOpen, order, handleOkClick, message }: ModalProp
 
 export const OrderListPage = () => {
     const classes = useStyles();
-    const [selectedDate, handleDateChange] = useState<Date | null>(() => {
-        // 환경설정에서 시작 시각 설정한 만큼 빼줘야 함
-        const correctedTime = getTimeMinusOpeningHour(Date.now());
-        return new Date(correctedTime);
-    });
-    const { orders, getOrders, setOrderForm, removeOrder, setOrderEditMode } = useOrder();
+    const {
+        orders,
+        getOrders,
+        setOrderForm,
+        removeOrder,
+        selectedDate,
+        setSelectedDate,
+        setOrderEditMode,
+    } = useOrder();
     const { setCustomerOrderForm } = useCustomerForm();
     const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
     const [clickedOrder, setClickedOrder] = useState<Order>();
@@ -252,9 +255,19 @@ export const OrderListPage = () => {
         }
     }, [getOrders, selectedDate]);
 
-    const handleAccept = useCallback((date) => {
-        handleDateChange(date);
-    }, []);
+    const handleDateChange = useCallback(
+        (date) => {
+            setSelectedDate(date);
+        },
+        [setSelectedDate]
+    );
+
+    const handleAccept = useCallback(
+        (date) => {
+            handleDateChange(date);
+        },
+        [handleDateChange]
+    );
 
     const handlePopoverOpen = useCallback(
         (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
@@ -343,6 +356,7 @@ export const OrderListPage = () => {
                         products,
                         orderRequest,
                         paymentMethod,
+                        phoneCallRecordIdx,
                     } = order;
                     const customerForm: CustomerForm = {
                         idx: customerIdx,
@@ -357,6 +371,7 @@ export const OrderListPage = () => {
                         products,
                         orderRequest,
                         paymentMethod,
+                        phoneCallRecordIdx,
                     };
                     setCustomerOrderForm(customerForm);
                     setOrderForm(orderForm);

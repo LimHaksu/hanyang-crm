@@ -35,6 +35,7 @@ function createWindow() {
                 parent: win,
                 frame: false,
                 alwaysOnTop: true,
+                resizable: false,
             });
             event.newGuest = new BrowserWindow(options);
         }

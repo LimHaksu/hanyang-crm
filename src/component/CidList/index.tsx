@@ -35,7 +35,7 @@ const CidList = () => {
 
     const { registeredPhoneDevices, setRegisteredPhoneDevices } = usePhone();
 
-    // 등록된 기기가 현재 연결돼 있지 않으면 제거하는 로직
+    // 로컬스토리지에 등록된 기기가 현재 연결돼 있지 않으면 로컬스토리지에서 제거하는 로직
     useEffect(() => {
         // selectedDevices에 있지만 devices(현재 검색된 목록)에 없으면 localStorage에서 제거
         const newSelectedDevices = registeredPhoneDevices
@@ -48,7 +48,7 @@ const CidList = () => {
             .map((phone) => phone.device);
         localStorage.setItem("selectedDevices", JSON.stringify(newSelectedDevices));
 
-        // devices에 있는 device의 path와 selectedDevices에 있는 device의 path가 같으면 selectedIdxes에 추가
+        // devices에 있는 device.path와 selectedDevices에 있는 device.path가 같으면 selectedIdxes에 추가
         const selectedIdxes: number[] = [];
         devices.forEach((device, idx) => {
             newSelectedDevices.forEach((selectedDevice) => {
@@ -76,6 +76,8 @@ const CidList = () => {
 
             const selectedDevices = devices.filter((device, idx) => newSelectedIdxes.includes(idx));
             const jsonData = JSON.stringify(selectedDevices);
+
+            // 로컬스토리지, store, state 세 개 변경
             localStorage.setItem("selectedDevices", jsonData);
             setRegisteredPhoneDevices(selectedDevices);
             setSelectedIdxes(newSelectedIdxes);

@@ -41,21 +41,21 @@ const SET_ADD_SUCCESS = "customer/SET_ADD_SUCCESS";
 const SET_EDIT_SUCCESS = "customer/SET_EDIT_SUCCESS";
 const SET_REMOVE_SUCCESS = "customer/SET_REMOVE_SUCCESS";
 
-export const searchCustomers = createAction(SEARCH_CUSTOMERS)();
-export const searchCustomersSuccess = createAction(SEARCH_CUSTOMERS_SUCCESS)<Customer[]>();
-export const searchCustomersError = createAction(SEARCH_CUSTOMERS_ERROR)<Error>();
+const searchCustomers = createAction(SEARCH_CUSTOMERS)();
+const searchCustomersSuccess = createAction(SEARCH_CUSTOMERS_SUCCESS)<Customer[]>();
+const searchCustomersError = createAction(SEARCH_CUSTOMERS_ERROR)<Error>();
 
-export const addCustomer = createAction(ADD_CUSTOMER)();
-export const addCustomerSuccess = createAction(ADD_CUSTOMER_SUCCESS)();
-export const addCustomerError = createAction(ADD_CUSTOMER_ERROR)<Error>();
+const addCustomer = createAction(ADD_CUSTOMER)();
+const addCustomerSuccess = createAction(ADD_CUSTOMER_SUCCESS)();
+const addCustomerError = createAction(ADD_CUSTOMER_ERROR)<Error>();
 
-export const editCustomer = createAction(EDIT_CUSTOMER)();
-export const editCustomerSuccess = createAction(EDIT_CUSTOMER_SUCCESS)<Customer>();
-export const editCustomerError = createAction(EDIT_CUSTOMER_ERROR)<Error>();
+const editCustomer = createAction(EDIT_CUSTOMER)();
+const editCustomerSuccess = createAction(EDIT_CUSTOMER_SUCCESS)<Customer>();
+const editCustomerError = createAction(EDIT_CUSTOMER_ERROR)<Error>();
 
-export const removeCustomer = createAction(REMOVE_CUSTOMER)();
-export const removeCustomerSuccess = createAction(REMOVE_CUSTOMER_SUCCESS)<number>();
-export const removeCustomerError = createAction(REMOVE_CUSTOMER_ERROR)<Error>();
+const removeCustomer = createAction(REMOVE_CUSTOMER)();
+const removeCustomerSuccess = createAction(REMOVE_CUSTOMER_SUCCESS)<number>();
+const removeCustomerError = createAction(REMOVE_CUSTOMER_ERROR)<Error>();
 
 export const setCustomerOrderFormAction = createAction(
     SET_CUSTOMER_ORDER_FORM,

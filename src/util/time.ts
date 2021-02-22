@@ -48,3 +48,10 @@ export const timeToFormatString = (orderTime: number) => {
     }
     return `${prevStr} ${hours < 10 ? "0" + hours : hours} : ${minutes < 10 ? "0" + minutes : minutes}`;
 };
+
+/**
+ * Date를 입력하면 {year, month, date} 객체 리턴
+ */
+export const timeToYearMonthDate = (date: Date) => {
+    return { year: date.getFullYear(), month: date.getMonth(), date: date.getDate() };
+};
