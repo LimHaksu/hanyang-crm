@@ -2,7 +2,7 @@ import React from "react";
 import { Droppable, Draggable } from "react-beautiful-dnd";
 import Content from "./Content";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
-import { contentType } from "./data";
+import usePrinter from "hook/usePrinter";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -17,18 +17,17 @@ const useStyles = makeStyles((theme: Theme) =>
         },
     })
 );
-interface InnerQuoteListProps {
-    contents: contentType[];
-}
 
-const InnerProductList = React.memo(({ contents }: InnerQuoteListProps) => {
+const InnerProductList = React.memo(() => {
+    const { currentPaperIndex, papersContents } = usePrinter();
     return (
         <>
-            {contents.map((content, index: number) => (
-                <Draggable key={content.idx} draggableId={`${content.idx}`} index={index}>
+            {papersContents[currentPaperIndex].map((content, index: number) => (
+                <Draggable key={index} draggableId={`draggable-${index}`} index={index}>
                     {(dragProvided, dragSnapshot) => (
                         <Content
-                            key={content.idx}
+                            key={index}
+                            index={index}
                             content={content}
                             isDragging={dragSnapshot.isDragging}
                             provided={dragProvided}
@@ -41,25 +40,21 @@ const InnerProductList = React.memo(({ contents }: InnerQuoteListProps) => {
 });
 
 interface InnerListProps {
-    contents: contentType[];
     dropProvided: any;
 }
 
-const InnerList = ({ contents, dropProvided }: InnerListProps) => {
+const InnerList = ({ dropProvided }: InnerListProps) => {
     const classes = useStyles();
 
     return (
         <div className={classes.dropZone} ref={dropProvided.innerRef}>
-            <InnerProductList contents={contents} />
+            <InnerProductList />
             {dropProvided.placeholder}
         </div>
     );
 };
 
-interface ContentListProps {
-    contents: contentType[];
-}
-const ContentList = ({ contents }: ContentListProps) => {
+const ContentList = () => {
     const classes = useStyles();
 
     return (
@@ -69,7 +64,7 @@ const ContentList = ({ contents }: ContentListProps) => {
                     className={dropSnapshot.isDraggingOver ? classes.isDraggingOver : ""}
                     {...dropProvided.droppableProps}
                 >
-                    <InnerList contents={contents} dropProvided={dropProvided} />
+                    <InnerList dropProvided={dropProvided} />
                 </div>
             )}
         </Droppable>

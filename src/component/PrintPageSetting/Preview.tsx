@@ -2,7 +2,6 @@ import React from "react";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import DragPrintContentList from "./DragPrintContentList";
-import { contents } from "./DragPrintContentList/data";
 
 const useStyles = makeStyles((theme: Theme) => ({
     root: {
@@ -28,7 +27,7 @@ const Preview = () => {
     return (
         <Paper className={classes.root}>
             <div className={classes.title}>위치 수정, 삭제</div>
-            <DragPrintContentList initial={contents} />
+            <DragPrintContentList />
         </Paper>
     );
 };

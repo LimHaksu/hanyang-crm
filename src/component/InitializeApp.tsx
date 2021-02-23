@@ -1,28 +1,41 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { getPhoneNumberFromDataByDevice, getValidDeviceName } from "util/cid/device";
 import { getCustomers } from "db/customer";
 import { Customer } from "module/customer";
 import { createPhonCallPopup } from "util/phone";
-import { Device } from "node-hid";
 import useCategory from "hook/useCategory";
 import usePhone from "hook/usePhone";
+import usePrinter from "hook/usePrinter";
 
 // React 초기화 로직을 담은 컴포넌트
 const InitializeApp = () => {
     const { registeredPhoneDevices, setRegisteredPhoneDevices, addPhoneCallRecord } = usePhone();
     const { getCategories } = useCategory();
-    const [selectedDevices] = useState<Device[]>(() => {
-        const savedDevices = localStorage.getItem("selectedDevices");
-        if (savedDevices) {
-            return JSON.parse(savedDevices);
-        }
-        return [];
-    });
+    const { setSelectedPrinter, setPapersOptions, setPapersContents } = usePrinter();
 
-    // 앱 실행시 localStorage에 저장된 기기정보 가져오기
+    // 앱 실행시 localStorage에서 정보 가져오기
     useEffect(() => {
-        setRegisteredPhoneDevices(selectedDevices);
-    }, [selectedDevices, setRegisteredPhoneDevices]);
+        // 기기정보 가져오기
+        const selectedDevices = localStorage.getItem("selectedDevices");
+        if (selectedDevices) {
+            setRegisteredPhoneDevices(JSON.parse(selectedDevices));
+        }
+        // 프린터 정보 가져오기
+        const selectedPrinter = localStorage.getItem("selectedPrinter");
+        if (selectedPrinter) {
+            setSelectedPrinter(selectedPrinter);
+        }
+        // 프린터 옵션 정보 가져오기
+        const papersOptions = localStorage.getItem("papersOptions");
+        if (papersOptions) {
+            setPapersOptions(JSON.parse(papersOptions));
+        }
+        // 프린터 내용 정보 가져오기
+        const papersContents = localStorage.getItem("papersContents");
+        if (papersContents) {
+            setPapersContents(JSON.parse(papersContents));
+        }
+    }, [setPapersContents, setPapersOptions, setRegisteredPhoneDevices, setSelectedPrinter]);
 
     useEffect(() => {
         // 전화 수신시 발신전화 표시 로직

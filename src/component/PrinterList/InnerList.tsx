@@ -4,7 +4,7 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import Checkbox from "@material-ui/core/Checkbox";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { printerType } from "util/printer";
+import { Printer } from "util/printer";
 
 const useStyles = makeStyles((theme: Theme) => ({
     root: {
@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface InnerListProps {
-    printers: printerType[];
+    printers: Printer[];
     onItemClick: (idx: number) => () => void;
     selectedPrinter: string;
 }

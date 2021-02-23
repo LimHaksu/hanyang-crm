@@ -21,7 +21,7 @@ import { Order, OrderForm } from "module/order";
 import useCustomerForm from "hook/useCustomerForm";
 import { CustomerForm } from "module/customer";
 import { useHistory } from "react-router-dom";
-import { getTimeMinusOpeningHour, timeToFormatString } from "util/time";
+import { timeToFormatString } from "util/time";
 
 const electron = window.require("electron");
 const { shell } = electron;

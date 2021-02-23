@@ -3,9 +3,10 @@ import { makeStyles, Theme } from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
-import { getPrinters, printerType } from "util/printer";
+import { getPrinters, Printer } from "util/printer";
 import InnerList from "./InnerList";
 import clsx from "clsx";
+import usePrinter from "hook/usePrinter";
 
 const useStyles = makeStyles((theme: Theme) => ({
     root: {
@@ -27,16 +28,18 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const PrinterList = () => {
     const classes = useStyles();
-    const [printers, setPrinters] = useState<printerType[]>(() => getPrinters());
-    const [selectedPrinter, setSelectedPrinter] = useState(() => localStorage.getItem("selectedPrinter") || "");
+    const [printers, setPrinters] = useState<Printer[]>(() => getPrinters());
+    const { selectedPrinter, setSelectedPrinter } = usePrinter();
 
     useEffect(() => {
         // selectedPrinter가 printers에 없으면 localStorage에서 제거
-        const found = printers.filter((printer) => printer.name === selectedPrinter);
-        if (!found) {
-            localStorage.removeItem("selectedPrinter");
+        if (selectedPrinter) {
+            const found = printers.find((printer) => printer.name === selectedPrinter);
+            if (!found) {
+                setSelectedPrinter("");
+            }
         }
-    }, [printers, selectedPrinter]);
+    }, [printers, selectedPrinter, setSelectedPrinter]);
 
     const handleSearchClick = useCallback(() => {
         setPrinters(getPrinters());
@@ -45,10 +48,9 @@ const PrinterList = () => {
     const handleItemClick = useCallback(
         (idx: number) => () => {
             const selectedPrinterName = printers[idx].name;
-            localStorage.setItem("selectedPrinter", selectedPrinterName);
             setSelectedPrinter(selectedPrinterName);
         },
-        [printers]
+        [printers, setSelectedPrinter]
     );
 
     return (

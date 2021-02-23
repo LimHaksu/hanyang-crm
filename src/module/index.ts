@@ -4,6 +4,7 @@ import phone from "./phone";
 import order from "./order";
 import product from "./product";
 import customer from "./customer";
+import printer from "./printer";
 import { customerSaga } from "./customer/saga";
 import { productSaga } from "./product/saga";
 import { orderSaga } from "./order/saga";
@@ -14,6 +15,7 @@ const rootReducer = combineReducers({
     order,
     product,
     customer,
+    printer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

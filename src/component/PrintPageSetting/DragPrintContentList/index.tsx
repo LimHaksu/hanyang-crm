@@ -1,9 +1,8 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import ContentList from "./ContentList";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
-import reorder from "component/DragProductList/reorder";
-import { contentType } from "./data";
+import usePrinter from "hook/usePrinter";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -27,13 +26,9 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 );
 
-interface DragPrintContentListProps {
-    initial: contentType[];
-}
-
-const DragPrintContentList = ({ initial }: DragPrintContentListProps) => {
+const DragPrintContentList = () => {
     const classes = useStyles();
-    const [contents, setContents] = useState(initial);
+    const { currentPaperIndex, reorderPaperContents } = usePrinter();
 
     const onDragEnd = useCallback(
         (result: DropResult) => {
@@ -47,18 +42,17 @@ const DragPrintContentList = ({ initial }: DragPrintContentListProps) => {
                 }
 
                 // reordering column
-                const newContents = reorder(contents, source.index, destination.index);
-                setContents(newContents);
+                reorderPaperContents(currentPaperIndex, source.index, destination.index);
                 return;
             }
         },
-        [contents]
+        [currentPaperIndex, reorderPaperContents]
     );
 
     return (
         <div className={classes.root}>
             <DragDropContext onDragEnd={onDragEnd}>
-                <ContentList contents={contents} />
+                <ContentList />
             </DragDropContext>
         </div>
     );
