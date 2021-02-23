@@ -67,6 +67,8 @@ const Category = ({ categoryIdx, name, lexoRank, products, index }: CategoryProp
     const { removeCategory } = useCategory();
     const { setCategoryForm, setCategoryEditMode } = useCategoryForm();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+
     const [clickedCategory, setClickedCategory] = useState({ name: "", idx: -1 });
 
     const handleEditClick = useCallback(
@@ -86,13 +88,22 @@ const Category = ({ categoryIdx, name, lexoRank, products, index }: CategoryProp
     );
 
     const handleDeleteOkClick = useCallback(() => {
+        if (products.length > 0) {
+            setIsModalOpen(false);
+            setIsErrorModalOpen(true);
+            return;
+        }
         removeCategory(clickedCategory.idx);
         setCategoryForm(-1, "", "");
         setCategoryEditMode(false);
-    }, [removeCategory, clickedCategory, setCategoryForm, setCategoryEditMode]);
+    }, [products.length, removeCategory, clickedCategory.idx, setCategoryForm, setCategoryEditMode]);
 
     const handleDeleteCancelClick = useCallback(() => {
         setIsModalOpen(false);
+    }, []);
+
+    const handleErrorOkClick = useCallback(() => {
+        setIsErrorModalOpen(false);
     }, []);
 
     return (
@@ -140,6 +151,20 @@ const Category = ({ categoryIdx, name, lexoRank, products, index }: CategoryProp
                                 </Button>
                                 <Button variant="contained" color="primary" onClick={handleDeleteCancelClick}>
                                     아니오
+                                </Button>
+                            </Box>
+                        </Box>
+                    </Modal>
+                    <Modal open={isErrorModalOpen} setOpen={setIsErrorModalOpen}>
+                        <Box display="flex" flexDirection="column">
+                            <div className={classes.modalMessage}>
+                                카테고리에 상품이 있으면 카테고리를 삭제할 수 없습니다.
+                                <br />
+                                카테고리를 비워주세요.
+                            </div>
+                            <Box display="flex" justifyContent="space-around">
+                                <Button variant="outlined" color="primary" onClick={handleErrorOkClick}>
+                                    확인
                                 </Button>
                             </Box>
                         </Box>
