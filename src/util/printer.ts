@@ -38,17 +38,15 @@ type Key = "papersOptions" | "papersContents";
  */
 export const getPapersLocalStorage = (key: Key) => {
     const paperslocalStorage = localStorage.getItem(key);
-    if (paperslocalStorage) {
-        switch (key) {
-            case "papersOptions":
-                return paperslocalStorage
-                    ? (JSON.parse(paperslocalStorage) as ReturnType<typeof defaultPapersOptions>)
-                    : defaultPapersOptions();
-            case "papersContents":
-                return paperslocalStorage
-                    ? (JSON.parse(paperslocalStorage) as ReturnType<typeof defaultPapersContents>)
-                    : defaultPapersContents();
-        }
+    switch (key) {
+        case "papersOptions":
+            return paperslocalStorage
+                ? (JSON.parse(paperslocalStorage) as ReturnType<typeof defaultPapersOptions>)
+                : defaultPapersOptions();
+        case "papersContents":
+            return paperslocalStorage
+                ? (JSON.parse(paperslocalStorage) as ReturnType<typeof defaultPapersContents>)
+                : defaultPapersContents();
     }
 };
 
