@@ -19,9 +19,11 @@ import Print from "@material-ui/icons/Print";
 import useOrder from "hook/useOrder";
 import useCustomerForm from "hook/useCustomerForm";
 import usePhone from "hook/usePhone";
+import usePrinter from "hook/usePrinter";
 import { Product } from "module/product";
 import { PaymentMethod, Order, OrderForm } from "module/order";
 import { CustomerForm } from "module/customer";
+import { print } from "util/printer";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -134,6 +136,7 @@ const SubmitOrder = () => {
     const classes = useStyles();
     const { customerOrderForm, setCustomerOrderForm } = useCustomerForm();
     const {
+        orders,
         orderForm,
         changeOrderRequest,
         changePaymentMethod,
@@ -144,6 +147,7 @@ const SubmitOrder = () => {
         setOrderEditMode,
     } = useOrder();
     const { appendOrderIdxToPhoneCallRecord } = usePhone();
+    const { papersOptions, papersContents, printerOption } = usePrinter();
     const { products, orderRequest, paymentMethod } = orderForm;
     const [selectedPayment, setSelectedPayment] = useState<SelectedPayment>(() => {
         switch (orderForm.paymentMethod) {
@@ -273,10 +277,32 @@ const SubmitOrder = () => {
     ]);
 
     const handlePrintSaveButtonClick = useCallback(() => {
-        // TODO... 출력 로직
+        const { address, request: customerRequest, phoneNumber } = customerOrderForm;
+        const { idx, products, orderRequest, paymentMethod, orderTime } = orderForm;
+
+        const order = {
+            products,
+            orderTime,
+            phoneNumber,
+            address,
+            customerRequest,
+            orderRequest,
+            paymentMethod,
+        };
+        // 주문 리스트에서 몇번째 주문인지 찾는 로직
+        let index = orders.findIndex((o) => o.idx === idx); // index는 1부터
+        if (index === -1) {
+            index = orders.length;
+        }
+        papersOptions.forEach((paperOptions, paperIndex) => {
+            const { printAvailable } = paperOptions;
+            if (printAvailable) {
+                print(index, order, papersContents[paperIndex], printerOption);
+            }
+        });
 
         handleSaveButtonClick();
-    }, [handleSaveButtonClick]);
+    }, [customerOrderForm, handleSaveButtonClick, orderForm, orders, papersContents, papersOptions, printerOption]);
 
     return (
         <Paper className={classes.submitPage}>

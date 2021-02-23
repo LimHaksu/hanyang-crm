@@ -17,11 +17,13 @@ import Modal from "component/Modal";
 import MouseoverPopover, { ID as ColumnId, isPopOverCell, getPopOverMessageById } from "component/MouseoverPopover";
 import clsx from "clsx";
 import useOrder from "hook/useOrder";
+import usePrinter from "hook/usePrinter";
 import { Order, OrderForm } from "module/order";
 import useCustomerForm from "hook/useCustomerForm";
 import { CustomerForm } from "module/customer";
 import { useHistory } from "react-router-dom";
 import { timeToFormatString } from "util/time";
+import { print } from "util/printer";
 
 const electron = window.require("electron");
 const { shell } = electron;
@@ -233,6 +235,7 @@ export const OrderListPage = () => {
         setOrderEditMode,
     } = useOrder();
     const { setCustomerOrderForm } = useCustomerForm();
+    const { printerOption, papersContents, papersOptions } = usePrinter();
     const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
     const [clickedOrder, setClickedOrder] = useState<Order>();
     const history = useHistory();
@@ -282,7 +285,17 @@ export const OrderListPage = () => {
         setAnchor({ el: null, message: undefined });
     }, []);
 
-    const handlePrintButtonClick = useCallback((order) => () => {}, []);
+    const handlePrintButtonClick = useCallback(
+        (orderIndex: number, order: Order) => () => {
+            papersOptions.forEach((paperOptions, paperIndex) => {
+                const { printAvailable } = paperOptions;
+                if (printAvailable) {
+                    print(orderIndex, order, papersContents[paperIndex], printerOption);
+                }
+            });
+        },
+        [papersContents, papersOptions, printerOption]
+    );
 
     const handleRemoveButtonClick = useCallback(
         (order) => () => {
@@ -322,7 +335,7 @@ export const OrderListPage = () => {
                     return calculateOrderPrice(order);
                 case "print":
                     return (
-                        <div className={classes.clickable} onClick={handlePrintButtonClick(order)}>
+                        <div className={classes.clickable} onClick={handlePrintButtonClick(index, order)}>
                             <PrintIcon />
                         </div>
                     );

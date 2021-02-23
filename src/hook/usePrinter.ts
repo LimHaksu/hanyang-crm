@@ -5,6 +5,7 @@ import {
     setCurrentPaperIndexAction,
     setPapersOptionsAction,
     setPapersContentsAction,
+    setPrinterOptionAction,
     toggleCheckItemAction,
     togglePrintAvailableAction,
     setSelectedPrinterAction,
@@ -12,13 +13,16 @@ import {
     addPaperContentAction,
     removePaperContentAction,
     PrintRowContent,
+    PaperOption,
 } from "module/printer";
+import { PosPrintOptions } from "electron-pos-printer";
 
 const usePrinter = () => {
     const currentPaperIndex = useSelector((state: RootState) => state.printer.currentPaperIndex);
     const papersOptions = useSelector((state: RootState) => state.printer.papersOptions);
     const selectedPrinter = useSelector((state: RootState) => state.printer.selectedPrinter);
     const papersContents = useSelector((state: RootState) => state.printer.papersContents);
+    const printerOption = useSelector((state: RootState) => state.printer.printerOption);
 
     const dispatch = useDispatch();
 
@@ -26,12 +30,18 @@ const usePrinter = () => {
         (currentPaperIndex) => dispatch(setCurrentPaperIndexAction(currentPaperIndex)),
         [dispatch]
     );
-    const setPapersOptions = useCallback((papersOptions) => dispatch(setPapersOptionsAction(papersOptions)), [
-        dispatch,
-    ]);
-    const setPapersContents = useCallback((papersContents) => dispatch(setPapersContentsAction(papersContents)), [
-        dispatch,
-    ]);
+    const setPapersOptions = useCallback(
+        (papersOptions: [PaperOption, PaperOption]) => dispatch(setPapersOptionsAction(papersOptions)),
+        [dispatch]
+    );
+    const setPapersContents = useCallback(
+        (papersContents: [PrintRowContent[], PrintRowContent[]]) => dispatch(setPapersContentsAction(papersContents)),
+        [dispatch]
+    );
+    const setPrinterOption = useCallback(
+        (printerOption: PosPrintOptions) => dispatch(setPrinterOptionAction(printerOption)),
+        [dispatch]
+    );
     const togglePrintAvailable = useCallback(
         (paperIndex: number, printAvailable: boolean) =>
             dispatch(togglePrintAvailableAction(paperIndex, printAvailable)),
@@ -64,9 +74,11 @@ const usePrinter = () => {
         papersOptions,
         selectedPrinter,
         papersContents,
+        printerOption,
         setCurrentPaperIndex,
         setPapersOptions,
         setPapersContents,
+        setPrinterOption,
         togglePrintAvailable,
         toggleCheckItem,
         setSelectedPrinter,

@@ -98,7 +98,6 @@ const phone = createReducer<PhoneState, PhoneAction>(initialState, {
         }),
     [APPEND_ORDER_IDX_TO_PHONE_CALL_RECORD_SUCCESS]: (state, { payload: { orderIdx, phoneCallRecordIdx } }) =>
         produce(state, (draft) => {
-            console.log(orderIdx, phoneCallRecordIdx);
             const foundRecord = draft.phoneCallRecords.find((record) => record.idx === phoneCallRecordIdx);
             if (foundRecord) {
                 foundRecord.orderIdx = orderIdx;

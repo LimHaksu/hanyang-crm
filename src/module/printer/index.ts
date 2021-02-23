@@ -1,12 +1,13 @@
 import { createAction, ActionType, createReducer } from "typesafe-actions";
 import produce from "immer";
 import { defaultPapersContents, defaultPapersOptions, getPapersLocalStorage } from "util/printer";
+import { PosPrintOptions } from "electron-pos-printer";
 
-type Type = "text" | "barCode" | "qrCode" | "image" | "table";
-type CSS = { [key: string]: string };
-type Position = "left" | "center" | "right";
-type Name = "순번" | "결제방법" | "주문시각" | "주소" | "연락처" | "요청사항" | "메뉴";
-type ValueType =
+export type Type = "text" | "barCode" | "qrCode" | "image" | "table";
+export type CSS = { [key: string]: string };
+export type Position = "left" | "center" | "right";
+export type Name = "순번" | "결제방법" | "주문시각" | "주소" | "연락처" | "요청사항" | "메뉴";
+export type ValueType =
     | "orderNumber"
     | "paymentMethod"
     | "orderTime"
@@ -45,6 +46,7 @@ export interface PrintRowContent {
 const SET_CURRENT_PAPER_INDEX = "printer/SET_CURRENT_PAPER_INDEX";
 const SET_PAPERS_OPTIONS = "printer/SET_PAPERS_OPTIONS";
 const SET_PAPERS_CONTENTS = "printer/SET_PAPERS_CONTENTS";
+const SET_PRINTER_OPTION = "printer/SET_PRINTER_OPTION";
 const TOGGLE_PRINT_AVAILABLE = "printer/TOGGLE_PRINT_AVAILABLE";
 const TOGGLE_CHECK_ITEM = "printer/TOGGLE_CHECK_ITEM";
 const SET_SELECTED_PRINTER = "printer/SET_SELECTED_PRINTER";
@@ -61,6 +63,8 @@ export const setCurrentPaperIndexAction = createAction(SET_CURRENT_PAPER_INDEX, 
 export const setPapersOptionsAction = createAction(SET_PAPERS_OPTIONS)<[PaperOption, PaperOption]>();
 
 export const setPapersContentsAction = createAction(SET_PAPERS_CONTENTS)<[PrintRowContent[], PrintRowContent[]]>();
+
+export const setPrinterOptionAction = createAction(SET_PRINTER_OPTION)<PosPrintOptions>();
 
 export const togglePrintAvailableAction = createAction(
     TOGGLE_PRINT_AVAILABLE,
@@ -99,6 +103,7 @@ const actions = {
     setCurrentPaperIndexAction,
     setPapersOptionsAction,
     setPapersContentsAction,
+    setPrinterOptionAction,
     togglePrintAvailableAction,
     toggleCheckItemAction,
     setSelectedPrinterAction,
@@ -122,6 +127,7 @@ export interface PrinterState {
     selectedPrinter: string;
     papersOptions: PaperOption[];
     papersContents: PrintRowContent[][];
+    printerOption: PosPrintOptions;
     currentPaperIndex: number;
 }
 
@@ -129,15 +135,25 @@ const initialState: PrinterState = {
     selectedPrinter: "",
     papersOptions: defaultPapersOptions(),
     papersContents: defaultPapersContents(),
+    printerOption: {
+        preview: false, // Preview in window or print
+        width: "300px", //  width of content body
+        margin: "10px 0 0 0", // margin of content body
+        copies: 1, // Number of copies to print
+        printerName: "", // printerName: string, check it at webContent.getPrinters()
+        timeOutPerLine: 400,
+        silent: true,
+    },
     currentPaperIndex: 0,
 };
 
 type PrinterAction = ActionType<typeof actions>;
 
-const phone = createReducer<PrinterState, PrinterAction>(initialState, {
+const printer = createReducer<PrinterState, PrinterAction>(initialState, {
     [SET_CURRENT_PAPER_INDEX]: (state, { payload: currentPaperIndex }) => ({ ...state, currentPaperIndex }),
     [SET_PAPERS_OPTIONS]: (state, { payload: papersOptions }) => ({ ...state, papersOptions }),
     [SET_PAPERS_CONTENTS]: (state, { payload: papersContents }) => ({ ...state, papersContents }),
+    [SET_PRINTER_OPTION]: (state, { payload: printerOption }) => ({ ...state, printerOption }),
     [TOGGLE_PRINT_AVAILABLE]: (state, { payload: { paperIndex, printAvailable } }) =>
         produce(state, (draft) => {
             const newPapersOptionsLocalStorage = getPapersLocalStorage("papersOptions") as PaperOption[];
@@ -177,14 +193,16 @@ const phone = createReducer<PrinterState, PrinterAction>(initialState, {
             localStorage.setItem("papersOptions", JSON.stringify(newPapersOptionsLocalStorage));
             localStorage.setItem("papersContents", JSON.stringify(newPapersContentsLocalStorage));
         }),
-    [SET_SELECTED_PRINTER]: (state, { payload: selectedPrinter }) => {
-        if (selectedPrinter === "") {
-            localStorage.removeItem("selectedPrinter");
-        } else {
-            localStorage.setItem("selectedPrinter", selectedPrinter);
-        }
-        return { ...state, selectedPrinter };
-    },
+    [SET_SELECTED_PRINTER]: (state, { payload: selectedPrinter }) =>
+        produce(state, (draft) => {
+            if (selectedPrinter === "") {
+                localStorage.removeItem("selectedPrinter");
+            } else {
+                localStorage.setItem("selectedPrinter", selectedPrinter);
+            }
+            draft.selectedPrinter = selectedPrinter;
+            draft.printerOption.printerName = selectedPrinter;
+        }),
     [ADD_PAPER_CONTENT]: (state, { payload: { paperIndex, content } }) =>
         produce(state, (draft) => {
             const newPapersContentsLocalStorage = getPapersLocalStorage("papersContents") as PrintRowContent[][];
@@ -219,4 +237,4 @@ const phone = createReducer<PrinterState, PrinterAction>(initialState, {
         }),
 });
 
-export default phone;
+export default printer;
