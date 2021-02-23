@@ -36,7 +36,7 @@ export const addOrder = async (order: Omit<Order, "idx" | "customerIdx" | "order
         // 전화번호를 이용하여 고객이 존재하는지 체크
         const querySelectCustomer = `SELECT idx
          FROM customers
-         WHERE phone_number = ?;`;
+         WHERE is_deleted = 0 AND phone_number = ?;`;
         const [customer] = await select<Customer>(querySelectCustomer, phoneNumber);
         let customerIdx = -1;
         if (customer) {
@@ -116,7 +116,7 @@ export const getOrderByIdx = async (orderIdx: number): Promise<Order> => {
         const querySelectOrderProduct = `SELECT name, price, product_count as amount
         FROM orders_products as a join products as b
         on a.product_idx = b.idx
-        where order_idx = ?;`;
+        where a.order_idx = ?;`;
         const productsByOrder = await select<Product & { amount: number }>(querySelectOrderProduct, order.idx);
         const orderWithProducts = { ...order, products: productsByOrder };
 

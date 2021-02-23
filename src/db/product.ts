@@ -25,13 +25,14 @@ export const getCategories = async () => {
     try {
         // 카테고리 리스트 가져오기
         const querySelectCategory = `SELECT idx, name, lexo_rank
-        FROM categories`;
+        FROM categories
+        WHERE is_deleted = 0`;
         const categories = await select<Category>(querySelectCategory);
 
         // 카테고리 리스트의 각 카테고리에 대해서 상품 리스트 추가하기
         const querySelectProductByCategoryIdx = `SELECT idx, name, price, lexo_rank, category_idx
         FROM products
-        WHERE category_idx = ?`;
+        WHERE is_deleted = 0 AND category_idx = ?`;
         const categoriesWithProducts = await Promise.all(
             categories.map(async (category) => {
                 const products = await select<Product>(querySelectProductByCategoryIdx, category.idx);
@@ -62,13 +63,13 @@ export const editCategory = async (idx: number, name: string, lexoRank: string) 
 };
 
 /**
- * 카테고리 idx를 입력하면 해당 카테고리 삭제, 하위 상품이 있을경우 에러 반환
+ * 카테고리 idx를 입력하면 해당 카테고리 삭제 soft delete
  * @param idx 삭제할 카테고리 idx
  */
 export const removeCategory = async (idx: number) => {
     try {
-        const query = `DELETE
-        FROM categories
+        const query = `UPDATE categories
+        SET is_deleted = 1
         WHERE idx = ?`;
         await deleteQuery(query, idx);
     } catch (e) {
@@ -115,12 +116,13 @@ export const editProduct = async (idx: number, name: string, price: number, lexo
 };
 
 /**
- * 상품 정보를 삭제
+ * 상품 정보를 삭제 soft delete
  * @param idx 삭제할 상품의 idx
  */
 export const removeProduct = async (idx: number) => {
     try {
-        const query = `DELETE FROM products
+        const query = `UPDATE products
+        SET is_deleted = 1
         WHERE idx = ?;`;
         await deleteQuery(query, idx);
     } catch (e) {

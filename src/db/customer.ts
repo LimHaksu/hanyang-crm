@@ -43,7 +43,7 @@ export const getCustomers = async ({
     try {
         const query = `SELECT idx, phone_number, name customer_name, address, request
         FROM customers
-        WHERE ${getSnakeCaseString(searchBy)} like ?;`;
+        WHERE is_deleted = 0 AND ${getSnakeCaseString(searchBy)} like ?;`;
         const customers = await select<Customer>(query, `%${keyword}%`);
         return changePropertyFromSnakeToCamel(customers);
     } catch (e) {
@@ -83,12 +83,13 @@ export const editCustomer = async ({
 };
 
 /**
- * 고객 idx에 해당하는 고객정보 삭제
+ * 고객 idx에 해당하는 고객정보 삭제 soft delete
  * @param idx 고객 idx
  */
 export const removeCustomer = async (idx: number) => {
     try {
-        const query = `DELETE FROM customers
+        const query = `UPDATE customers
+        SET is_deleted = 1
         WHERE idx = ?;`;
         await deleteQuery(query, idx);
     } catch (e) {
