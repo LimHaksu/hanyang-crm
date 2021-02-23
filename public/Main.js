@@ -1,7 +1,8 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, dialog } = require("electron");
 const path = require("path");
 const url = require("url");
 
+let forceQuit = false;
 function createWindow() {
     const win = new BrowserWindow({
         width: 1920,
@@ -25,6 +26,22 @@ function createWindow() {
         });
 
     win.loadURL(startUrl);
+
+    win.on("close", async function (e) {
+        if (!forceQuit) {
+            e.preventDefault();
+            const choice = await dialog.showMessageBox(this, {
+                type: "question",
+                buttons: ["예", "아니요"],
+                title: "프로그램 종료",
+                message: "정말로 종료하시겠어요?",
+            });
+            if (choice.response === 0) {
+                forceQuit = true;
+                win.close();
+            }
+        }
+    });
 
     win.webContents.on("new-window", (event, url, frameName, disposition, options, additionalFeatures) => {
         if (frameName === "PopupPhoneCall") {
