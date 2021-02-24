@@ -136,9 +136,9 @@ const CustomerSearch = () => {
     const classes = useStyles();
     const [searchBy, setSearchBy] = useState<SearchBy>("name");
 
-    const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const handleChange = useCallback((event: React.ChangeEvent<{ value: unknown }>) => {
         setSearchBy(event.target.value as SearchBy);
-    };
+    }, []);
 
     return (
         <Paper>
