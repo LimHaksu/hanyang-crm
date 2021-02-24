@@ -2,7 +2,7 @@ import { RunResult } from "sqlite3";
 const path = window.require("path");
 const { remote } = window.require("electron");
 const sqlite3 = window.require("sqlite3").verbose();
-const dbFile = path.join(remote.app.getAppPath(), path.sep + "database.db");
+const dbFile = path.join(remote.app.getPath("userData"), path.sep + "database.db");
 const db = new sqlite3.Database(dbFile);
 db.get("PRAGMA foreign_keys = ON");
 export default db;

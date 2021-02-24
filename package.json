@@ -1,5 +1,5 @@
 {
-    "name": "hangyang-crm",
+    "name": "hanyang-crm",
     "version": "0.1.0",
     "private": true,
     "dependencies": {
@@ -94,9 +94,11 @@
             ]
         },
         "nsis": {
-            "oneClick": false,
-            "allowToChangeInstallationDirectory": true,
-            "shortcutName": "한양CRM"
+            "oneClick": true,
+            "language": 1042,
+            "perMachine": false,
+            "shortcutName": "한양CRM",
+            "include": "script/installer.nsh"
         }
     }
 }
