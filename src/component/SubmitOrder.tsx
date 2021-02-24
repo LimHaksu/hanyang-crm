@@ -146,7 +146,6 @@ const SubmitOrder = () => {
         isOrderEditMode,
         setOrderEditMode,
     } = useOrder();
-    const { appendOrderIdxToPhoneCallRecord } = usePhone();
     const { papersOptions, papersContents, printerOption } = usePrinter();
     const { products, orderRequest, paymentMethod } = orderForm;
     const [selectedPayment, setSelectedPayment] = useState<SelectedPayment>(() => {
@@ -260,21 +259,9 @@ const SubmitOrder = () => {
             };
             submitOrder(order);
         }
-        // 전화 기록에서 주문 추가한 경우
-        if (phoneCallRecordIdx >= 0) {
-            appendOrderIdxToPhoneCallRecord(phoneCallRecordIdx, orderIdx);
-        }
         // 주문 폼 초기화
         handleCancelButtonClick();
-    }, [
-        customerOrderForm,
-        orderForm,
-        isOrderEditMode,
-        handleCancelButtonClick,
-        editOrder,
-        submitOrder,
-        appendOrderIdxToPhoneCallRecord,
-    ]);
+    }, [customerOrderForm, orderForm, isOrderEditMode, handleCancelButtonClick, editOrder, submitOrder]);
 
     const handlePrintSaveButtonClick = useCallback(() => {
         const { address, request: customerRequest, phoneNumber } = customerOrderForm;

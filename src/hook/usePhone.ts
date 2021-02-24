@@ -3,11 +3,7 @@ import { Device } from "node-hid";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "module/index";
 import { setRegiteredPhoneDevicesAction, setSelectedDateAction } from "module/phone";
-import {
-    getPhoneCallRecordsAsync,
-    addPhoneCallRecordAsync,
-    appendOrderIdxToPhoneCallRecordAsync,
-} from "module/phone/saga";
+import { getPhoneCallRecordsAsync, addPhoneCallRecordAsync } from "module/phone/saga";
 
 const usePhone = () => {
     const registeredPhoneDevices = useSelector((state: RootState) => state.phone.registeredPhoneDevices);
@@ -29,12 +25,6 @@ const usePhone = () => {
         [dispatch]
     );
 
-    const appendOrderIdxToPhoneCallRecord = useCallback(
-        (phoneCallRecordIdx: number, orderIdx: number) =>
-            dispatch(appendOrderIdxToPhoneCallRecordAsync.request({ phoneCallRecordIdx, orderIdx })),
-        [dispatch]
-    );
-
     const setSelectedDate = useCallback((selectedDate: Date | null) => dispatch(setSelectedDateAction(selectedDate)), [
         dispatch,
     ]);
@@ -49,7 +39,6 @@ const usePhone = () => {
         selectedDate,
         getPhoneCallRecords,
         addPhoneCallRecord,
-        appendOrderIdxToPhoneCallRecord,
         setRegisteredPhoneDevices,
         setSelectedDate,
     };

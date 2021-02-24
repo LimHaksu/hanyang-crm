@@ -29,10 +29,6 @@ export const ADD_PHONE_CALL_RECORD = "phone/ADD_PHONE_CALL_RECORD";
 export const ADD_PHONE_CALL_RECORD_SUCCESS = "phone/ADD_PHONE_CALL_RECORD_SUCCESS";
 export const ADD_PHONE_CALL_RECORD_ERROR = "phone/ADD_PHONE_CALL_RECORD_ERROR";
 
-export const APPEND_ORDER_IDX_TO_PHONE_CALL_RECORD = "phone/APPEND_ORDER_IDX_TO_PHONE_CALL_RECORD";
-export const APPEND_ORDER_IDX_TO_PHONE_CALL_RECORD_SUCCESS = "phone/APPEND_ORDER_IDX_TO_PHONE_CALL_RECORD_SUCCESS";
-export const APPEND_ORDER_IDX_TO_PHONE_CALL_RECORD_ERROR = "phone/APPEND_ORDER_IDX_TO_PHONE_CALL_RECORD_ERROR";
-
 const SET_SELECTED_DATE = "phone/SET_SELECTED_DATE";
 const SET_REGISTERED_PHONE_DEVICES = "phone/SET_REGISTERED_PHONE_DEVICES";
 
@@ -41,12 +37,6 @@ const getPhoneCallRecordsError = createAction(GET_PHONE_CALL_RECORDS_ERROR)<Erro
 
 const addPhoneCallRecordSuccess = createAction(ADD_PHONE_CALL_RECORD_SUCCESS)<PhoneCallRecord>();
 const addPhoneCallRecordError = createAction(ADD_PHONE_CALL_RECORD_ERROR)<Error>();
-
-const appendOrderIdxToPhoneCallRecordSuccess = createAction(APPEND_ORDER_IDX_TO_PHONE_CALL_RECORD_SUCCESS)<{
-    phoneCallRecordIdx: number;
-    orderIdx: number;
-}>();
-const appendOrderIdxToPhoneCallRecordError = createAction(APPEND_ORDER_IDX_TO_PHONE_CALL_RECORD_ERROR)<Error>();
 
 export const setSelectedDateAction = createAction(SET_SELECTED_DATE, (selectedDate: Date | null) => selectedDate)();
 export const setRegiteredPhoneDevicesAction = createAction(
@@ -60,8 +50,6 @@ const actions = {
     setRegiteredPhoneDevicesAction,
     addPhoneCallRecordSuccess,
     addPhoneCallRecordError,
-    appendOrderIdxToPhoneCallRecordSuccess,
-    appendOrderIdxToPhoneCallRecordError,
     setSelectedDateAction,
 };
 
@@ -93,17 +81,6 @@ const phone = createReducer<PhoneState, PhoneAction>(initialState, {
             draft.phoneCallRecords.push(phoneCallRecord);
         }),
     [ADD_PHONE_CALL_RECORD_ERROR]: (state, { payload: error }) =>
-        produce(state, (draft) => {
-            // TODO... 에러 핸들링 로직
-        }),
-    [APPEND_ORDER_IDX_TO_PHONE_CALL_RECORD_SUCCESS]: (state, { payload: { orderIdx, phoneCallRecordIdx } }) =>
-        produce(state, (draft) => {
-            const foundRecord = draft.phoneCallRecords.find((record) => record.idx === phoneCallRecordIdx);
-            if (foundRecord) {
-                foundRecord.orderIdx = orderIdx;
-            }
-        }),
-    [APPEND_ORDER_IDX_TO_PHONE_CALL_RECORD_ERROR]: (state, { payload: error }) =>
         produce(state, (draft) => {
             // TODO... 에러 핸들링 로직
         }),

@@ -76,6 +76,13 @@ export const addOrder = async (order: Omit<Order, "idx" | "customerIdx" | "order
             await Promise.all(
                 products.map(({ idx, amount }) => insert(queryInsertOrderProduct, orderIdx, idx, amount))
             );
+
+            // 전화 수신 기록에 orderIdx 등록하는 로직
+            const query = `UPDATE phone_call_records
+            SET order_idx = ?
+            WHERE idx = ?`;
+            await update(query, orderIdx, phoneCallRecordIdx);
+
             return orderIdx;
         }
     } catch (e) {

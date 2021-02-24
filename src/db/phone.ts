@@ -25,17 +25,6 @@ export const addPhoneCallRecord = async (
     }
 };
 
-export const appendOrderIdxToPhoneCallRecord = async (phoneCallRecordIdx: number, orderIdx: number) => {
-    try {
-        const query = `UPDATE phone_call_records
-        SET order_idx = ?
-        WHERE idx = ?`;
-        await update(query, orderIdx, phoneCallRecordIdx);
-    } catch (e) {
-        throw e;
-    }
-};
-
 /**
  * 영업 시작 시각을 고려해서 해당 일의 전화 수신기록 반환
  * @param year 년도
