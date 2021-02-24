@@ -37,8 +37,8 @@ function* getPhoneCallRecordsSaga(action: ReturnType<typeof getPhoneCallRecordsA
 
 function* addPhoneCallRecordSaga(action: ReturnType<typeof addPhoneCallRecordAsync.request>) {
     try {
-        const { receivedDatetime, customerName, phoneNumber, address } = action.payload;
-        const lastIdx = yield call(addPhoneCallRecord, receivedDatetime, customerName, phoneNumber, address);
+        const { receivedDatetime, customerName, phoneNumber, address, request } = action.payload;
+        const lastIdx = yield call(addPhoneCallRecord, receivedDatetime, customerName, phoneNumber, address, request);
         yield put(addPhoneCallRecordAsync.success({ ...action.payload, idx: lastIdx }));
     } catch (e) {
         yield put(addPhoneCallRecordAsync.failure(e));
