@@ -18,7 +18,6 @@ import clsx from "clsx";
 import Print from "@material-ui/icons/Print";
 import useOrder from "hook/useOrder";
 import useCustomerForm from "hook/useCustomerForm";
-import usePhone from "hook/usePhone";
 import usePrinter from "hook/usePrinter";
 import { Product } from "module/product";
 import { PaymentMethod, Order, OrderForm } from "module/order";

@@ -1,4 +1,4 @@
-import { insert, select, update, PhoneCallRecord } from "./db";
+import { insert, select, PhoneCallRecord } from "./db";
 import { getTimePlusOpeningHour } from "util/time";
 import { changePropertyFromSnakeToCamel } from "util/db";
 
