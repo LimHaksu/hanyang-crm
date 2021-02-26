@@ -12,6 +12,7 @@ function createWindow() {
             enableRemoteModule: true,
             nativeWindowOpen: true,
         },
+        icon: path.join(__dirname, "/../build/icon.ico"),
     });
 
     win.maximize();

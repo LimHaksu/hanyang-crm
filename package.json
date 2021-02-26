@@ -82,6 +82,9 @@
     "main": "public/Main.js",
     "homepage": "./",
     "build": {
+        "files": [
+            "build/*"
+        ],
         "extraFiles": [
             "database.db"
         ],
@@ -93,13 +96,15 @@
                         "x64"
                     ]
                 }
-            ]
+            ],
+            "icon": "build/icon.ico"
         },
         "nsis": {
             "oneClick": true,
             "language": 1042,
             "perMachine": false,
             "shortcutName": "한양CRM",
+            "createDesktopShortcut": "always",
             "include": "script/installer.nsh"
         }
     }
