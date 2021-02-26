@@ -62,7 +62,7 @@ export const createPhonCallPopup = ({
                 color:#ffffff;">
             <div style="font-size:3rem; margin-bottom:10px">${formatTime}</div>
             <div style="font-size:8rem; margin-bottom:10px">${phoneNumber}</div>
-            ${customerName ? `<div style="margin-bottom:10px">${customerName}</div>` : ""}
+            <div style="margin-bottom:10px">${customerName ? customerName : "신규 고객"}</div>
             ${address ? `<div style="font-size:4rem; margin-bottom:25px">${address}</div>` : ""}
             ${customerRequest ? `<div style="font-size:3rem;">단골 요청사항: ${customerRequest}</div>` : ""}
         </div>`;
