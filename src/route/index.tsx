@@ -8,6 +8,7 @@ import {
     PreferencesCidPage,
     PreferencesPrinterPage,
     PreferencesOpeningHours,
+    PreferencesDefaultRegion,
     ProductManagementPage,
     StatisticsPage,
 } from "page";
@@ -22,7 +23,8 @@ export type Path =
     | "/preferences"
     | "/preferences/cid"
     | "/preferences/printer"
-    | "/preferences/opening-hours";
+    | "/preferences/opening-hours"
+    | "/preferences/default-region";
 
 export interface tabRouteType {
     name: string;
@@ -83,5 +85,10 @@ export const preferencesTabRoutes: tabRouteType[] = [
         name: "영업시간 설정",
         path: "/preferences/opening-hours",
         component: PreferencesOpeningHours,
+    },
+    {
+        name: "기본지역 설정",
+        path: "/preferences/default-region",
+        component: PreferencesDefaultRegion,
     },
 ];

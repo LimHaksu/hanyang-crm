@@ -358,7 +358,8 @@ export const OrderListPage = () => {
         (columnId: string, order: Order) => () => {
             switch (columnId) {
                 case "address":
-                    const searchParam = order.address.replace(" ", "%20");
+                    const defaultRegion = localStorage.getItem("defaultRegion");
+                    const searchParam = (defaultRegion ? `${defaultRegion} ` : "") + order.address.replace(" ", "%20");
                     shell.openExternal(`https://map.naver.com/v5/search/${searchParam}`);
                     break;
                 case "productName":
