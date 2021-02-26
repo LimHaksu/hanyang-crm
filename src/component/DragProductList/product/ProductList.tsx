@@ -26,7 +26,7 @@ const InnerProductList = React.memo(({ products }: InnerQuoteListProps) => {
     return (
         <>
             {products.map((product, index: number) => (
-                <Draggable key={product.idx} draggableId={`${product.idx}`} index={index}>
+                <Draggable key={product.idx} draggableId={`product-${product.idx}`} index={index}>
                     {(dragProvided, dragSnapshot) => (
                         <Product
                             key={product.idx}

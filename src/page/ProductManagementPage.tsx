@@ -12,10 +12,10 @@ const useStyles = makeStyles((theme: Theme) =>
             backgroundColor: theme.palette.primary.light,
         },
         leftSide: {
-            width: "50%",
+            width: '45%'
         },
         rightSide: {
-            width: "50%",
+            width: '40%',
             paddingLeft: "10px",
         },
     })
@@ -26,7 +26,7 @@ export const ProductManagementPage = () => {
 
     return (
         <Paper className={classes.root}>
-            <Box display="flex">
+            <Box display="flex" justifyContent="center">
                 <Box className={classes.leftSide}>
                     <DragProductList />
                 </Box>

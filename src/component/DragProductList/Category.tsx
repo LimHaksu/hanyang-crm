@@ -24,9 +24,14 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         name: {
             fontWeight: "bold",
-            fontSize: "1.4rem",
-            padding: "15px",
+            fontSize: "1.1rem",
+            padding: "5px",
             borderBottom: "1px solid #ddd",
+        },
+        textVerticalCenter: {
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center'
         },
         isDragging: {
             boxShadow: "3px 3px 5px black",
@@ -107,7 +112,7 @@ const Category = ({ categoryIdx, name, lexoRank, products, index }: CategoryProp
     }, []);
 
     return (
-        <Draggable draggableId={"" + categoryIdx} index={index}>
+        <Draggable draggableId={`category-${categoryIdx}`} index={index}>
             {(provided, snapshot) => (
                 <>
                     <Paper
@@ -115,8 +120,8 @@ const Category = ({ categoryIdx, name, lexoRank, products, index }: CategoryProp
                         className={clsx(classes.root, snapshot.isDragging && classes.isDragging)}
                         {...provided.draggableProps}
                     >
-                        <Grid container className={classes.name} {...provided.dragHandleProps}>
-                            <Grid item xs={9}>
+                        <Grid container className={clsx(classes.name)} {...provided.dragHandleProps}>
+                            <Grid item xs={9} className={classes.textVerticalCenter}>
                                 {name}
                             </Grid>
                             <Grid item xs={1}></Grid>

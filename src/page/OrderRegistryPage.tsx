@@ -16,10 +16,10 @@ const useStyles = makeStyles((theme: Theme) =>
             backgroundColor: theme.palette.primary.light,
         },
         leftSide: {
-            width: "30%",
+            width: "33%",
         },
         rightSide: {
-            width: "70%",
+            width: "50%",
             paddingLeft: "10px",
         },
     })
@@ -31,11 +31,11 @@ export const OrderRegistryPage = () => {
 
     return (
         <Paper className={classes.root}>
-            <Box display="flex">
+            <Box display="flex" justifyContent="center">
                 <Box className={classes.leftSide}>
                     <ProductList />
                 </Box>
-                <Box className={classes.rightSide} flexGrow={1} display="flex" flexDirection="column">
+                <Box className={classes.rightSide} display="flex" flexDirection="column">
                     <Box>
                         <CustomerInfo customerForm={customerOrderForm} setCustomerForm={setCustomerOrderForm} />
                     </Box>

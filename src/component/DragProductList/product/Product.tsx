@@ -15,12 +15,17 @@ import useProduct from "hook/useProduct";
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
-            padding: "15px 15px 15px 25px",
-            fontSize: "1.2rem",
+            padding: 5,
+            fontSize: "1.1rem",
             borderBottom: "1px solid #ddd",
         },
         isDragging: {
             boxShadow: "3px 3px 5px black",
+        },
+        textVerticalCenter: {
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center'
         },
         centerAlign: {
             textAlign: "center",
@@ -86,10 +91,10 @@ const Product = ({ product, isDragging, provided }: ProductProps) => {
         <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
             <Paper className={clsx(classes.root, isDragging && classes.isDragging)}>
                 <Grid container spacing={1}>
-                    <Grid item xs={7} className={classes.centerAlign}>
+                    <Grid item xs={7} className={clsx(classes.centerAlign, classes.textVerticalCenter)}>
                         {product.name}
                     </Grid>
-                    <Grid item xs={2} className={classes.rightAlign}>
+                    <Grid item xs={2} className={clsx(classes.rightAlign, classes.textVerticalCenter)}>
                         {product.price.toLocaleString()}
                     </Grid>
                     <Grid item xs={1}></Grid>

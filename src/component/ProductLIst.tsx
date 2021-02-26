@@ -22,8 +22,9 @@ const useStyles = makeStyles((theme: Theme) =>
         tableHead: {
             "& th": {
                 fontWeight: "bold",
-                fontSize: "1.2rem",
+                fontSize: "1rem",
                 cursor: "default",
+                padding: 10
             },
         },
         priceHead: {
@@ -36,8 +37,9 @@ const useStyles = makeStyles((theme: Theme) =>
             userSelect: "none",
             "& > *": {
                 borderBottom: "unset",
-                fontSize: "1.1rem",
+                fontSize: "1rem",
                 cursor: "pointer",
+                padding: 7
             },
         },
         noItems: {
