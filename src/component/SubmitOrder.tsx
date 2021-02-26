@@ -22,7 +22,7 @@ import usePrinter from "hook/usePrinter";
 import { Product } from "module/product";
 import { PaymentMethod, Order, OrderForm } from "module/order";
 import { CustomerForm } from "module/customer";
-import { print } from "util/printer";
+import { print, isSerialPrinter, serialPrint } from "util/printer";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -145,7 +145,7 @@ const SubmitOrder = () => {
         isOrderEditMode,
         setOrderEditMode,
     } = useOrder();
-    const { papersOptions, papersContents, printerOption } = usePrinter();
+    const { papersOptions, papersContents, printerOption, selectedPrinter, serialPrinterConfig } = usePrinter();
     const { products, orderRequest, paymentMethod } = orderForm;
     const [selectedPayment, setSelectedPayment] = useState<SelectedPayment>(() => {
         switch (orderForm.paymentMethod) {
@@ -283,12 +283,26 @@ const SubmitOrder = () => {
         papersOptions.forEach((paperOptions, paperIndex) => {
             const { printAvailable } = paperOptions;
             if (printAvailable) {
-                print(index, order, papersContents[paperIndex], printerOption);
+                if (isSerialPrinter(selectedPrinter)) {
+                    serialPrint(index, order, papersContents[paperIndex], serialPrinterConfig);
+                } else {
+                    print(index, order, papersContents[paperIndex], printerOption);
+                }
             }
         });
 
         handleSaveButtonClick();
-    }, [customerOrderForm, handleSaveButtonClick, orderForm, orders, papersContents, papersOptions, printerOption]);
+    }, [
+        customerOrderForm,
+        handleSaveButtonClick,
+        orderForm,
+        orders,
+        papersContents,
+        papersOptions,
+        printerOption,
+        selectedPrinter,
+        serialPrinterConfig,
+    ]);
 
     return (
         <Paper className={classes.submitPage}>

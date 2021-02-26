@@ -23,7 +23,7 @@ import useCustomerForm from "hook/useCustomerForm";
 import { CustomerForm } from "module/customer";
 import { useHistory } from "react-router-dom";
 import { timeToFormatString } from "util/time";
-import { print } from "util/printer";
+import { print, serialPrint, isSerialPrinter } from "util/printer";
 
 const electron = window.require("electron");
 const { shell } = electron;
@@ -235,7 +235,7 @@ export const OrderListPage = () => {
         setOrderEditMode,
     } = useOrder();
     const { setCustomerOrderForm } = useCustomerForm();
-    const { printerOption, papersContents, papersOptions } = usePrinter();
+    const { printerOption, papersContents, papersOptions, selectedPrinter, serialPrinterConfig } = usePrinter();
     const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
     const [clickedOrder, setClickedOrder] = useState<Order>();
     const history = useHistory();
@@ -290,11 +290,15 @@ export const OrderListPage = () => {
             papersOptions.forEach((paperOptions, paperIndex) => {
                 const { printAvailable } = paperOptions;
                 if (printAvailable) {
-                    print(orderIndex, order, papersContents[paperIndex], printerOption);
+                    if (isSerialPrinter(selectedPrinter)) {
+                        serialPrint(orderIndex, order, papersContents[paperIndex], serialPrinterConfig);
+                    } else {
+                        print(orderIndex, order, papersContents[paperIndex], printerOption);
+                    }
                 }
             });
         },
-        [papersContents, papersOptions, printerOption]
+        [papersContents, papersOptions, printerOption, selectedPrinter, serialPrinterConfig]
     );
 
     const handleRemoveButtonClick = useCallback(

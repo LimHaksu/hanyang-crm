@@ -28,12 +28,18 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const PrinterList = () => {
     const classes = useStyles();
-    const [printers, setPrinters] = useState<Printer[]>(() => getPrinters());
-    const { selectedPrinter, setSelectedPrinter } = usePrinter();
+    const [printers, setPrinters] = useState<Printer[]>([]);
+    const { selectedPrinter, setSelectedPrinter, setSerialPrinterConfig, serialPrinterConfig } = usePrinter();
+
+    useEffect(() => {
+        getPrinters().then((printers) => {
+            setPrinters(printers);
+        });
+    }, []);
 
     useEffect(() => {
         // selectedPrinter가 printers에 없으면 localStorage에서 제거
-        if (selectedPrinter) {
+        if (selectedPrinter && printers.length > 0) {
             const found = printers.find((printer) => printer.name === selectedPrinter);
             if (!found) {
                 setSelectedPrinter("");
@@ -41,8 +47,9 @@ const PrinterList = () => {
         }
     }, [printers, selectedPrinter, setSelectedPrinter]);
 
-    const handleSearchClick = useCallback(() => {
-        setPrinters(getPrinters());
+    const handleSearchClick = useCallback(async () => {
+        const printers = await getPrinters();
+        setPrinters(printers);
     }, []);
 
     const handleItemClick = useCallback(

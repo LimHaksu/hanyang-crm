@@ -12,8 +12,10 @@ import {
     reorderPaperContentsAction,
     addPaperContentAction,
     removePaperContentAction,
+    setSerialPrinterConfigAction,
     PrintRowContent,
     PaperOption,
+    SerialPrinterConfig,
 } from "module/printer";
 import { PosPrintOptions } from "electron-pos-printer";
 
@@ -23,6 +25,7 @@ const usePrinter = () => {
     const selectedPrinter = useSelector((state: RootState) => state.printer.selectedPrinter);
     const papersContents = useSelector((state: RootState) => state.printer.papersContents);
     const printerOption = useSelector((state: RootState) => state.printer.printerOption);
+    const serialPrinterConfig = useSelector((state: RootState) => state.printer.serialPrinterConfig);
 
     const dispatch = useDispatch();
 
@@ -69,12 +72,18 @@ const usePrinter = () => {
         [dispatch]
     );
 
+    const setSerialPrinterConfig = useCallback(
+        (serialPrinterConfig: SerialPrinterConfig) => dispatch(setSerialPrinterConfigAction(serialPrinterConfig)),
+        [dispatch]
+    );
+
     return {
         currentPaperIndex,
         papersOptions,
         selectedPrinter,
         papersContents,
         printerOption,
+        serialPrinterConfig,
         setCurrentPaperIndex,
         setPapersOptions,
         setPapersContents,
@@ -85,6 +94,7 @@ const usePrinter = () => {
         reorderPaperContents,
         addPaperContent,
         removePaperContent,
+        setSerialPrinterConfig,
     };
 };
 

@@ -2,6 +2,8 @@ import { createAction, ActionType, createReducer } from "typesafe-actions";
 import produce from "immer";
 import { defaultPapersContents, defaultPapersOptions, getPapersLocalStorage } from "util/printer";
 import { PosPrintOptions } from "electron-pos-printer";
+import { types as PrinterTypes } from "node-thermal-printer";
+import { isSerialPrinter } from "util/printer";
 
 export type Type = "text" | "barCode" | "qrCode" | "image" | "table";
 export type CSS = { [key: string]: string };
@@ -17,7 +19,19 @@ export type ValueType =
     | "menu"
     | "text";
 
-//
+export interface SerialPrinterConfig {
+    type?: PrinterTypes;
+    interface: string;
+    width?: number;
+    characterSet?: string;
+    lineCharacter?: string;
+    driver?: Object;
+    removeSpecialCharacters?: boolean;
+    options?: {
+        timeout?: number;
+    };
+}
+
 export interface PrintRowContent {
     type: Type;
     /** valueType 이 text 인 경우에는 value 출력, 이외에는 주문정보 가져와서 출력 */
@@ -53,6 +67,7 @@ const SET_SELECTED_PRINTER = "printer/SET_SELECTED_PRINTER";
 const ADD_PAPER_CONTENT = "printer/ADD_PAPER_CONTENT";
 const REMOVE_PAPER_CONTENT = "printer/REMOVE_PAPER_CONTENT";
 const REORDER_PAPER_CONTENTS = "printer/REORDER_PAPER_CONTENTS";
+const SET_SERIAL_PRINTER_CONFIG = "printer/SET_SERIAL_PRINTER_CONFIG";
 
 export const GET_PHONE_CALL_RECORDS = "phone/GET_PHONE_CALL_RECORDS";
 export const GET_PHONE_CALL_RECORDS_SUCCESS = "phone/GET_PHONE_CALL_RECORDS_SUCCESS";
@@ -99,6 +114,8 @@ export const reorderPaperContentsAction = createAction(
     (paperIndex: number, srcIndex: number, destIndex: number) => ({ paperIndex, srcIndex, destIndex })
 )();
 
+export const setSerialPrinterConfigAction = createAction(SET_SERIAL_PRINTER_CONFIG)<SerialPrinterConfig>();
+
 const actions = {
     setCurrentPaperIndexAction,
     setPapersOptionsAction,
@@ -110,6 +127,7 @@ const actions = {
     addPaperContentAction,
     removePaperContentAction,
     reorderPaperContentsAction,
+    setSerialPrinterConfigAction,
 };
 
 export interface CheckItem {
@@ -124,14 +142,18 @@ export interface PaperOption {
 }
 
 export interface PrinterState {
+    /** normal 일 경우에는 printerOption 사용, serial 일 경우에는 serialPrinterConfing 사용 */
+    printerType: "normal" | "serial";
     selectedPrinter: string;
     papersOptions: PaperOption[];
     papersContents: PrintRowContent[][];
     printerOption: PosPrintOptions;
+    serialPrinterConfig: SerialPrinterConfig;
     currentPaperIndex: number;
 }
 
 const initialState: PrinterState = {
+    printerType: "normal",
     selectedPrinter: "",
     papersOptions: defaultPapersOptions(),
     papersContents: defaultPapersContents(),
@@ -143,6 +165,16 @@ const initialState: PrinterState = {
         printerName: "", // printerName: string, check it at webContent.getPrinters()
         timeOutPerLine: 400,
         silent: true,
+    },
+    serialPrinterConfig: {
+        type: PrinterTypes.EPSON,
+        interface: "",
+        width: 42,
+        lineCharacter: "-",
+        options: {
+            timeout: 1000,
+        },
+        characterSet: "KOREA",
     },
     currentPaperIndex: 0,
 };
@@ -201,7 +233,16 @@ const printer = createReducer<PrinterState, PrinterAction>(initialState, {
                 localStorage.setItem("selectedPrinter", selectedPrinter);
             }
             draft.selectedPrinter = selectedPrinter;
-            draft.printerOption.printerName = selectedPrinter;
+            if (isSerialPrinter(selectedPrinter)) {
+                localStorage.setItem(
+                    "serialPrinterConfig",
+                    JSON.stringify({ ...state.serialPrinterConfig, interface: `\\\\.\\${selectedPrinter}` })
+                );
+
+                draft.serialPrinterConfig.interface = `\\\\.\\${selectedPrinter}`;
+            } else {
+                draft.printerOption.printerName = selectedPrinter;
+            }
         }),
     [ADD_PAPER_CONTENT]: (state, { payload: { paperIndex, content } }) =>
         produce(state, (draft) => {
@@ -234,6 +275,12 @@ const printer = createReducer<PrinterState, PrinterAction>(initialState, {
                 contents.splice(destIndex, 0, removed);
                 localStorage.setItem("papersContents", JSON.stringify(newPapersContentsLocalStorage));
             }
+        }),
+    [SET_SERIAL_PRINTER_CONFIG]: (state, { payload: serialPrinterConfig }) =>
+        produce(state, (draft) => {
+            draft.serialPrinterConfig = serialPrinterConfig;
+
+            localStorage.setItem("serialPrinterConfig", JSON.stringify(serialPrinterConfig));
         }),
 });
 

@@ -1,11 +1,18 @@
-import { PaperOption, PrintRowContent, ValueType } from "module/printer";
+import { PaperOption, PrintRowContent, ValueType, SerialPrinterConfig } from "module/printer";
 import { Order } from "module/order";
-import { timeToFormatString } from "util/time";
+import { timeToFullFormatString } from "util/time";
 import { PosPrintOptions } from "electron-pos-printer";
+import { printer as ThermalPrinter } from "node-thermal-printer";
 
 const { remote } = window.require("electron");
 const { PosPrinter } = remote.require("electron-pos-printer");
 const webContents = remote.getCurrentWebContents();
+const SerialPort = remote.require("serialport");
+const thermalPrinter = remote.require("node-thermal-printer").printer;
+
+export const isSerialPrinter = (printerName: string) => {
+    return /^COM[0-9]+$/.test(printerName);
+};
 
 export const defaultPapersOptions = (): PaperOption[] => [
     {
@@ -22,13 +29,23 @@ export const defaultPapersOptions = (): PaperOption[] => [
 export const defaultPapersContents = (): PrintRowContent[][] => [[], []];
 export interface Printer {
     name: string;
-    description: string;
-    status: number;
-    isDefault: boolean;
-    options: {
+    description?: string;
+    status?: number;
+    isDefault?: boolean;
+    options?: {
         "printer-make-and-model": string;
         system_driverinfo: string;
     };
+}
+export interface SerialPrinter {
+    comName?: string;
+    path?: string;
+    manufacturer?: string;
+    serialNumber?: string;
+    pnpId?: string;
+    locationId?: string;
+    vendorId?: string;
+    productId?: string;
 }
 
 type Key = "papersOptions" | "papersContents";
@@ -50,8 +67,15 @@ export const getPapersLocalStorage = (key: Key) => {
     }
 };
 
-export const getPrinters = () => {
-    return webContents.getPrinters();
+export const getPrinters = async () => {
+    // 일반 프린터
+    const printers = webContents.getPrinters();
+    // 시리얼 포트 프린터
+    const serialPrinters: SerialPrinter[] = await SerialPort.list();
+    serialPrinters.forEach((serialPrinter) => {
+        printers.push({ name: serialPrinter.path });
+    });
+    return printers;
 };
 
 /**
@@ -74,7 +98,7 @@ export const makeHTMLForm = (
         case "paymentMethod":
             return `<div style="font-size:1.2rem; font-weight:bold; order-bottom:1px dashed;">${order.paymentMethod}</div>`;
         case "orderTime":
-            return `<div>${timeToFormatString(order.orderTime)}</div>`;
+            return `<div>${timeToFullFormatString(order.orderTime)}</div>`;
         case "address":
             return `<div style="font-size:1.1rem;">주소 : <span style="font-weight:bold">${order.address}</span></div>`;
         case "phoneNumber":
@@ -116,7 +140,7 @@ export const makeHTMLForm = (
 };
 
 /**
- * 주문정보, 출력할 항목, 출력 옵션을 입력하면 프린터를 호출하여 출력.
+ * 일반 프린터를 사용, 주문정보, 출력할 항목, 출력 옵션을 입력하면 프린터를 호출하여 출력.
  * @param orderIndex 주문목록에서 주문 순서
  * @param order 주문 정보
  * @param printContents 출력할 항목
@@ -145,5 +169,125 @@ export const print = (
         PosPrinter.print(printData, printerOption);
     } catch (e) {
         alert(e);
+    }
+};
+
+/**
+ * 시리얼 포트 프린터에 프린트 명령을 내리는 함수
+ * @param printer 시리얼 포트 프린터
+ * @param valueType orderNumber | paymentMethod | orderTime | address | phoneNumber | request | menu | text
+ * @param value valueType이 text일 경우 출력할 문구
+ * @param orderIndex 주문 목록 상 순서
+ * @param order 주문 객체중 valueType에 해당하는 속성만 Pick<Order>
+ */
+const serialPrintLine = (
+    printer: ThermalPrinter,
+    valueType: ValueType,
+    value: string,
+    orderIndex: number,
+    order: Pick<
+        Order,
+        "paymentMethod" | "orderTime" | "address" | "phoneNumber" | "customerRequest" | "orderRequest" | "products"
+    >
+) => {
+    switch (valueType) {
+        case "orderNumber":
+            printer.alignRight();
+            printer.println(`순번 : ${orderIndex + 1}`);
+            printer.alignLeft();
+            break;
+        case "paymentMethod":
+            printer.alignCenter();
+            printer.setTextSize(0, 1);
+            printer.println(`${order.paymentMethod}`);
+            printer.setTextNormal();
+            printer.alignLeft();
+            break;
+        case "orderTime":
+            printer.println(`${timeToFullFormatString(order.orderTime)}`);
+            break;
+        case "address":
+            printer.setTextSize(0, 1);
+            printer.println(`주소 : ${order.address}`);
+            printer.setTextNormal();
+            break;
+        case "phoneNumber":
+            printer.setTextSize(0, 1);
+            printer.println(`연락처 : ${order.phoneNumber}`);
+            printer.setTextNormal();
+            break;
+        case "request":
+            printer.setTextSize(0, 1);
+            printer.println(`요청사항 : ${order.customerRequest} / ${order.orderRequest}`);
+            printer.setTextNormal();
+            break;
+        case "menu":
+            printer.drawLine();
+            printer.tableCustom([
+                { text: "메뉴", align: "LEFT", width: 0.6 },
+                { text: "수량", align: "RIGHT", width: 0.1 },
+                { text: "금액", align: "RIGHT", width: 0.3 },
+            ]);
+            printer.drawLine();
+            order.products.forEach((product) => {
+                const { name, price, amount } = product;
+                printer.setTextSize(0, 1);
+                printer.tableCustom([
+                    { text: name, align: "LEFT", width: 0.6 },
+                    { text: `${amount}`, align: "RIGHT", width: 0.1, bold: amount > 1 },
+                    { text: `${(price * amount).toLocaleString()}`, align: "RIGHT", width: 0.3, bold: amount > 1 },
+                ]);
+                printer.setTextNormal();
+                printer.drawLine();
+            });
+            printer.setTextSize(0, 1);
+            printer.tableCustom([
+                { text: "합계", align: "LEFT", width: 0.7, bold: true },
+                {
+                    text: order.products
+                        .reduce((acc, product) => acc + product.price * product.amount, 0)
+                        .toLocaleString(),
+                    align: "RIGHT",
+                    width: 0.3,
+                    bold: true,
+                },
+            ]);
+            printer.setTextNormal();
+            printer.drawLine();
+            break;
+        case "text":
+            printer.println(value);
+            break;
+        default:
+            break;
+    }
+};
+
+/**
+ * 시리얼 포트(COM1, COM2, ... , COM숫자)에 연결된 프린터를 사용
+ * @param orderIndex
+ * @param order
+ * @param printContents
+ * @param printerOption
+ */
+export const serialPrint = async (
+    orderIndex: number,
+    order: Pick<
+        Order,
+        "paymentMethod" | "orderTime" | "address" | "phoneNumber" | "customerRequest" | "orderRequest" | "products"
+    >,
+    printContents: PrintRowContent[],
+    serialPrinterConfig: SerialPrinterConfig
+) => {
+    const printer: ThermalPrinter = new thermalPrinter(serialPrinterConfig);
+    printContents.forEach((printContent) => {
+        const { valueType, value } = printContent;
+        serialPrintLine(printer, valueType, value, orderIndex, order);
+    });
+    printer.cut();
+    try {
+        await printer.execute();
+    } catch (error) {
+        console.error("Print error:", error);
     }
 };

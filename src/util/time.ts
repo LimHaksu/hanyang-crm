@@ -50,6 +50,30 @@ export const timeToFormatString = (orderTime: number) => {
 };
 
 /**
+ * milliseconds를 입력 받으면 '년월일 오전/오후 h:mm' 포맷의 시간으로 리턴
+ * @param orderTime 1970-01-01 기준의 milliseconds
+ */
+export const timeToFullFormatString = (orderTime: number) => {
+    const date = new Date(orderTime);
+    const y = date.getFullYear();
+    const m = date.getMonth() + 1;
+    const d = date.getDate();
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
+    const isMorning = hours < 12;
+    let prevStr = "";
+    if (isMorning) {
+        prevStr = "오전 ";
+    } else {
+        prevStr = "오후 ";
+        hours -= 12;
+    }
+    return `${y}년 ${m}월 ${d}일, ${prevStr} ${hours < 10 ? "0" + hours : hours} : ${
+        minutes < 10 ? "0" + minutes : minutes
+    }`;
+};
+
+/**
  * Date를 입력하면 {year, month, date} 객체 리턴
  */
 export const timeToYearMonthDate = (date: Date) => {

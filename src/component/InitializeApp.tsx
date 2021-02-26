@@ -11,7 +11,7 @@ import usePrinter from "hook/usePrinter";
 const InitializeApp = () => {
     const { registeredPhoneDevices, setRegisteredPhoneDevices, addPhoneCallRecord } = usePhone();
     const { getCategories } = useCategory();
-    const { setSelectedPrinter, setPapersOptions, setPapersContents } = usePrinter();
+    const { setSelectedPrinter, setPapersOptions, setPapersContents, setSerialPrinterConfig } = usePrinter();
 
     // 앱 초기 세팅
     useEffect(() => {
@@ -36,7 +36,13 @@ const InitializeApp = () => {
         if (papersContents) {
             setPapersContents(JSON.parse(papersContents));
         }
-    }, [setPapersContents, setPapersOptions, setRegisteredPhoneDevices, setSelectedPrinter]);
+
+        // 시리얼 포트 프린터 설정 가져오기
+        const serialPrinterConfig = localStorage.getItem("serialPrinterConfig");
+        if (serialPrinterConfig) {
+            setSerialPrinterConfig(JSON.parse(serialPrinterConfig));
+        }
+    }, [setPapersContents, setPapersOptions, setRegisteredPhoneDevices, setSelectedPrinter, setSerialPrinterConfig]);
 
     useEffect(() => {
         // 전화 수신시 발신전화 표시 로직
