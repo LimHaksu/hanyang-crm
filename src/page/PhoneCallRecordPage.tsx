@@ -141,7 +141,8 @@ const PhoneCallRecordTableBody = () => {
 
     return (
         <TableBody>
-            {phoneCallRecords.map((row, index) => {
+            {[...phoneCallRecords].reverse().map((row, i) => {
+                const index = phoneCallRecords.length - 1 - i;
                 const { idx, customerName, phoneNumber, address, request } = row;
                 return (
                     <StyledTableRow hover role="checkbox" key={row.idx}>

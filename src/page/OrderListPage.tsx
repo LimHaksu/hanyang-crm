@@ -283,14 +283,11 @@ export const OrderListPage = () => {
         [handleDateChange]
     );
 
-    const handlePopoverOpen = useCallback(
-        (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
-            const target = event.currentTarget;
-            const message = target.dataset.message;
-            setAnchor({ el: target, message });
-        },
-        [setAnchor]
-    );
+    const handlePopoverOpen = useCallback((event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+        const target = event.currentTarget;
+        const message = target.dataset.message;
+        setAnchor({ el: target, message });
+    }, []);
 
     const handlePopoverClose = useCallback(() => {
         setAnchor({ el: null, message: undefined });
@@ -452,7 +449,8 @@ export const OrderListPage = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {orders.map((order, index) => {
+                        {[...orders].reverse().map((order, i) => {
+                            const index = orders.length - 1 - i;
                             return (
                                 <StyledTableRow hover role="checkbox" key={index}>
                                     {columns.map((column) => {
