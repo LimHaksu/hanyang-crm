@@ -21,9 +21,9 @@ const useStyles = makeStyles(() =>
             top: 0,
             backgroundColor: "#f7f7f7",
             "& *": {
-                fontSize: "1.2rem",
+                fontSize: "1rem",
                 fontWeight: "bold",
-                padding: "16px",
+                padding: "10px",
                 borderBottom: "1px solid #ddd",
             },
             userSelect: "none",
