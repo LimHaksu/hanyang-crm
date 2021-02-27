@@ -55,8 +55,7 @@ export const PreferencesDefaultRegion = () => {
     return (
         <div className={classes.root}>
             <Box display="flex" justifyContent="center">
-                <Box flexGrow={2} />
-                <Box flexGrow={1}>
+                <Box>
                     <Paper className={classes.paper}>
                         <div className={classes.title}>
                             주문 목록에서 지도를 검색할때 검색어 앞에 지역을 추가해줍니다.
@@ -76,7 +75,6 @@ export const PreferencesDefaultRegion = () => {
                         </div>
                     </Paper>
                 </Box>
-                <Box flexGrow={2} />
             </Box>
         </div>
     );

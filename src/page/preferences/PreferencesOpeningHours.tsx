@@ -54,8 +54,7 @@ export const PreferencesOpeningHours = () => {
     return (
         <div className={classes.root}>
             <Box display="flex" justifyContent="center">
-                <Box flexGrow={2} />
-                <Box flexGrow={1}>
+                <Box>
                     <Paper className={classes.paper}>
                         <div className={classes.title}>영업 시작 시각을 기준으로 날짜를 계산합니다.</div>
                         <div className={classes.notice}>
@@ -77,7 +76,6 @@ export const PreferencesOpeningHours = () => {
                         </div>
                     </Paper>
                 </Box>
-                <Box flexGrow={2} />
             </Box>
         </div>
     );
