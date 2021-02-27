@@ -104,10 +104,6 @@ export const removeProductAsync = createAsyncAction(REMOVE_PRODUCT, REMOVE_PRODU
 function* getCategoriesSaga(action: ReturnType<typeof getCategoriesAsync.request>) {
     try {
         const categories: Category[] = yield call(getCategories);
-        categories.sort((a, b) => (a.lexoRank < b.lexoRank ? -1 : 1));
-        categories.forEach((category) => {
-            category.products.sort((a, b) => (a.lexoRank < b.lexoRank ? -1 : 1));
-        });
         yield put(getCategoriesAsync.success(categories));
     } catch (e) {
         yield put(getCategoriesAsync.failure(e));

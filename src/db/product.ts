@@ -26,13 +26,15 @@ export const getCategories = async () => {
         // 카테고리 리스트 가져오기
         const querySelectCategory = `SELECT idx, name, lexo_rank
         FROM categories
-        WHERE is_deleted = 0`;
+        WHERE is_deleted = 0
+        ORDER BY lexo_rank`;
         const categories = await select<Category>(querySelectCategory);
 
         // 카테고리 리스트의 각 카테고리에 대해서 상품 리스트 추가하기
         const querySelectProductByCategoryIdx = `SELECT idx, name, price, lexo_rank, category_idx
         FROM products
-        WHERE is_deleted = 0 AND category_idx = ?`;
+        WHERE is_deleted = 0 AND category_idx = ?
+        ORDER BY lexo_rank`;
         const categoriesWithProducts = await Promise.all(
             categories.map(async (category) => {
                 const products = await select<Product>(querySelectProductByCategoryIdx, category.idx);

@@ -164,7 +164,8 @@ export const getOrdersByYearMonthDate = async (year: number, month: number, date
         const querySelectOrder = `SELECT a.idx idx, b.idx customer_idx, order_datetime order_time, b.name customer_name, phone_number, address, a.request order_request, b.request customer_request, payment_method, old_address, old_products_names, old_price
         FROM orders as a join customers as b
         ON a.customer_idx = b.idx
-        WHERE a.order_datetime BETWEEN ? AND ?;`;
+        WHERE a.order_datetime BETWEEN ? AND ?
+        ORDER BY order_datetime;`;
         const searchedDate = getTimePlusOpeningHour(new Date(year, month, date).getTime());
         const nextDate = searchedDate + 86_400_000; // 24 * 60 * 60 * 1000
         const orders = await select<OrderForList>(querySelectOrder, searchedDate, nextDate);

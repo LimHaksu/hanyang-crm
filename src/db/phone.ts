@@ -36,7 +36,8 @@ export const getPhoneCallRecords = async (year: number, month: number, date: num
     try {
         const query = `SELECT idx, received_datetime, customer_name, phone_number, address, request, order_idx
         FROM phone_call_records
-        WHERE received_datetime between ? and ?;`;
+        WHERE received_datetime between ? and ?
+        ORDER BY received_datetime;`;
         const searchedDate = getTimePlusOpeningHour(new Date(year, month, date).getTime());
         const nextDate = searchedDate + 86_400_000; // 24 * 60 * 60 * 1000
         const rows = await select<PhoneCallRecord>(query, searchedDate, nextDate);
