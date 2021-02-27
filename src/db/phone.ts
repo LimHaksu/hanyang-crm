@@ -1,4 +1,4 @@
-import { insert, select, PhoneCallRecord } from "./db";
+import { insert, select, deleteQuery, PhoneCallRecord } from "./db";
 import { getTimePlusOpeningHour } from "util/time";
 import { changePropertyFromSnakeToCamel } from "util/db";
 
@@ -42,6 +42,20 @@ export const getPhoneCallRecords = async (year: number, month: number, date: num
         const nextDate = searchedDate + 86_400_000; // 24 * 60 * 60 * 1000
         const rows = await select<PhoneCallRecord>(query, searchedDate, nextDate);
         return changePropertyFromSnakeToCamel(rows);
+    } catch (e) {
+        throw e;
+    }
+};
+
+/**
+ * 전화 수신 기록 Idx를 이용하여 주문 삭제
+ * @param phoneCallRecordIdx
+ */
+export const removePhoneCallRecord = async (phoneCallRecordIdx: number) => {
+    try {
+        const query = `DELETE FROM phone_call_records
+        WHERE idx = ?`;
+        await deleteQuery(query, phoneCallRecordIdx);
     } catch (e) {
         throw e;
     }

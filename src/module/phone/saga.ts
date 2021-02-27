@@ -7,9 +7,12 @@ import {
     ADD_PHONE_CALL_RECORD,
     ADD_PHONE_CALL_RECORD_SUCCESS,
     ADD_PHONE_CALL_RECORD_ERROR,
+    REMOVE_PHONE_CALL_RECORD,
+    REMOVE_PHONE_CALL_RECORD_SUCCESS,
+    REMOVE_PHONE_CALL_RECORD_ERROR,
 } from "./index";
 import { PhoneCallRecord } from "module/phone";
-import { getPhoneCallRecords, addPhoneCallRecord } from "db/phone";
+import { getPhoneCallRecords, addPhoneCallRecord, removePhoneCallRecord } from "db/phone";
 
 // createAsyncAction : request, success, failure, cancel arg를 넣으면
 // asyncAction을 만들어줌
@@ -24,6 +27,12 @@ export const addPhoneCallRecordAsync = createAsyncAction(
     ADD_PHONE_CALL_RECORD_SUCCESS,
     ADD_PHONE_CALL_RECORD_ERROR
 )<Omit<PhoneCallRecord, "idx" | "orderIdx">, PhoneCallRecord, Error>();
+
+export const removePhoneCallRecordAsync = createAsyncAction(
+    REMOVE_PHONE_CALL_RECORD,
+    REMOVE_PHONE_CALL_RECORD_SUCCESS,
+    REMOVE_PHONE_CALL_RECORD_ERROR
+)<number, number, Error>();
 
 function* getPhoneCallRecordsSaga(action: ReturnType<typeof getPhoneCallRecordsAsync.request>) {
     try {
@@ -45,7 +54,17 @@ function* addPhoneCallRecordSaga(action: ReturnType<typeof addPhoneCallRecordAsy
     }
 }
 
+function* removePhoneCallRecordSaga(action: ReturnType<typeof removePhoneCallRecordAsync.request>) {
+    try {
+        yield call(removePhoneCallRecord, action.payload);
+        yield put(removePhoneCallRecordAsync.success(action.payload));
+    } catch (e) {
+        yield put(removePhoneCallRecordAsync.failure(e));
+    }
+}
+
 export function* phoneSaga() {
     yield takeLatest(GET_PHONE_CALL_RECORDS, getPhoneCallRecordsSaga);
     yield takeEvery(ADD_PHONE_CALL_RECORD, addPhoneCallRecordSaga);
+    yield takeEvery(REMOVE_PHONE_CALL_RECORD, removePhoneCallRecordSaga);
 }
