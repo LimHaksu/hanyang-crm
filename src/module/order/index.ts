@@ -17,6 +17,9 @@ export interface Order {
     orderRequest: string;
     paymentMethod: PaymentMethod;
     phoneCallRecordIdx: number;
+    oldAddress?: string;
+    oldProductsNames?: string;
+    oldPrice?: string;
 }
 
 export interface OrderForm {
@@ -26,6 +29,8 @@ export interface OrderForm {
     orderRequest: string;
     paymentMethod: PaymentMethod;
     phoneCallRecordIdx: number;
+    oldProductsNames?: string;
+    oldPrice?: number;
 }
 
 export const GET_ORDERS = "order/GET_ORDERS";
@@ -117,6 +122,8 @@ const initialState: OrderState = {
         orderRequest: "",
         paymentMethod: "현금",
         phoneCallRecordIdx: -1,
+        oldProductsNames: "",
+        oldPrice: -1,
     },
     isOrderEditMode: false,
 };

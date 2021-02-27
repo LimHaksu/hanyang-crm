@@ -148,11 +148,15 @@ const columns: Column[] = [
 
 const calculateTotalRevenue = (orders: Order[]) => {
     return orders
-        .reduce(
-            (totalRevenue, order) =>
-                totalRevenue + order.products.reduce((acc, { price, amount }) => acc + price * amount, 0),
-            0
-        )
+        .reduce((totalRevenue, order) => {
+            let sum = 0;
+            if (order.oldPrice) {
+                sum += +order.oldPrice.replace(",", "");
+            } else {
+                sum += order.products.reduce((acc, { price, amount }) => acc + price * amount, 0);
+            }
+            return totalRevenue + sum;
+        }, 0)
         .toLocaleString();
 };
 
@@ -167,6 +171,10 @@ const StyledTableRow = withStyles((theme: Theme) =>
 )(TableRow);
 
 const getProductNames = (order: Order) => {
+    // oldProductsNames : 자료 이관으로 넣은 과거 데이터, 문자열 형태에 구매 상품 정보가 담겨있음.
+    if (order.oldProductsNames) {
+        return order.oldProductsNames;
+    }
     const productNames = order.products.reduce(
         (acc, product) => `${acc}${product.name}${product.amount > 1 ? ` x ${product.amount}` : ``}, `,
         ""
@@ -175,11 +183,15 @@ const getProductNames = (order: Order) => {
 };
 
 const calculateOrderPrice = (order: Order) => {
+    // oldPrice : 자료 이관으로 넣은 과거 데이터, 상품 총 합계를 의미
+    if (order.oldPrice) {
+        return order.oldPrice;
+    }
     return order.products.reduce((acc, product) => acc + product.price * product.amount, 0).toLocaleString();
 };
 
 const getRequest = (order: Order) => {
-    return `${order.customerRequest} / ${order.orderRequest}`;
+    return `${order.customerRequest ? order.customerRequest : ""} / ${order.orderRequest ? order.orderRequest : ""}`;
 };
 
 interface ModalProps {
@@ -204,8 +216,8 @@ const StyledModal = ({ open, setOpen, order, handleOkClick, message }: ModalProp
                         주문시각 : {order && timeToFormatString(order.orderTime)}
                     </div>
                     {order && order.customerName} <br />
-                    {order && order.phoneNumber} <br />
-                    {order && order.address} <br />
+                    {order && (order.phoneNumber !== "-1" ? order.phoneNumber : "")} <br />
+                    {order && (order.oldAddress ? order.oldAddress : order.address)} <br />
                     {order && getProductNames(order)} <br />
                     {order && calculateOrderPrice(order)} 원 <br /> <br />
                     <div className={classes.modalMessageEmphasize}>{message}</div>
@@ -238,14 +250,13 @@ export const OrderListPage = () => {
     const { printerOption, papersContents, papersOptions, selectedPrinter, serialPrinterConfig } = usePrinter();
     const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
     const [clickedOrder, setClickedOrder] = useState<Order>();
+    const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
     const history = useHistory();
-
     // anchor : 마우스 팝 오버할때 메세지가 위치할 element
     const [anchor, setAnchor] = useState<{ el: HTMLElement | null; message: string | undefined }>({
         el: null,
         message: undefined,
     });
-
     useEffect(() => {
         if (selectedDate) {
             const time = selectedDate.getTime();
@@ -326,9 +337,9 @@ export const OrderListPage = () => {
                 case "customerName":
                     return order.customerName;
                 case "phoneNumber":
-                    return order.phoneNumber;
+                    return order.phoneNumber === "-1" ? "" : order.phoneNumber;
                 case "address":
-                    return order.address;
+                    return order.oldAddress ? order.oldAddress : order.address;
                 case "productName":
                     return getProductNames(order);
                 case "request":
@@ -363,6 +374,10 @@ export const OrderListPage = () => {
                     shell.openExternal(`https://map.naver.com/v5/search/${searchParam}`);
                     break;
                 case "productName":
+                    if (order.oldProductsNames) {
+                        setIsErrorModalOpen(true);
+                        return;
+                    }
                     const {
                         customerIdx,
                         customerName,
@@ -402,6 +417,10 @@ export const OrderListPage = () => {
         },
         [history, setCustomerOrderForm, setOrderForm, setOrderEditMode]
     );
+
+    const handleErrorOkClick = useCallback(() => {
+        setIsErrorModalOpen(false);
+    }, []);
 
     return (
         <Paper className={classes.root}>
@@ -469,6 +488,16 @@ export const OrderListPage = () => {
                 handleOkClick={handleRemoveModalOkClick}
                 message="삭제 하시겠습니까?"
             />
+            <Modal open={isErrorModalOpen} setOpen={setIsErrorModalOpen}>
+                <Box display="flex" flexDirection="column">
+                    <div className={classes.modalMessage}>자료 이관으로 등록한 옛날 주문정보는 수정할 수 없습니다.</div>
+                    <Box display="flex" justifyContent="space-around">
+                        <Button variant="outlined" color="primary" onClick={handleErrorOkClick}>
+                            확인
+                        </Button>
+                    </Box>
+                </Box>
+            </Modal>
         </Paper>
     );
 };

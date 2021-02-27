@@ -17,7 +17,19 @@ import { Order } from "module/order";
  * @param paymentMethod 결제 수단
  * @param phoneCallRecordIdx 전화 수신 기록 idx - optional
  */
-export const addOrder = async (order: Omit<Order, "idx" | "customerIdx" | "orderTime">) => {
+export const addOrder = async (
+    order: Pick<
+        Order,
+        | "products"
+        | "orderRequest"
+        | "paymentMethod"
+        | "phoneCallRecordIdx"
+        | "customerName"
+        | "phoneNumber"
+        | "address"
+        | "customerRequest"
+    >
+) => {
     const {
         customerName,
         phoneNumber,
@@ -100,6 +112,8 @@ interface OrderForList {
     order_request: string;
     customer_request: string;
     payment_method: string;
+    old_products_names?: string;
+    odl_price?: number;
 }
 
 /**
@@ -147,7 +161,7 @@ export const getOrdersByYearMonthDate = async (year: number, month: number, date
      * order_product: order_idx, product_idx, product_count
      */
     try {
-        const querySelectOrder = `SELECT a.idx idx, b.idx customer_idx, order_datetime order_time, b.name customer_name, phone_number, address, a.request order_request, b.request customer_request, payment_method
+        const querySelectOrder = `SELECT a.idx idx, b.idx customer_idx, order_datetime order_time, b.name customer_name, phone_number, address, a.request order_request, b.request customer_request, payment_method, old_address, old_products_names, old_price
         FROM orders as a join customers as b
         ON a.customer_idx = b.idx
         WHERE a.order_datetime BETWEEN ? AND ?;`;
