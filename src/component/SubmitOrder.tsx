@@ -264,11 +264,10 @@ const SubmitOrder = () => {
 
     const handlePrintSaveButtonClick = useCallback(() => {
         const { address, request: customerRequest, phoneNumber } = customerOrderForm;
-        const { idx, products, orderRequest, paymentMethod, orderTime } = orderForm;
-
+        const { idx, products, orderRequest, paymentMethod } = orderForm;
         const order = {
             products,
-            orderTime,
+            orderTime: Date.now(),
             phoneNumber,
             address,
             customerRequest,
