@@ -25,7 +25,11 @@ export const searchCustomersAsync = createAsyncAction(
     SEARCH_CUSTOMERS,
     SEARCH_CUSTOMERS_SUCCESS,
     SEARCH_CUSTOMERS_ERROR
-)<{ searchBy: SearchBy; keyword: string }, Customer[], Error>();
+)<
+    { searchBy: SearchBy; keyword: string; startIndex: number; isAppendMode: boolean },
+    { customers: Customer[]; isAppendMode: boolean },
+    Error
+>();
 
 export const addCustomerAsync = createAsyncAction(ADD_CUSTOMER, ADD_CUSTOMER_SUCCESS, ADD_CUSTOMER_ERROR)<
     {
@@ -64,8 +68,9 @@ export const removeCustomerAsync = createAsyncAction(REMOVE_CUSTOMER, REMOVE_CUS
 
 function* searchCustomersSaga(action: ReturnType<typeof searchCustomersAsync.request>) {
     try {
-        const customers = yield call(getCustomers, action.payload);
-        yield put(searchCustomersAsync.success(customers));
+        const { searchBy, keyword, startIndex, isAppendMode } = action.payload;
+        const customers = yield call(getCustomers, { searchBy, keyword, startIndex });
+        yield put(searchCustomersAsync.success({ customers, isAppendMode }));
     } catch (e) {
         yield put(searchCustomersAsync.failure(e));
     }

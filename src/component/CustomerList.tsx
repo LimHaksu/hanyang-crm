@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useRef, useEffect } from "react";
 import { withStyles, makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -86,6 +86,27 @@ const columns: Column[] = [
     },
 ];
 
+const CustomerTableHead = () => {
+    const classes = useStyles();
+
+    return (
+        <TableHead>
+            <TableRow>
+                {columns.map((column) => (
+                    <TableCell
+                        className={clsx(classes.cell, classes.head)}
+                        key={column.id}
+                        align={column.align}
+                        style={{ width: column.width, minWidth: column.minWidth }}
+                    >
+                        {column.label}
+                    </TableCell>
+                ))}
+            </TableRow>
+        </TableHead>
+    );
+};
+
 const StyledTableRow = withStyles((theme: Theme) =>
     createStyles({
         root: {
@@ -99,16 +120,52 @@ const StyledTableRow = withStyles((theme: Theme) =>
     })
 )(TableRow);
 
-interface CustomerListProp {
-    customers: Customer[];
-}
-
-const CustomerList = ({ customers }: CustomerListProp) => {
+const CustomerList = () => {
     const classes = useStyles();
-    const { removeCustomer } = useCustomer();
+    const { customers, removeCustomer, searchInfo, searchCustomer, isSearchingNow } = useCustomer();
     const { setCustomerManagementForm, setCustomerManagementFormEditMode } = useCustomerForm();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [clickedCustomer, setClickedCustomer] = useState<Customer>();
+    // infinite scroll을 위한 viewport와 리스트의 마지막 target
+    const viewport = useRef<HTMLDivElement>(null);
+    const target = useRef<HTMLTableRowElement>(null);
+
+    useEffect(() => {
+        if (isSearchingNow && viewport.current) {
+            viewport.current.scrollTo(0, 0);
+        }
+    }, [isSearchingNow]);
+
+    useEffect(() => {
+        console.log("viewport", viewport);
+        console.log("last", target);
+        const options = {
+            root: viewport.current,
+            threshold: 0,
+        };
+
+        const handleIntersection = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting && entry.intersectionRatio < 1) {
+                    observer.unobserve(entry.target);
+                    if (target.current) {
+                        observer.observe(target.current);
+                    }
+                    // 데이터 불러오는 로직
+                    const { searchBy, keyword } = searchInfo;
+                    searchCustomer(searchBy, keyword, customers.length, true);
+                }
+            });
+        };
+
+        const io = new IntersectionObserver(handleIntersection, options);
+
+        if (target.current) {
+            io.observe(target.current);
+        }
+
+        return () => io && io.disconnect();
+    }, [customers.length, searchCustomer, searchInfo]);
 
     const handleEditClick = useCallback(
         (customerManagementForm: CustomerForm) => () => {
@@ -139,27 +196,15 @@ const CustomerList = ({ customers }: CustomerListProp) => {
 
     return (
         <>
-            <TableContainer className={classes.container}>
+            <TableContainer className={classes.container} ref={viewport}>
                 <Table stickyHeader aria-label="sticky table">
-                    <TableHead>
-                        <TableRow>
-                            {columns.map((column) => (
-                                <TableCell
-                                    className={clsx(classes.cell, classes.head)}
-                                    key={column.id}
-                                    align={column.align}
-                                    style={{ width: column.width, minWidth: column.minWidth }}
-                                >
-                                    {column.label}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                    </TableHead>
+                    <CustomerTableHead />
                     <TableBody>
                         {customers.map((customer, rowIdx) => {
+                            const isLast = rowIdx === customers.length - 1;
                             const { idx, customerName, phoneNumber, address, request } = customer;
                             return (
-                                <StyledTableRow hover role="checkbox" key={customer.idx}>
+                                <StyledTableRow hover role="checkbox" key={rowIdx} ref={isLast ? target : null}>
                                     {columns.map((column) => {
                                         if (column.id === "idx") {
                                             return (

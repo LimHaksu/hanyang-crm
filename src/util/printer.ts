@@ -199,7 +199,9 @@ const serialPrintLine = (
         case "paymentMethod":
             printer.alignCenter();
             printer.setTextSize(0, 1);
+            printer.invert(true);
             printer.println(`${order.paymentMethod}`);
+            printer.invert(false);
             printer.setTextNormal();
             printer.alignLeft();
             break;

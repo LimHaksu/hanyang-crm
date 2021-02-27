@@ -93,15 +93,17 @@ interface SearchProp {
 const Search = ({ searchBy }: SearchProp) => {
     const classes = useStyles();
     const [keyword, setKeyword] = useState("");
-    const { searchCustomer } = useCustomer();
+    const { searchCustomer, setSearchInfo, setIsSearchingNow } = useCustomer();
 
     const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setKeyword(e.target.value);
     }, []);
 
     const handleSubmit = useCallback(() => {
-        searchCustomer(searchBy, keyword);
-    }, [searchCustomer, searchBy, keyword]);
+        setIsSearchingNow(true);
+        setSearchInfo({ searchBy, keyword });
+        searchCustomer(searchBy, keyword, 0, false);
+    }, [setIsSearchingNow, setSearchInfo, searchBy, keyword, searchCustomer]);
 
     const handleEnter = useCallback(
         (e) => {
