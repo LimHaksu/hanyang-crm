@@ -40,9 +40,14 @@ const SET_CUSTOMER_MANAGEMENT_FORM_EDIT_MODE = "customer/SET_CUSTOMER_MANAGEMENT
 const SET_ADD_SUCCESS = "customer/SET_ADD_SUCCESS";
 const SET_EDIT_SUCCESS = "customer/SET_EDIT_SUCCESS";
 const SET_REMOVE_SUCCESS = "customer/SET_REMOVE_SUCCESS";
+const SET_SEARCH_INFO = "customer/SET_SEARCH_INFO";
+const SET_IS_SEARCHING_NOW = "customer/SET_IS_SEARCHING_NOW";
 
 const searchCustomers = createAction(SEARCH_CUSTOMERS)();
-const searchCustomersSuccess = createAction(SEARCH_CUSTOMERS_SUCCESS)<Customer[]>();
+const searchCustomersSuccess = createAction(SEARCH_CUSTOMERS_SUCCESS)<{
+    customers: Customer[];
+    isAppendMode: boolean;
+}>();
 const searchCustomersError = createAction(SEARCH_CUSTOMERS_ERROR)<Error>();
 
 const addCustomer = createAction(ADD_CUSTOMER)();
@@ -90,6 +95,9 @@ export const setRemoveSuccessAction = createAction(
     (isRemoveCustomerSuccess: boolean) => isRemoveCustomerSuccess
 )();
 
+export const setSearchInfoAction = createAction(SET_SEARCH_INFO)<{ searchBy: SearchBy; keyword: string }>();
+export const setIsSearchingNowAction = createAction(SET_IS_SEARCHING_NOW)<boolean>();
+
 const actions = {
     searchCustomers,
     searchCustomersSuccess,
@@ -114,6 +122,8 @@ const actions = {
     setAddSuccessAction,
     setEditSuccessAction,
     setRemoveSuccessAction,
+    setSearchInfoAction,
+    setIsSearchingNowAction,
 };
 
 interface CustomerState {
@@ -125,6 +135,8 @@ interface CustomerState {
     addState: { loading: boolean; error: Error | null; isSuccess: boolean };
     editState: { loading: boolean; error: Error | null; isSuccess: boolean };
     removeState: { loading: boolean; error: Error | null; isSuccess: boolean };
+    searchInfo: { searchBy: SearchBy; keyword: string };
+    isSearchingNow: boolean;
 }
 
 const initialState: CustomerState = {
@@ -140,26 +152,32 @@ const initialState: CustomerState = {
     addState: { loading: false, error: null, isSuccess: false },
     editState: { loading: false, error: null, isSuccess: false },
     removeState: { loading: false, error: null, isSuccess: false },
+    searchInfo: { searchBy: "name", keyword: "" },
+    isSearchingNow: false,
 };
 
 type CustomerAction = ActionType<typeof actions>;
 
 const customer = createReducer<CustomerState, CustomerAction>(initialState, {
-    [SEARCH_CUSTOMERS]: (state) => ({ ...state, customers: { loading: true, error: null, data: [] } }),
-    [SEARCH_CUSTOMERS_SUCCESS]: (state, { payload: searchResults }) => ({
+    [SEARCH_CUSTOMERS]: (state) => ({
+        ...state,
+        customers: { ...state.customers, loading: true, error: null },
+    }),
+    [SEARCH_CUSTOMERS_SUCCESS]: (state, { payload: { customers, isAppendMode } }) => ({
         ...state,
         customers: {
             loading: false,
             error: null,
-            data: searchResults.map((row) => row),
+            data: isAppendMode ? [...state.customers.data, ...customers] : customers,
         },
+        isSearchingNow: false,
     }),
-    [SEARCH_CUSTOMERS_ERROR]: (state, { payload: searchResults }) => ({
+    [SEARCH_CUSTOMERS_ERROR]: (state, { payload: error }) => ({
         ...state,
         customers: {
+            ...state.customers,
             loading: false,
-            error: searchResults,
-            data: [],
+            error,
         },
     }),
 
@@ -226,6 +244,11 @@ const customer = createReducer<CustomerState, CustomerAction>(initialState, {
         produce(state, (draft) => {
             draft.removeState.isSuccess = isRemoveCustomerSuccess;
         }),
+    [SET_SEARCH_INFO]: (state, { payload: searchInfo }) => ({ ...state, searchInfo }),
+    [SET_IS_SEARCHING_NOW]: (state, { payload: isSearchingNow }) => ({
+        ...state,
+        isSearchingNow,
+    }),
 });
 
 export default customer;

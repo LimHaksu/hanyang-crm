@@ -176,7 +176,7 @@ const Modals = () => {
 
 export const CustomerManagementPage = () => {
     const classes = useStyles();
-    const { customers } = useCustomer();
+
     const { customerManagementForm, setCustomerManagementForm } = useCustomerForm();
     return (
         <>
@@ -184,7 +184,7 @@ export const CustomerManagementPage = () => {
                 <Box display="flex">
                     <Box className={classes.leftSide}>
                         <CustomerSearch />
-                        <CustomerList customers={customers} />
+                        <CustomerList />
                     </Box>
                     <Box className={classes.rightSide}>
                         <CustomerInfo

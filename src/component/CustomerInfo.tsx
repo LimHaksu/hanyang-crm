@@ -14,7 +14,6 @@ import { CustomerForm, SET_CUSTOMER_ORDER_FORM, SET_CUSTOMER_MANAGEMENT_FORM } f
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         paper: {
-            height: "100%",
             padding: "15px",
             boxSizing: "border-box",
         },

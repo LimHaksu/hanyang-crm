@@ -1,7 +1,14 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../module";
 import { useCallback } from "react";
-import { setAddSuccessAction, setEditSuccessAction, setRemoveSuccessAction, SearchBy } from "module/customer";
+import {
+    setAddSuccessAction,
+    setEditSuccessAction,
+    setRemoveSuccessAction,
+    setSearchInfoAction,
+    setIsSearchingNowAction,
+    SearchBy,
+} from "module/customer";
 import { searchCustomersAsync, addCustomerAsync, editCustomerAsync, removeCustomerAsync } from "module/customer/saga";
 
 const useCustomer = () => {
@@ -9,11 +16,14 @@ const useCustomer = () => {
     const isAddCustomerSuccess = useSelector((state: RootState) => state.customer.addState.isSuccess);
     const isEditCustomerSuccess = useSelector((state: RootState) => state.customer.editState.isSuccess);
     const isRemoveCustomerSuccess = useSelector((state: RootState) => state.customer.removeState.isSuccess);
+    const searchInfo = useSelector((state: RootState) => state.customer.searchInfo);
+    const isSearchingNow = useSelector((state: RootState) => state.customer.isSearchingNow);
 
     const dispatch = useDispatch();
 
     const searchCustomer = useCallback(
-        (searchBy: SearchBy, keyword: string) => dispatch(searchCustomersAsync.request({ searchBy, keyword })),
+        (searchBy: SearchBy, keyword: string, startIndex: number, isAppendMode: boolean) =>
+            dispatch(searchCustomersAsync.request({ searchBy, keyword, startIndex, isAppendMode })),
         [dispatch]
     );
 
@@ -46,11 +56,24 @@ const useCustomer = () => {
         [dispatch]
     );
 
+    const setSearchInfo = useCallback(
+        ({ searchBy, keyword }: { searchBy: SearchBy; keyword: string }) =>
+            dispatch(setSearchInfoAction({ searchBy, keyword })),
+        [dispatch]
+    );
+
+    const setIsSearchingNow = useCallback(
+        (isSearchingNow: boolean) => dispatch(setIsSearchingNowAction(isSearchingNow)),
+        [dispatch]
+    );
+
     return {
         customers,
         isAddCustomerSuccess,
         isEditCustomerSuccess,
         isRemoveCustomerSuccess,
+        searchInfo,
+        isSearchingNow,
         searchCustomer,
         addCustomer,
         editCustomer,
@@ -58,6 +81,8 @@ const useCustomer = () => {
         setAddSuccess,
         setEditSuccess,
         setRemoveSuccess,
+        setSearchInfo,
+        setIsSearchingNow,
     };
 };
 

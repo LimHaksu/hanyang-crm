@@ -36,14 +36,16 @@ export const addCustomer = async ({
 export const getCustomers = async ({
     searchBy,
     keyword,
+    startIndex = 0,
 }: {
     searchBy: "name" | "phoneNumber" | "address";
     keyword: string;
+    startIndex?: number;
 }) => {
     try {
         const query = `SELECT idx, phone_number, name customer_name, address, request
         FROM customers
-        WHERE is_deleted = 0 AND ${getSnakeCaseString(searchBy)} like ?;`;
+        WHERE is_deleted = 0 AND ${getSnakeCaseString(searchBy)} like ? limit ${startIndex},20;`;
         const customers = await select<Customer>(query, `%${keyword}%`);
         return changePropertyFromSnakeToCamel(customers);
     } catch (e) {
