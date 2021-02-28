@@ -22,44 +22,32 @@ const InitializeApp = () => {
 
     // 앱 초기 세팅
     useEffect(() => {
+        const localStorageItemSetters: { [key: string]: Function } = {
+            isOrderAsc: setIsOrderAsc, // 주문 정렬 순서 T/F
+            isPhoneCallRecordAsc: setIsPhoneCallRecordAsc, // 전화 기록 정렬 순서 T/F
+            selectedDevices: setRegisteredPhoneDevices, // 기기 정보
+            selectedPrinter: setSelectedPrinter, // 프린터 정보
+            papersOptions: setPapersOptions, // 프린터 옵션 정보
+            papersContents: setPapersContents, // 프린터 내용 정보
+            serialPrinterConfig: setSerialPrinterConfig, // 시리얼 포트 프린터 설정
+        };
         // 앱 실행시 localStorage에서 정보 가져오기
-        // 정렬 순서 가져오기
-        const isOrderAsc = localStorage.getItem("isOrderAsc");
-        if (isOrderAsc) {
-            setIsOrderAsc(JSON.parse(isOrderAsc));
+        for (const key of Object.keys(localStorageItemSetters)) {
+            const item = localStorage.getItem(key);
+            if (item) {
+                const parsedItem = key === "selectedPrinter" ? item : JSON.parse(item);
+                localStorageItemSetters[key](parsedItem);
+            }
         }
-        const isPhoneCallRecordAsc = localStorage.getItem("isPhoneCallRecordAsc");
-        if (isPhoneCallRecordAsc) {
-            setIsPhoneCallRecordAsc(JSON.parse(isPhoneCallRecordAsc));
-        }
-
-        // 기기정보 가져오기
-        const selectedDevices = localStorage.getItem("selectedDevices");
-        if (selectedDevices) {
-            setRegisteredPhoneDevices(JSON.parse(selectedDevices));
-        }
-        // 프린터 정보 가져오기
-        const selectedPrinter = localStorage.getItem("selectedPrinter");
-        if (selectedPrinter) {
-            setSelectedPrinter(selectedPrinter);
-        }
-        // 프린터 옵션 정보 가져오기
-        const papersOptions = localStorage.getItem("papersOptions");
-        if (papersOptions) {
-            setPapersOptions(JSON.parse(papersOptions));
-        }
-        // 프린터 내용 정보 가져오기
-        const papersContents = localStorage.getItem("papersContents");
-        if (papersContents) {
-            setPapersContents(JSON.parse(papersContents));
-        }
-
-        // 시리얼 포트 프린터 설정 가져오기
-        const serialPrinterConfig = localStorage.getItem("serialPrinterConfig");
-        if (serialPrinterConfig) {
-            setSerialPrinterConfig(JSON.parse(serialPrinterConfig));
-        }
-    }, [setPapersContents, setPapersOptions, setRegisteredPhoneDevices, setSelectedPrinter, setSerialPrinterConfig]);
+    }, [
+        setIsOrderAsc,
+        setIsPhoneCallRecordAsc,
+        setPapersContents,
+        setPapersOptions,
+        setRegisteredPhoneDevices,
+        setSelectedPrinter,
+        setSerialPrinterConfig,
+    ]);
 
     useEffect(() => {
         // 전화 수신시 발신전화 표시 로직
