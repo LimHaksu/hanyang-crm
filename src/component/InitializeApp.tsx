@@ -6,16 +6,33 @@ import { createPhonCallPopup } from "util/phone";
 import useCategory from "hook/useCategory";
 import usePhone from "hook/usePhone";
 import usePrinter from "hook/usePrinter";
+import useOrder from "hook/useOrder";
 
 // React 초기화 로직을 담은 컴포넌트
 const InitializeApp = () => {
-    const { registeredPhoneDevices, setRegisteredPhoneDevices, addPhoneCallRecord } = usePhone();
+    const {
+        registeredPhoneDevices,
+        setRegisteredPhoneDevices,
+        addPhoneCallRecord,
+        setIsPhoneCallRecordAsc,
+    } = usePhone();
     const { getCategories } = useCategory();
     const { setSelectedPrinter, setPapersOptions, setPapersContents, setSerialPrinterConfig } = usePrinter();
+    const { setIsOrderAsc } = useOrder();
 
     // 앱 초기 세팅
     useEffect(() => {
         // 앱 실행시 localStorage에서 정보 가져오기
+        // 정렬 순서 가져오기
+        const isOrderAsc = localStorage.getItem("isOrderAsc");
+        if (isOrderAsc) {
+            setIsOrderAsc(JSON.parse(isOrderAsc));
+        }
+        const isPhoneCallRecordAsc = localStorage.getItem("isPhoneCallRecordAsc");
+        if (isPhoneCallRecordAsc) {
+            setIsPhoneCallRecordAsc(JSON.parse(isPhoneCallRecordAsc));
+        }
+
         // 기기정보 가져오기
         const selectedDevices = localStorage.getItem("selectedDevices");
         if (selectedDevices) {

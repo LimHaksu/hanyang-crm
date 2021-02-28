@@ -60,6 +60,7 @@ export const REMOVE_ORDER_ERROR = "order/REMOVE_ORDER_ERROR";
 
 const SET_SELECTED_DATE = "order/SET_SELECTED_DATE";
 const SET_ORDER_EDIT_MODE = "order/SET_ORDER_EDIT_MODE";
+const SET_IS_ORDER_ASC = "order/SET_IS_ORDER_ASC";
 
 export const setOrderFormAction = createAction(SET_ORDER_FORM, (orderForm: OrderForm) => orderForm)();
 export const addProductAction = createAction(ADD_PRODUCT, (product: Product & { amount: number }) => product)();
@@ -85,6 +86,7 @@ const removeOrderError = createAction(REMOVE_ORDER_ERROR)<Error>();
 
 export const setSelectedDateAction = createAction(SET_SELECTED_DATE, (selectedDate: Date | null) => selectedDate)();
 export const setOrderEditModeAction = createAction(SET_ORDER_EDIT_MODE, (isEditMode: boolean) => isEditMode)();
+export const setIsOrderAscAction = createAction(SET_IS_ORDER_ASC, (isOrderAsc: boolean) => isOrderAsc)();
 
 const actions = {
     setOrderFormAction,
@@ -103,11 +105,13 @@ const actions = {
     removeOrderError,
     setSelectedDateAction,
     setOrderEditModeAction,
+    setIsOrderAscAction,
 };
 
 interface OrderState {
     selectedDate: Date | null;
     orders: Order[];
+    isOrderAsc: boolean;
     orderForm: OrderForm;
     isOrderEditMode: boolean;
 }
@@ -115,6 +119,7 @@ interface OrderState {
 const initialState: OrderState = {
     selectedDate: new Date(getTimeMinusOpeningHour(Date.now())),
     orders: [],
+    isOrderAsc: true,
     orderForm: {
         idx: -1,
         orderTime: -1,
@@ -195,6 +200,10 @@ const order = createReducer<OrderState, OrderAction>(initialState, {
 
     [SET_SELECTED_DATE]: (state, { payload: selectedDate }) => ({ ...state, selectedDate }),
     [SET_ORDER_EDIT_MODE]: (state, { payload: isOrderEditMode }) => ({ ...state, isOrderEditMode }),
+    [SET_IS_ORDER_ASC]: (state, { payload: isOrderAsc }) => {
+        localStorage.setItem("isOrderAsc", JSON.stringify(isOrderAsc));
+        return { ...state, isOrderAsc };
+    },
 });
 
 export default order;

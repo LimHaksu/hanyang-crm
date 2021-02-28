@@ -35,6 +35,7 @@ export const REMOVE_PHONE_CALL_RECORD_ERROR = "phone/REMOVE_PHONE_CALL_RECORD_ER
 
 const SET_SELECTED_DATE = "phone/SET_SELECTED_DATE";
 const SET_REGISTERED_PHONE_DEVICES = "phone/SET_REGISTERED_PHONE_DEVICES";
+const SET_IS_PHONE_CALL_RECORD_ASC = "phone/SET_IS_PHONE_CALL_RECORD_ASC";
 
 const getPhoneCallRecordsSuccess = createAction(GET_PHONE_CALL_RECORDS_SUCCESS)<PhoneCallRecord[]>();
 const getPhoneCallRecordsError = createAction(GET_PHONE_CALL_RECORDS_ERROR)<Error>();
@@ -51,6 +52,11 @@ export const setRegiteredPhoneDevicesAction = createAction(
     (selectedDevices: Device[]) => selectedDevices
 )();
 
+export const setIsPhoneCallRecordAscAction = createAction(
+    SET_IS_PHONE_CALL_RECORD_ASC,
+    (isPhoneCallRecordAsc: boolean) => isPhoneCallRecordAsc
+)();
+
 const actions = {
     getPhoneCallRecordsSuccess,
     getPhoneCallRecordsError,
@@ -60,18 +66,21 @@ const actions = {
     removePhoneCallRecordSuccess,
     removePhoneCallRecordError,
     setSelectedDateAction,
+    setIsPhoneCallRecordAscAction,
 };
 
 interface PhoneState {
     selectedDate: Date | null;
     phoneCallRecords: PhoneCallRecord[];
     registeredPhoneDevices: RegisteredPhoneDevice[];
+    isPhoneCallRecordAsc: boolean;
 }
 
 const initialState: PhoneState = {
     selectedDate: new Date(getTimeMinusOpeningHour(Date.now())),
     phoneCallRecords: [],
     registeredPhoneDevices: [],
+    isPhoneCallRecordAsc: true,
 };
 
 type PhoneAction = ActionType<typeof actions>;
@@ -115,6 +124,10 @@ const phone = createReducer<PhoneState, PhoneAction>(initialState, {
             }));
         }),
     [SET_SELECTED_DATE]: (state, { payload: selectedDate }) => ({ ...state, selectedDate }),
+    [SET_IS_PHONE_CALL_RECORD_ASC]: (state, { payload: isPhoneCallRecordAsc }) => {
+        localStorage.setItem("isPhoneCallRecordAsc", JSON.stringify(isPhoneCallRecordAsc));
+        return { ...state, isPhoneCallRecordAsc };
+    },
 });
 
 export default phone;

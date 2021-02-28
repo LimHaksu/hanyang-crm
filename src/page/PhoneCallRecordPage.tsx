@@ -171,7 +171,9 @@ const PhoneCallRecordTableBody = ({ handleRemoveButtonClick }: PhoneCallRecordTa
     const classes = useStyles();
     const { setCustomerOrderForm } = useCustomerForm();
     const { setOrderForm, setOrderEditMode } = useOrder();
-    const { phoneCallRecords } = usePhone();
+    const { phoneCallRecords, isPhoneCallRecordAsc } = usePhone();
+
+    const phoneCallRecordsForDisplay = isPhoneCallRecordAsc ? phoneCallRecords : [...phoneCallRecords].reverse();
 
     const handleCreateButtonClick = useCallback(
         ({
@@ -204,8 +206,8 @@ const PhoneCallRecordTableBody = ({ handleRemoveButtonClick }: PhoneCallRecordTa
 
     return (
         <TableBody>
-            {[...phoneCallRecords].reverse().map((row, i) => {
-                const index = phoneCallRecords.length - 1 - i;
+            {phoneCallRecordsForDisplay.map((row, i) => {
+                const index = isPhoneCallRecordAsc ? i : phoneCallRecordsForDisplay.length - 1 - i;
                 const { idx, customerName, phoneNumber, address, request } = row;
                 return (
                     <StyledTableRow hover role="checkbox" key={row.idx}>
@@ -273,7 +275,14 @@ const PhoneCallRecordTableBody = ({ handleRemoveButtonClick }: PhoneCallRecordTa
 
 export function PhoneCallRecordPage() {
     const classes = useStyles();
-    const { selectedDate, setSelectedDate, getPhoneCallRecords, removePhoneCallRecord } = usePhone();
+    const {
+        selectedDate,
+        setSelectedDate,
+        getPhoneCallRecords,
+        removePhoneCallRecord,
+        setIsPhoneCallRecordAsc,
+        isPhoneCallRecordAsc,
+    } = usePhone();
     const [clickedRecord, setClickedRecord] = useState<PhoneCallRecord>();
     const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
 
@@ -313,6 +322,10 @@ export function PhoneCallRecordPage() {
         setIsRemoveModalOpen(false);
     }, [clickedRecord, removePhoneCallRecord]);
 
+    const handleSortingClick = useCallback(() => {
+        setIsPhoneCallRecordAsc(!isPhoneCallRecordAsc);
+    }, [isPhoneCallRecordAsc, setIsPhoneCallRecordAsc]);
+
     return (
         <Paper className={classes.root}>
             <DatePicker selectedDate={selectedDate} handleDateChange={handleDateChange} handleAccept={handleAccept} />
@@ -322,10 +335,15 @@ export function PhoneCallRecordPage() {
                         <TableRow>
                             {columns.map((column) => (
                                 <TableCell
-                                    className={clsx(classes.cell, classes.head)}
+                                    className={clsx(
+                                        classes.cell,
+                                        classes.head,
+                                        column.id === "idx" && classes.clickableCell
+                                    )}
                                     key={column.id}
                                     align={column.align}
                                     style={{ width: column.width, minWidth: column.minWidth }}
+                                    onClick={column.id === "idx" ? handleSortingClick : () => {}}
                                 >
                                     {column.label}
                                 </TableCell>

@@ -9,6 +9,7 @@ import {
     changePaymentMethodAction,
     setSelectedDateAction,
     setOrderEditModeAction,
+    setIsOrderAscAction,
     PaymentMethod,
     OrderForm,
     Order,
@@ -22,6 +23,7 @@ const useOrder = () => {
     const orderForm = useSelector((state: RootState) => state.order.orderForm);
     const selectedDate = useSelector((state: RootState) => state.order.selectedDate);
     const isOrderEditMode = useSelector((state: RootState) => state.order.isOrderEditMode);
+    const isOrderAsc = useSelector((state: RootState) => state.order.isOrderAsc);
 
     const dispatch = useDispatch();
 
@@ -60,12 +62,14 @@ const useOrder = () => {
     const setOrderEditMode = useCallback((isEditMode: boolean) => dispatch(setOrderEditModeAction(isEditMode)), [
         dispatch,
     ]);
+    const setIsOrderAsc = useCallback((isOrderAsc: boolean) => dispatch(setIsOrderAscAction(isOrderAsc)), [dispatch]);
 
     return {
         orders,
         orderForm,
         selectedDate,
         isOrderEditMode,
+        isOrderAsc,
         setOrderForm,
         addProduct,
         changeAmount,
@@ -78,6 +82,7 @@ const useOrder = () => {
         removeOrder,
         setSelectedDate,
         setOrderEditMode,
+        setIsOrderAsc,
     };
 };
 

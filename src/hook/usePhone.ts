@@ -2,13 +2,14 @@ import { useCallback } from "react";
 import { Device } from "node-hid";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "module/index";
-import { setRegiteredPhoneDevicesAction, setSelectedDateAction } from "module/phone";
+import { setIsPhoneCallRecordAscAction, setRegiteredPhoneDevicesAction, setSelectedDateAction } from "module/phone";
 import { getPhoneCallRecordsAsync, addPhoneCallRecordAsync, removePhoneCallRecordAsync } from "module/phone/saga";
 
 const usePhone = () => {
     const registeredPhoneDevices = useSelector((state: RootState) => state.phone.registeredPhoneDevices);
     const phoneCallRecords = useSelector((state: RootState) => state.phone.phoneCallRecords);
     const selectedDate = useSelector((state: RootState) => state.phone.selectedDate);
+    const isPhoneCallRecordAsc = useSelector((state: RootState) => state.phone.isPhoneCallRecordAsc);
 
     const dispatch = useDispatch();
 
@@ -37,16 +38,22 @@ const usePhone = () => {
         (selectedDevices: Device[]) => dispatch(setRegiteredPhoneDevicesAction(selectedDevices)),
         [dispatch]
     );
+    const setIsPhoneCallRecordAsc = useCallback(
+        (isPhoneCallRecordAsc: boolean) => dispatch(setIsPhoneCallRecordAscAction(isPhoneCallRecordAsc)),
+        [dispatch]
+    );
 
     return {
         registeredPhoneDevices,
         phoneCallRecords,
         selectedDate,
+        isPhoneCallRecordAsc,
         getPhoneCallRecords,
         addPhoneCallRecord,
         removePhoneCallRecord,
         setRegisteredPhoneDevices,
         setSelectedDate,
+        setIsPhoneCallRecordAsc,
     };
 };
 

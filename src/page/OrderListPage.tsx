@@ -245,6 +245,8 @@ export const OrderListPage = () => {
         selectedDate,
         setSelectedDate,
         setOrderEditMode,
+        isOrderAsc,
+        setIsOrderAsc,
     } = useOrder();
     const { setCustomerOrderForm } = useCustomerForm();
     const { printerOption, papersContents, papersOptions, selectedPrinter, serialPrinterConfig } = usePrinter();
@@ -252,6 +254,8 @@ export const OrderListPage = () => {
     const [clickedOrder, setClickedOrder] = useState<Order>();
     const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
     const history = useHistory();
+    const ordersForDisplay = isOrderAsc ? orders : [...orders].reverse();
+
     // anchor : 마우스 팝 오버할때 메세지가 위치할 element
     const [anchor, setAnchor] = useState<{ el: HTMLElement | null; message: string | undefined }>({
         el: null,
@@ -419,6 +423,10 @@ export const OrderListPage = () => {
         setIsErrorModalOpen(false);
     }, []);
 
+    const handleSortingClick = useCallback(() => {
+        setIsOrderAsc(!isOrderAsc);
+    }, [isOrderAsc, setIsOrderAsc]);
+
     return (
         <Paper className={classes.root}>
             <Box display="flex">
@@ -427,7 +435,7 @@ export const OrderListPage = () => {
                     handleDateChange={handleDateChange}
                     handleAccept={handleAccept}
                 />
-                <div className={classes.totalRevenue}>하루 매출 : {calculateTotalRevenue(orders)} 원</div>
+                <div className={classes.totalRevenue}>하루 매출 : {calculateTotalRevenue(ordersForDisplay)} 원</div>
             </Box>
             <TableContainer className={classes.container}>
                 <Table stickyHeader aria-label="sticky table">
@@ -435,13 +443,18 @@ export const OrderListPage = () => {
                         <TableRow>
                             {columns.map((column) => (
                                 <TableCell
-                                    className={clsx(classes.cell, classes.head)}
+                                    className={clsx(
+                                        classes.cell,
+                                        classes.head,
+                                        column.id === "idx" && classes.clickable
+                                    )}
                                     key={column.id}
                                     align={column.align}
                                     style={{
                                         width: column.width,
                                         minWidth: column.minWidth,
                                     }}
+                                    onClick={column.id === "idx" ? handleSortingClick : () => {}}
                                 >
                                     {column.label}
                                 </TableCell>
@@ -449,8 +462,8 @@ export const OrderListPage = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {[...orders].reverse().map((order, i) => {
-                            const index = orders.length - 1 - i;
+                        {ordersForDisplay.map((order, i) => {
+                            const index = isOrderAsc ? i : ordersForDisplay.length - 1 - i;
                             return (
                                 <StyledTableRow hover role="checkbox" key={index}>
                                     {columns.map((column) => {
