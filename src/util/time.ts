@@ -1,6 +1,7 @@
 /**
- * milliseconds 시간을 받아오면 영업 시작 시각에 해당하는 milliseconds를 더해서 반환
- * 영업 시작 시각을 설정하지 않았으면 인풋을 그대로 반환
+ * milliseconds 시간을 받아오면 영업 시작 시각에 해당하는 milliseconds를 빼서 반환.
+ * 자료를 조회할때 사용.
+ * 영업 시작 시각을 설정하지 않았으면 인풋을 그대로 반환.
  * @param time 1970-01-01 기준의 milliseconds
  */
 export const getTimePlusOpeningHour = (time: number) => {
@@ -15,8 +16,9 @@ export const getTimePlusOpeningHour = (time: number) => {
 };
 
 /**
- * milliseconds 시간을 받아오면 영업 시작 시각에 해당하는 milliseconds를 더해서 반환
- * 영업 시작 시각을 설정하지 않았으면 인풋을 그대로 반환
+ * milliseconds 시간을 받아오면 영업 시작 시각에 해당하는 milliseconds를 더해서 반환.
+ * 오늘 날짜를 세팅할 때 사용 new Date(getTimeMinusOpeningHour(Date.now())).
+ * 영업 시작 시각을 설정하지 않았으면 인풋을 그대로 반환.
  * @param time 1970-01-01 기준의 milliseconds
  */
 export const getTimeMinusOpeningHour = (time: number) => {
