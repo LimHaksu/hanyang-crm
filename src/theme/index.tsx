@@ -1,10 +1,10 @@
 //@ts-nocheck
 import { createMuiTheme } from "@material-ui/core/styles";
 
-const PRIMARY_MAIN_COLOR = "#298d63";
-const PRIMARY_LIGHT_COLOR = "#39b481";
-const SECONDARY_MAIN_COLOR = "#9ee9af";
-const SECONDARY_DARK_COLOR = "#88c997";
+export const PRIMARY_MAIN_COLOR = "#298d63";
+export const PRIMARY_LIGHT_COLOR = "#39b481";
+export const SECONDARY_MAIN_COLOR = "#9ee9af";
+export const SECONDARY_DARK_COLOR = "#88c997";
 
 export const defaultTheme = createMuiTheme({
     palette: {
