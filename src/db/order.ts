@@ -271,6 +271,10 @@ export const removeOrder = async (orderIdx: number) => {
     }
 };
 
+/**
+ * 통계를 위하여 첫 주문 날짜를 가져옴
+ * @returns 첫 주문 날짜의 milliseconds
+ */
 export const getFirstOrderDatetime = async (): Promise<{ orderDatetime: number }> => {
     try {
         const querySelectFirstOrdertiime = `SELECT order_datetime
@@ -279,6 +283,51 @@ export const getFirstOrderDatetime = async (): Promise<{ orderDatetime: number }
         LIMIT 1`;
         const [firstOrderTime] = await select<number>(querySelectFirstOrdertiime);
         return changePropertyFromSnakeToCamel(firstOrderTime);
+    } catch (e) {
+        throw e;
+    }
+};
+
+/**
+ * 특정 년도의 월별 매출을 가져옴
+ * @param year 월 매출을 알고싶은 연도
+ * @returns 해당 년도의 월별 매출
+ */
+export const getMonthlyRevenues = async (year: number): Promise<{ year: number; month: number; revenue: number }[]> => {
+    try {
+        const querySelectMonthlyRevenues = `SELECT STRFTIME("%Y" ,order_datetime/1000, 'unixepoch', 'localtime') year,
+        STRFTIME("%m" ,order_datetime/1000, 'unixepoch', 'localtime') month,
+        SUM(IFNULL(p.price,0) * IFNULL(op.product_count,0) + IFNULL(REPLACE(o.old_price,",",""), 0)) revenue
+        FROM orders o
+        LEFT OUTER JOIN orders_products op
+        ON o.idx = op.order_idx
+        LEFT OUTER JOIN products p
+        ON op.product_idx = p.idx
+        WHERE year = ?
+        GROUP BY month;`;
+        const monthlyRevenues = await select(querySelectMonthlyRevenues, year.toString());
+        return changePropertyFromSnakeToCamel(monthlyRevenues);
+    } catch (e) {
+        throw e;
+    }
+};
+
+/**
+ * 연별 매출을 가져옴
+ * @returns 연별 매출
+ */
+export const getYearlyRevenues = async (): Promise<{ year: number; revenue: number }[]> => {
+    try {
+        const querySelectYearlyRevenues = `SELECT STRFTIME("%Y" ,order_datetime/1000, 'unixepoch', 'localtime') year,
+        SUM(IFNULL(p.price,0) * IFNULL(op.product_count,0) + IFNULL(REPLACE(o.old_price,",",""), 0)) revenue
+        FROM orders o
+        LEFT OUTER JOIN orders_products op
+        ON o.idx = op.order_idx
+        LEFT OUTER JOIN products p
+        ON op.product_idx = p.idx
+        GROUP BY year;`;
+        const yearlyRevenues = await select(querySelectYearlyRevenues);
+        return changePropertyFromSnakeToCamel(yearlyRevenues);
     } catch (e) {
         throw e;
     }

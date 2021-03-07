@@ -134,8 +134,10 @@ interface OrderState {
     };
 }
 
+const now = new Date(getTimeMinusOpeningHour(Date.now()));
+
 const initialState: OrderState = {
-    selectedDate: new Date(getTimeMinusOpeningHour(Date.now())),
+    selectedDate: now,
     orders: [],
     isOrderAsc: true,
     orderForm: {
@@ -150,9 +152,9 @@ const initialState: OrderState = {
     },
     isOrderEditMode: false,
     firstOrderDate: {
-        year: -1,
-        month: -1,
-        date: -1,
+        year: now.getFullYear(),
+        month: now.getMonth(),
+        date: now.getDate(),
     },
 };
 

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { select, scaleBand, scaleLinear, max, Selection, axisLeft, axisTop } from "d3";
+import { select, scaleBand, scaleLinear, max, Selection, axisLeft, axisTop, selectAll } from "d3";
 import { PRIMARY_MAIN_COLOR } from "theme";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles, Theme } from "@material-ui/core/styles";
@@ -36,9 +36,13 @@ export const HorizontalBarChart = ({ data }: Props) => {
     const svgRef = useRef<SVGSVGElement | null>(null);
 
     useEffect(() => {
+        // 기존 그래프 지우기
+        selectAll("svg > *").remove();
+
+        // 새 그래프 그리기
         const width = 800;
         const height = 600;
-        const margin = { top: 80, right: 80, bottom: 30, left: 40 };
+        const margin = { top: 80, right: 110, bottom: 30, left: 40 };
         const svg = select(svgRef.current);
         const x = scaleLinear()
             .domain([0, max(data.list, (d: Data) => d.value) as number])
@@ -73,7 +77,7 @@ export const HorizontalBarChart = ({ data }: Props) => {
                         .tickFormat((_, i: number) => data.list[i].name)
                         .tickSizeOuter(0)
                 )
-                .style("font-size", "1rem");
+                .style("font-size", "0.9rem");
 
         svg.attr("width", width);
         svg.attr("height", height);
@@ -107,6 +111,7 @@ export const HorizontalBarChart = ({ data }: Props) => {
             .attr("dx", 8)
             .attr("dy", "0.35rem")
             .style("opacity", 0)
+            .style("font-size", "0.9rem")
             .transition()
             .duration(500)
             .delay((d, i) => i * 25 + data.list.length * 20)

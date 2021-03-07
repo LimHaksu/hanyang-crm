@@ -7,7 +7,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
 import { makeStyles, Theme } from "@material-ui/core/styles";
-import { getFirstOrderDatetime } from "db/order";
+import { getYearlyRevenues, getMonthlyRevenues } from "db/order";
 import useOrder from "hook/useOrder";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -28,25 +28,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 export const StatisticsRevenue = () => {
     const classes = useStyles();
-    const [data, setData] = useState<BarChartData>(() => ({
-        list: [
-            { name: "1월", value: 30000000 },
-            { name: "2월", value: 25753588 },
-            { name: "3월", value: 40135488 },
-            { name: "4월", value: 35426582 },
-            { name: "5월", value: 26845756 },
-            { name: "6월", value: 35687485 },
-            { name: "7월", value: 41235754 },
-            { name: "8월", value: 35486755 },
-            { name: "9월", value: 23542685 },
-            { name: "10월", value: 35486581 },
-            { name: "11월", value: 46526852 },
-            { name: "12월", value: 41358562 },
-        ],
-        format: "s",
-        y: "매출",
-        unit: "원",
-    }));
+    const [data, setData] = useState<BarChartData>({ list: [], unit: "원", y: "매출" });
     const { firstOrderDate } = useOrder();
     const [division, setDivision] = useState("");
     const [years] = useState(() => {
@@ -60,12 +42,22 @@ export const StatisticsRevenue = () => {
     });
     const [selectedYear, setSelectedYear] = useState("");
 
-    const handleDivisionChange = useCallback((event: React.ChangeEvent<{ value: unknown }>) => {
-        setDivision(event.target.value as string);
+    const handleDivisionChange = useCallback(async (event: React.ChangeEvent<{ value: unknown }>) => {
+        const division = event.target.value as string;
+        if (division === "year") {
+            const revenues = await getYearlyRevenues();
+            const list = revenues.map((r) => ({ name: `${r.year}년`, value: r.revenue }));
+            setData({ list, format: "s", y: "매출", unit: "원" });
+        }
+        setDivision(division);
     }, []);
 
-    const handleYearChange = useCallback((event: React.ChangeEvent<{ value: unknown }>) => {
-        setSelectedYear(event.target.value as string);
+    const handleYearChange = useCallback(async (event: React.ChangeEvent<{ value: unknown }>) => {
+        const year = event.target.value as number;
+        const revenues = await getMonthlyRevenues(year);
+        const list = revenues.map((r) => ({ name: `${r.month}월`, value: r.revenue }));
+        setSelectedYear("" + year);
+        setData({ list, format: "s", y: "매출", unit: "원" });
     }, []);
 
     return (
@@ -82,8 +74,12 @@ export const StatisticsRevenue = () => {
                                 onChange={handleDivisionChange}
                                 label="구분"
                             >
-                                <MenuItem value="year">연 매출</MenuItem>
-                                <MenuItem value="month">월 매출</MenuItem>
+                                <MenuItem value="year" key="year">
+                                    연 매출
+                                </MenuItem>
+                                <MenuItem value="month" key="month">
+                                    월 매출
+                                </MenuItem>
                             </Select>
                         </FormControl>
                         {division === "month" && (
@@ -96,8 +92,10 @@ export const StatisticsRevenue = () => {
                                     onChange={handleYearChange}
                                     label="년도"
                                 >
-                                    {years.map((year) => (
-                                        <MenuItem value={year}>{year}</MenuItem>
+                                    {years.map((year, index) => (
+                                        <MenuItem value={year} key={index}>
+                                            {year}
+                                        </MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
