@@ -137,8 +137,6 @@ const CustomerList = () => {
     }, [isSearchingNow]);
 
     useEffect(() => {
-        console.log("viewport", viewport);
-        console.log("last", target);
         const options = {
             root: viewport.current,
             threshold: 0,
