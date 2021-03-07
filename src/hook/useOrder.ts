@@ -14,7 +14,13 @@ import {
     OrderForm,
     Order,
 } from "module/order";
-import { getOrdersAsync, submitOrderAsync, removeOrderAsync, editOrderAsync } from "module/order/saga";
+import {
+    getOrdersAsync,
+    submitOrderAsync,
+    removeOrderAsync,
+    editOrderAsync,
+    setFirstOrderDateAsync,
+} from "module/order/saga";
 import { Product } from "module/product";
 import { useCallback } from "react";
 
@@ -24,6 +30,7 @@ const useOrder = () => {
     const selectedDate = useSelector((state: RootState) => state.order.selectedDate);
     const isOrderEditMode = useSelector((state: RootState) => state.order.isOrderEditMode);
     const isOrderAsc = useSelector((state: RootState) => state.order.isOrderAsc);
+    const firstOrderDate = useSelector((state: RootState) => state.order.firstOrderDate);
 
     const dispatch = useDispatch();
 
@@ -64,12 +71,15 @@ const useOrder = () => {
     ]);
     const setIsOrderAsc = useCallback((isOrderAsc: boolean) => dispatch(setIsOrderAscAction(isOrderAsc)), [dispatch]);
 
+    const setFirstOrderDateAsc = useCallback(() => dispatch(setFirstOrderDateAsync.request()), [dispatch]);
+
     return {
         orders,
         orderForm,
         selectedDate,
         isOrderEditMode,
         isOrderAsc,
+        firstOrderDate,
         setOrderForm,
         addProduct,
         changeAmount,
@@ -83,6 +93,7 @@ const useOrder = () => {
         setSelectedDate,
         setOrderEditMode,
         setIsOrderAsc,
+        setFirstOrderDateAsc,
     };
 };
 

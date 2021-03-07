@@ -270,3 +270,16 @@ export const removeOrder = async (orderIdx: number) => {
         throw e;
     }
 };
+
+export const getFirstOrderDatetime = async (): Promise<{ orderDatetime: number }> => {
+    try {
+        const querySelectFirstOrdertiime = `SELECT order_datetime
+        FROM orders
+        ORDER BY order_datetime
+        LIMIT 1`;
+        const [firstOrderTime] = await select<number>(querySelectFirstOrdertiime);
+        return changePropertyFromSnakeToCamel(firstOrderTime);
+    } catch (e) {
+        throw e;
+    }
+};

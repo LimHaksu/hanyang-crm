@@ -11,6 +11,7 @@ import {
     PreferencesDefaultRegion,
     ProductManagementPage,
     StatisticsPage,
+    StatisticsRevenue,
 } from "page";
 
 export type Path =
@@ -18,6 +19,7 @@ export type Path =
     | "/phone-call-record"
     | "/order-registry"
     | "/statistics"
+    | "/statistics/revenue"
     | "/product-management"
     | "/customer-management"
     | "/preferences"
@@ -67,6 +69,14 @@ export const tabRoutes: tabRouteType[] = [
         name: "환경 설정",
         path: "/preferences",
         component: PreferencesPage,
+    },
+];
+
+export const statisticsTabRoutes: tabRouteType[] = [
+    {
+        name: "매출",
+        path: "/statistics/revenue",
+        component: StatisticsRevenue,
     },
 ];
 

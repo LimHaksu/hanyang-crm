@@ -53,15 +53,28 @@ const Header = ({ tabRoutes, subHeader }: HeaderProps) => {
     return (
         <AppBar position="static" className={subHeader ? classes.subHeader : ""}>
             <Toolbar>
-                {tabRoutes.map(({ name, path }, idx) => (
-                    <Link
-                        className={clsx(classes.link, isSelectedPath(pathname, path) && classes.emphasis)}
-                        href={`#${path === "/preferences" ? `${path}/cid` : path}`}
-                        key={idx}
-                    >
-                        {name}
-                    </Link>
-                ))}
+                {tabRoutes.map(({ name, path }, idx) => {
+                    let href = path;
+                    switch (path) {
+                        case "/preferences":
+                            href += "/cid";
+                            break;
+                        case "/statistics":
+                            href += "/revenue";
+                            break;
+                        default:
+                            break;
+                    }
+                    return (
+                        <Link
+                            className={clsx(classes.link, isSelectedPath(pathname, path) && classes.emphasis)}
+                            href={`#${href}`}
+                            key={idx}
+                        >
+                            {name}
+                        </Link>
+                    );
+                })}
             </Toolbar>
         </AppBar>
     );

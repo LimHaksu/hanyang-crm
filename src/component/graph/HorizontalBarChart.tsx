@@ -1,6 +1,14 @@
 import { useEffect, useRef } from "react";
 import { select, scaleBand, scaleLinear, max, Selection, axisLeft, axisTop } from "d3";
 import { PRIMARY_MAIN_COLOR } from "theme";
+import Paper from "@material-ui/core/Paper";
+import { makeStyles, Theme } from "@material-ui/core/styles";
+
+const useStyles = makeStyles((theme: Theme) => ({
+    root: {
+        padding: "0 20px 0 20px",
+    },
+}));
 
 interface Data {
     name: string;
@@ -9,7 +17,9 @@ interface Data {
 
 export interface BarChartData {
     list: Data[];
-    /** y축 포맷 */
+    /** y축 포맷
+     * d3.format 참고 https://observablehq.com/@d3/d3-format
+     */
     format?: string;
     /** y축 라벨 */
     y: string;
@@ -22,6 +32,7 @@ interface Props {
 }
 
 export const HorizontalBarChart = ({ data }: Props) => {
+    const classes = useStyles();
     const svgRef = useRef<SVGSVGElement | null>(null);
 
     useEffect(() => {
@@ -106,8 +117,8 @@ export const HorizontalBarChart = ({ data }: Props) => {
     }, [data]);
 
     return (
-        <div>
+        <Paper className={classes.root}>
             <svg ref={svgRef}></svg>
-        </div>
+        </Paper>
     );
 };

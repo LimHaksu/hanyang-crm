@@ -17,9 +17,18 @@ const App = () => {
                     <Header tabRoutes={tabRoutes} />
                     <MuiPickersUtilsProvider utils={DateFnsUtils} locale={koLocale}>
                         <Switch>
-                            {tabRoutes.map(({ path, component }, key) => (
-                                <Route path={path} exact={path !== "/preferences"} key={key} component={component} />
-                            ))}
+                            {tabRoutes.map(({ path, component }, key) => {
+                                let exact = true;
+                                switch (path) {
+                                    case "/preferences":
+                                    case "/statistics":
+                                        exact = false;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                return <Route path={path} exact={exact} key={key} component={component} />;
+                            })}
                         </Switch>
                     </MuiPickersUtilsProvider>
                 </ThemeProvider>

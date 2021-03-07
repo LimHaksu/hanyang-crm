@@ -62,6 +62,10 @@ const SET_SELECTED_DATE = "order/SET_SELECTED_DATE";
 const SET_ORDER_EDIT_MODE = "order/SET_ORDER_EDIT_MODE";
 const SET_IS_ORDER_ASC = "order/SET_IS_ORDER_ASC";
 
+export const SET_FIRST_ORDER_DATE = "order/SET_FIRST_ORDER_DATE";
+export const SET_FIRST_ORDER_DATE_SUCCESS = "order/SET_FIRST_ORDER_DATE_SUCCESS";
+export const SET_FIRST_ORDER_DATE_ERROR = "order/SET_FIRST_ORDER_DATE_ERROR";
+
 export const setOrderFormAction = createAction(SET_ORDER_FORM, (orderForm: OrderForm) => orderForm)();
 export const addProductAction = createAction(ADD_PRODUCT, (product: Product & { amount: number }) => product)();
 export const changeAmountAction = createAction(CHANGE_AMOUNT, (index: number, amount: number) => ({ index, amount }))();
@@ -88,6 +92,13 @@ export const setSelectedDateAction = createAction(SET_SELECTED_DATE, (selectedDa
 export const setOrderEditModeAction = createAction(SET_ORDER_EDIT_MODE, (isEditMode: boolean) => isEditMode)();
 export const setIsOrderAscAction = createAction(SET_IS_ORDER_ASC, (isOrderAsc: boolean) => isOrderAsc)();
 
+const setFirstOrderDateSuccess = createAction(SET_FIRST_ORDER_DATE_SUCCESS)<{
+    year: number;
+    month: number;
+    date: number;
+}>();
+const setFirstOrderDateError = createAction(SET_FIRST_ORDER_DATE_ERROR)<Error>();
+
 const actions = {
     setOrderFormAction,
     addProductAction,
@@ -106,6 +117,8 @@ const actions = {
     setSelectedDateAction,
     setOrderEditModeAction,
     setIsOrderAscAction,
+    setFirstOrderDateSuccess,
+    setFirstOrderDateError,
 };
 
 interface OrderState {
@@ -114,6 +127,11 @@ interface OrderState {
     isOrderAsc: boolean;
     orderForm: OrderForm;
     isOrderEditMode: boolean;
+    firstOrderDate: {
+        year: number;
+        month: number;
+        date: number;
+    };
 }
 
 const initialState: OrderState = {
@@ -131,6 +149,11 @@ const initialState: OrderState = {
         oldPrice: -1,
     },
     isOrderEditMode: false,
+    firstOrderDate: {
+        year: -1,
+        month: -1,
+        date: -1,
+    },
 };
 
 type OrderAction = ActionType<typeof actions>;
@@ -204,6 +227,13 @@ const order = createReducer<OrderState, OrderAction>(initialState, {
         localStorage.setItem("isOrderAsc", JSON.stringify(isOrderAsc));
         return { ...state, isOrderAsc };
     },
+
+    [SET_FIRST_ORDER_DATE_SUCCESS]: (state, { payload: firstOrderDate }) => ({ ...state, firstOrderDate }),
+    [SET_FIRST_ORDER_DATE_ERROR]: (state, { payload: error }) =>
+        produce(state, (draft) => {
+            // TODO... 에러 핸들링 로직
+            console.error(error);
+        }),
 });
 
 export default order;

@@ -13,9 +13,19 @@ import {
     REMOVE_ORDER,
     REMOVE_ORDER_SUCCESS,
     REMOVE_ORDER_ERROR,
+    SET_FIRST_ORDER_DATE,
+    SET_FIRST_ORDER_DATE_SUCCESS,
+    SET_FIRST_ORDER_DATE_ERROR,
 } from "./index";
 import { Order } from "module/order";
-import { getOrderByIdx, addOrder, editOrder, removeOrder, getOrdersByYearMonthDate } from "db/order";
+import {
+    getOrderByIdx,
+    addOrder,
+    editOrder,
+    removeOrder,
+    getOrdersByYearMonthDate,
+    getFirstOrderDatetime,
+} from "db/order";
 
 // createAsyncAction : request, success, failure, cancel arg를 넣으면
 // asyncAction을 만들어줌
@@ -42,6 +52,12 @@ export const removeOrderAsync = createAsyncAction(REMOVE_ORDER, REMOVE_ORDER_SUC
     number,
     Error
 >();
+
+export const setFirstOrderDateAsync = createAsyncAction(
+    SET_FIRST_ORDER_DATE,
+    SET_FIRST_ORDER_DATE_SUCCESS,
+    SET_FIRST_ORDER_DATE_ERROR
+)<undefined, { year: number; month: number; date: number }, Error>();
 
 function* getOrdersSaga(action: ReturnType<typeof getOrdersAsync.request>) {
     try {
@@ -81,9 +97,28 @@ function* removeOrderSaga(action: ReturnType<typeof removeOrderAsync.request>) {
     }
 }
 
+function* setFirstOrderDateSage(action: ReturnType<typeof setFirstOrderDateAsync.request>) {
+    try {
+        const { orderDatetime } = yield call(getFirstOrderDatetime);
+        const dateObj = new Date(orderDatetime);
+        const year = dateObj.getFullYear();
+        const month = dateObj.getMonth();
+        const date = dateObj.getDate();
+        const firstOrderDate = {
+            year,
+            month,
+            date,
+        };
+        yield put(setFirstOrderDateAsync.success(firstOrderDate));
+    } catch (e) {
+        yield put(setFirstOrderDateAsync.failure(e));
+    }
+}
+
 export function* orderSaga() {
     yield takeLatest(GET_ORDERS, getOrdersSaga);
     yield takeEvery(SUBMIT_ORDER, submitOrderSaga);
     yield takeEvery(EDIT_ORDER, editOrderSaga);
     yield takeEvery(REMOVE_ORDER, removeOrderSaga);
+    yield takeLatest(SET_FIRST_ORDER_DATE, setFirstOrderDateSage);
 }

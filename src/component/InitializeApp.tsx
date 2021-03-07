@@ -18,7 +18,7 @@ const InitializeApp = () => {
     } = usePhone();
     const { getCategories } = useCategory();
     const { setSelectedPrinter, setPapersOptions, setPapersContents, setSerialPrinterConfig } = usePrinter();
-    const { setIsOrderAsc } = useOrder();
+    const { setIsOrderAsc, setFirstOrderDateAsc } = useOrder();
 
     // 앱 초기 세팅
     useEffect(() => {
@@ -39,7 +39,11 @@ const InitializeApp = () => {
                 localStorageItemSetters[key](parsedItem);
             }
         }
+
+        // 첫 주문 날짜 가져오기 (통계에서 사용)
+        setFirstOrderDateAsc();
     }, [
+        setFirstOrderDateAsc,
         setIsOrderAsc,
         setIsPhoneCallRecordAsc,
         setPapersContents,

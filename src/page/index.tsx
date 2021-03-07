@@ -8,4 +8,5 @@ export * from "page/preferences/PreferencesPrinterPage";
 export * from "page/preferences/PreferencesOpeningHours";
 export * from "page/preferences/PreferencesDefaultRegion";
 export * from "page/ProductManagementPage";
-export * from "page/StatisticsPage";
+export * from "page/statistics/StatisticsPage";
+export * from "page/statistics/StatisticsRevenue";
