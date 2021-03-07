@@ -12,7 +12,7 @@ import { timeToFormatString } from "util/time";
 export const insertDashIntoPhoneNumber = (phoneNumber: string) => {
     return phoneNumber
         .replace(/-/g, "")
-        .replace(/(^02|^050[0-9]{1}|^1[0-9]{3}|^0[0-9]{2})([0-9]+)?([0-9]{4})$/, "$1-$2-$3")
+        .replace(/(^02|^050|^1[0-9]{3}|^0[0-9]{2})([0-9]+)?([0-9]{4})$/, "$1-$2-$3")
         .replace("--", "-");
 };
 
