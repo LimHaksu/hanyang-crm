@@ -49,6 +49,7 @@
         "@types/react-router-dom": "^5.1.7",
         "@types/redux-actions": "^2.6.1",
         "@types/sqlite3": "^3.1.7",
+        "cross-env": "^7.0.3",
         "electron": "^8.2.0",
         "electron-builder": "^22.9.1",
         "electron-rebuild": "^2.3.5"
@@ -60,7 +61,7 @@
         "test": "react-scripts test",
         "eject": "react-scripts eject",
         "react-start": "set BROWSER=none && yarn start",
-        "electron-start": "set ELECTRON_START_URL=http://localhost:3000 && electron .",
+        "electron-start": "set ELECTRON_START_URL=http://localhost:3000 && cross-env NODE_ENV=development electron .",
         "electron-pack": "yarn build && electron-builder build -c.extraMetadata.main=build/Main.js"
     },
     "eslintConfig": {

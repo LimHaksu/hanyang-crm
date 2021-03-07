@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog } = require("electron");
+const { app, BrowserWindow, dialog, Menu } = require("electron");
 const path = require("path");
 const url = require("url");
 
@@ -16,7 +16,9 @@ function createWindow() {
     });
 
     win.maximize();
-    // win.setMenu(null); // 배포할때는 주석 해제
+    if (process.env.NODE_ENV !== "development") {
+        win.setMenu(null);
+    }
 
     const startUrl =
         process.env.ELECTRON_START_URL ||
