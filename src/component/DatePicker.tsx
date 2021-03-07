@@ -3,6 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import Button from "@material-ui/core/Button";
 import Box from "@material-ui/core/Box";
+import { getTimeMinusOpeningHour } from "util/time";
 
 interface Props {
     selectedDate: Date | null;
@@ -27,7 +28,7 @@ const DatePicker = ({ selectedDate, handleDateChange, handleAccept }: Props) => 
     const classes = useStyles();
 
     const handleTodayButtonClick = useCallback(() => {
-        handleDateChange(new Date());
+        handleDateChange(new Date(getTimeMinusOpeningHour(Date.now())));
     }, [handleDateChange]);
 
     return (
