@@ -36,6 +36,9 @@ const useStyles = makeStyles(() =>
         alignCenter: {
             textAlign: "center",
         },
+        alignRight: {
+            textAlign: "right",
+        },
     })
 );
 
@@ -110,12 +113,13 @@ const DragProductList = () => {
     return (
         <Paper className={classes.root}>
             <Grid container className={classes.head}>
-                <Grid item xs={8} className={classes.alignCenter}>
+                <Grid item xs={7} className={classes.alignCenter}>
                     상품명
                 </Grid>
-                <Grid item xs={2}>
+                <Grid item xs={2} className={classes.alignRight}>
                     가격
                 </Grid>
+                <Grid item xs={1}></Grid>
                 <Grid item xs={1}>
                     수정
                 </Grid>

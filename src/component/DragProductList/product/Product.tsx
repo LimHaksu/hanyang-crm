@@ -23,9 +23,9 @@ const useStyles = makeStyles((theme: Theme) =>
             boxShadow: "3px 3px 5px black",
         },
         textVerticalCenter: {
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center'
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
         },
         centerAlign: {
             textAlign: "center",
@@ -101,7 +101,7 @@ const Product = ({ product, isDragging, provided }: ProductProps) => {
                     <Grid
                         item
                         xs={1}
-                        className={clsx(classes.rightAlign, classes.hover)}
+                        className={clsx(classes.centerAlign, classes.hover)}
                         data-idx={product.idx}
                         data-categoryidx={product.categoryIdx}
                         data-name={product.name}
@@ -114,7 +114,7 @@ const Product = ({ product, isDragging, provided }: ProductProps) => {
                     <Grid
                         item
                         xs={1}
-                        className={clsx(classes.rightAlign, classes.hover)}
+                        className={clsx(classes.centerAlign, classes.hover)}
                         data-idx={product.idx}
                         data-name={product.name}
                         onClick={handleDeleteClick}

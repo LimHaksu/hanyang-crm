@@ -29,9 +29,9 @@ const useStyles = makeStyles((theme: Theme) =>
             borderBottom: "1px solid #ddd",
         },
         textVerticalCenter: {
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center'
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
         },
         isDragging: {
             boxShadow: "3px 3px 5px black",
@@ -120,7 +120,7 @@ const Category = ({ categoryIdx, name, lexoRank, products, index }: CategoryProp
                         className={clsx(classes.root, snapshot.isDragging && classes.isDragging)}
                         {...provided.draggableProps}
                     >
-                        <Grid container className={clsx(classes.name)} {...provided.dragHandleProps}>
+                        <Grid container spacing={1} className={clsx(classes.name)} {...provided.dragHandleProps}>
                             <Grid item xs={9} className={classes.textVerticalCenter}>
                                 {name}
                             </Grid>
@@ -128,7 +128,7 @@ const Category = ({ categoryIdx, name, lexoRank, products, index }: CategoryProp
                             <Grid
                                 item
                                 xs={1}
-                                className={clsx(classes.rightAlign, classes.hover)}
+                                className={clsx(classes.centerAlign, classes.hover)}
                                 onClick={handleEditClick}
                             >
                                 <Edit />
@@ -136,7 +136,7 @@ const Category = ({ categoryIdx, name, lexoRank, products, index }: CategoryProp
                             <Grid
                                 item
                                 xs={1}
-                                className={clsx(classes.rightAlign, classes.hover)}
+                                className={clsx(classes.centerAlign, classes.hover)}
                                 onClick={handleDeleteClick}
                             >
                                 <Delete />
