@@ -281,15 +281,15 @@ export const serialPrint = async (
     printContents: PrintRowContent[],
     serialPrinterConfig: SerialPrinterConfig
 ) => {
-    const printer: ThermalPrinter = new thermalPrinter(serialPrinterConfig);
-    printContents.forEach((printContent) => {
-        const { valueType, value } = printContent;
-        serialPrintLine(printer, valueType, value, orderIndex, order);
-    });
-    printer.cut();
     try {
+        const printer: ThermalPrinter = new thermalPrinter(serialPrinterConfig);
+        printContents.forEach((printContent) => {
+            const { valueType, value } = printContent;
+            serialPrintLine(printer, valueType, value, orderIndex, order);
+        });
+        printer.cut();
         await printer.execute();
     } catch (error) {
-        console.error("Print error:", error);
+        alert(`에러 : ${error}`);
     }
 };
