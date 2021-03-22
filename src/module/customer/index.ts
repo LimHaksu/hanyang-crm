@@ -13,9 +13,10 @@ import {
     REMOVE_CUSTOMER,
     REMOVE_CUSTOMER_SUCCESS,
     REMOVE_CUSTOMER_ERROR,
-    AUTO_COMPLETE_CUSTOMER_ORDER_FORM,
     AUTO_COMPLETE_CUSTOMER_ORDER_FORM_SUCCESS,
     AUTO_COMPLETE_CUSTOMER_ORDER_FORM_ERROR,
+    GET_ORDERS_BY_CUSTOMER_SUCCESS,
+    GET_ORDERS_BY_CUSTOMER_ERROR,
 } from "./saga";
 
 export type SearchBy = "name" | "phoneNumber" | "address";
@@ -36,6 +37,21 @@ export interface CustomerForm {
     request: string;
 }
 
+export interface OrderByCustomer {
+    idx: number;
+    orderRequest: string;
+    orderTime: number;
+    paymentMethod: string;
+    products: {
+        idx: number;
+        name: string;
+        price: number;
+        amount: number;
+    }[];
+    oldProducts?: string;
+    oldPrice?: string;
+}
+
 export const SET_CUSTOMER_ORDER_FORM = "customer/SET_CUSTOMER_ORDER_FORM";
 export const SET_CUSTOMER_MANAGEMENT_FORM = "customer/SET_CUSTOMER_MANAGEMENT_FORM";
 const SET_CUSTOMER_ORDER_FORM_EDIT_MODE = "customer/SET_CUSTOMER_ORDER_FORM_EDIT_MODE";
@@ -46,6 +62,7 @@ const SET_REMOVE_SUCCESS = "customer/SET_REMOVE_SUCCESS";
 const SET_SEARCH_INFO = "customer/SET_SEARCH_INFO";
 const SET_IS_SEARCHING_NOW = "customer/SET_IS_SEARCHING_NOW";
 const RESET_ERROR_MESSAGE = "customer/RESET_ERROR_MESSAGE";
+export const RESET_ORDERS_BY_CUSTOMER = "customer/RESET_ORDERS_BY_CUSTOMER";
 
 const searchCustomers = createAction(SEARCH_CUSTOMERS)();
 const searchCustomersSuccess = createAction(SEARCH_CUSTOMERS_SUCCESS)<{
@@ -66,9 +83,13 @@ const removeCustomer = createAction(REMOVE_CUSTOMER)();
 const removeCustomerSuccess = createAction(REMOVE_CUSTOMER_SUCCESS)<number>();
 const removeCustomerError = createAction(REMOVE_CUSTOMER_ERROR)<Error>();
 
-const autoCompleteCustomerOrderForm = createAction(AUTO_COMPLETE_CUSTOMER_ORDER_FORM)();
 const autoCompleteCustomerOrderFormSuccess = createAction(AUTO_COMPLETE_CUSTOMER_ORDER_FORM_SUCCESS)<Customer>();
 const autoCompleteCustomerOrderFormError = createAction(AUTO_COMPLETE_CUSTOMER_ORDER_FORM_ERROR)<Error>();
+
+const getOrdersByCustomerSuccess = createAction(GET_ORDERS_BY_CUSTOMER_SUCCESS)<OrderByCustomer[]>();
+const getOrdersByCustomerError = createAction(GET_ORDERS_BY_CUSTOMER_ERROR)<Error>();
+
+export const resetOrdersByCustomerAction = createAction(RESET_ORDERS_BY_CUSTOMER)<undefined>();
 
 export const setCustomerOrderFormAction = createAction(
     SET_CUSTOMER_ORDER_FORM,
@@ -136,9 +157,12 @@ const actions = {
     setIsSearchingNowAction,
     resetErrorMessageAction,
 
-    autoCompleteCustomerOrderForm,
     autoCompleteCustomerOrderFormSuccess,
     autoCompleteCustomerOrderFormError,
+    getOrdersByCustomerSuccess,
+    getOrdersByCustomerError,
+
+    resetOrdersByCustomerAction,
 };
 
 interface CustomerState {
@@ -153,6 +177,7 @@ interface CustomerState {
     searchInfo: { searchBy: SearchBy; keyword: string };
     isSearchingNow: boolean;
     errorMessage: string | null;
+    ordersByCustomer: OrderByCustomer[];
 }
 
 const initialState: CustomerState = {
@@ -171,6 +196,7 @@ const initialState: CustomerState = {
     searchInfo: { searchBy: "name", keyword: "" },
     isSearchingNow: false,
     errorMessage: null,
+    ordersByCustomer: [],
 };
 
 type CustomerAction = ActionType<typeof actions>;
@@ -284,6 +310,16 @@ const customer = createReducer<CustomerState, CustomerAction>(initialState, {
         }),
 
     [RESET_ERROR_MESSAGE]: (state) => ({ ...state, errorMessage: null }),
+
+    [GET_ORDERS_BY_CUSTOMER_SUCCESS]: (state, { payload: ordersByCustomer }) => ({
+        ...state,
+        ordersByCustomer,
+    }),
+    [GET_ORDERS_BY_CUSTOMER_ERROR]: (state, { payload: error }) =>
+        produce(state, (draft) => {
+            console.error(error);
+        }),
+    [RESET_ORDERS_BY_CUSTOMER]: (state) => ({ ...state, ordersByCustomer: [] }),
 });
 
 export default customer;

@@ -1,7 +1,7 @@
 import { call, put, takeLatest, takeEvery } from "redux-saga/effects";
 import { createAsyncAction } from "typesafe-actions";
-import { SearchBy, Customer } from "module/customer";
-import { getCustomers, addCustomer, editCustomer, removeCustomer, getCustomer } from "db/customer";
+import { SearchBy, Customer, OrderByCustomer } from "module/customer";
+import { getCustomers, addCustomer, editCustomer, removeCustomer, getCustomer, getOrdersByCustomer } from "db/customer";
 
 export const SEARCH_CUSTOMERS = "customer/SEARCH_CUSTOMERS";
 export const SEARCH_CUSTOMERS_SUCCESS = "customer/SEARCH_CUSTOMERS_SUCCESS";
@@ -22,6 +22,10 @@ export const REMOVE_CUSTOMER_ERROR = "customer/REMOVE_CUSTOMER_ERROR";
 export const AUTO_COMPLETE_CUSTOMER_ORDER_FORM = "customer/AUTO_COMPLETE_CUSTOMER_ORDER_FORM";
 export const AUTO_COMPLETE_CUSTOMER_ORDER_FORM_SUCCESS = "customer/AUTO_COMPLETE_CUSTOMER_ORDER_FORM_SUCCESS";
 export const AUTO_COMPLETE_CUSTOMER_ORDER_FORM_ERROR = "customer/AUTO_COMPLETE_CUSTOMER_ORDER_FORM_ERROR";
+
+export const GET_ORDERS_BY_CUSTOMER = "customer/GET_ORDERS_BY_CUSTOMER";
+export const GET_ORDERS_BY_CUSTOMER_SUCCESS = "customer/GET_ORDERS_BY_CUSTOMER_SUCCESS";
+export const GET_ORDERS_BY_CUSTOMER_ERROR = "customer/GET_ORDERS_BY_CUSTOMER_ERROR";
 
 // createAsyncAction : request, success, failure, cancel arg를 넣으면
 // asyncAction을 만들어줌
@@ -76,6 +80,12 @@ export const autoCompleteCustomerOrderFormAsync = createAsyncAction(
     AUTO_COMPLETE_CUSTOMER_ORDER_FORM_ERROR
 )<{ searchBy: SearchBy; keyword: string }, Customer, Error>();
 
+export const getOrdersByCustomerAsync = createAsyncAction(
+    GET_ORDERS_BY_CUSTOMER,
+    GET_ORDERS_BY_CUSTOMER_SUCCESS,
+    GET_ORDERS_BY_CUSTOMER_ERROR
+)<number, OrderByCustomer[], Error>();
+
 function* searchCustomersSaga(action: ReturnType<typeof searchCustomersAsync.request>) {
     try {
         const { searchBy, keyword, startIndex, isAppendMode } = action.payload;
@@ -122,10 +132,20 @@ function* autoCompleteCustomerOrderFormSaga(action: ReturnType<typeof autoComple
     }
 }
 
+function* getOrdersByCustomerSaga(action: ReturnType<typeof getOrdersByCustomerAsync.request>) {
+    try {
+        const ordersByCustomer: OrderByCustomer[] = yield call(getOrdersByCustomer, action.payload);
+        yield put(getOrdersByCustomerAsync.success(ordersByCustomer));
+    } catch (e) {
+        yield put(getOrdersByCustomerAsync.failure(e));
+    }
+}
+
 export function* customerSaga() {
     yield takeLatest(SEARCH_CUSTOMERS, searchCustomersSaga);
     yield takeEvery(ADD_CUSTOMER, addCustomerSaga);
     yield takeEvery(EDIT_CUSTOMER, editCustomerSaga);
     yield takeEvery(REMOVE_CUSTOMER, removeCustomerSaga);
     yield takeEvery(AUTO_COMPLETE_CUSTOMER_ORDER_FORM, autoCompleteCustomerOrderFormSaga);
+    yield takeEvery(GET_ORDERS_BY_CUSTOMER, getOrdersByCustomerSaga);
 }

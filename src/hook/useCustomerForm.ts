@@ -8,7 +8,10 @@ import {
     setCustomerManagementFormEditModeAction,
     CustomerForm,
     resetErrorMessageAction,
+    SearchBy,
+    resetOrdersByCustomerAction,
 } from "module/customer";
+import { autoCompleteCustomerOrderFormAsync, getOrdersByCustomerAsync } from "module/customer/saga";
 
 const useCustomerForm = () => {
     const customerOrderForm = useSelector((state: RootState) => state.customer.customerOrderForm);
@@ -18,11 +21,16 @@ const useCustomerForm = () => {
         (state: RootState) => state.customer.isCustomerManagementFormEditMode
     );
     const errorMessage = useSelector((state: RootState) => state.customer.errorMessage);
+    const ordersByCustomer = useSelector((state: RootState) => state.customer.ordersByCustomer);
 
     const dispatch = useDispatch();
 
     const setCustomerOrderForm = useCallback(
         (customerOrderForm: CustomerForm) => dispatch(setCustomerOrderFormAction(customerOrderForm)),
+        [dispatch]
+    );
+    const getOrdersByCustomer = useCallback(
+        (customerIdx: number) => dispatch(getOrdersByCustomerAsync.request(customerIdx)),
         [dispatch]
     );
 
@@ -41,7 +49,15 @@ const useCustomerForm = () => {
         [dispatch]
     );
 
+    const autoCompleteCustomerOrderForm = useCallback(
+        ({ searchBy, keyword }: { searchBy: SearchBy; keyword: string }) =>
+            dispatch(autoCompleteCustomerOrderFormAsync.request({ searchBy, keyword })),
+        [dispatch]
+    );
+
     const resetErrorMessage = useCallback(() => dispatch(resetErrorMessageAction()), [dispatch]);
+
+    const resetOrdersByCustomer = useCallback(() => dispatch(resetOrdersByCustomerAction()), [dispatch]);
 
     return {
         customerOrderForm,
@@ -49,11 +65,15 @@ const useCustomerForm = () => {
         isCustomerOrderFormEditMode,
         isCustomerManagementFormEditMode,
         errorMessage,
+        ordersByCustomer,
         setCustomerOrderForm,
         setCustomerManagementForm,
         setCustomerOrderFormEditMode,
         setCustomerManagementFormEditMode,
         resetErrorMessage,
+        getOrdersByCustomer,
+        autoCompleteCustomerOrderForm,
+        resetOrdersByCustomer,
     };
 };
 

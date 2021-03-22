@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
 import Paper from "@material-ui/core/Paper";
@@ -18,10 +18,10 @@ const useStyles = makeStyles((theme: Theme) =>
             backgroundColor: theme.palette.primary.light,
         },
         leftSide: {
-            width: "33%",
+            width: "30%",
         },
         rightSide: {
-            width: "50%",
+            width: "70%",
             paddingLeft: "10px",
         },
         modalMessage: {
@@ -37,10 +37,14 @@ export const OrderRegistryPage = () => {
     const classes = useStyles();
     const [open, setOpen] = useState(false);
     const { customerOrderForm, setCustomerOrderForm, errorMessage, resetErrorMessage } = useCustomerForm();
+    const okButtonRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
         if (errorMessage) {
             setOpen(true);
+            setTimeout(() => {
+                okButtonRef.current?.focus();
+            }, 0);
         }
     }, [errorMessage]);
 
@@ -50,7 +54,9 @@ export const OrderRegistryPage = () => {
 
     useEffect(() => {
         if (!open) {
-            resetErrorMessage();
+            setTimeout(() => {
+                resetErrorMessage();
+            }, 200);
         }
     }, [open, resetErrorMessage]);
 
@@ -76,7 +82,7 @@ export const OrderRegistryPage = () => {
                 <Box display="flex" flexDirection="column">
                     <div className={classes.modalMessage}>{errorMessage}</div>
                     <Box display="flex" justifyContent="space-around">
-                        <Button variant="contained" color="primary" onClick={handleModalClose}>
+                        <Button variant="contained" color="primary" onClick={handleModalClose} ref={okButtonRef}>
                             확인
                         </Button>
                     </Box>

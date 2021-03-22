@@ -1,36 +1,29 @@
-import React, { useCallback } from "react";
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
-import { PayloadAction } from "typesafe-actions";
-import Grid from "@material-ui/core/Grid";
+import { useCallback, useEffect } from "react";
 import TextField from "@material-ui/core/TextField";
-import Paper from "@material-ui/core/Paper";
 import AccountBox from "@material-ui/icons/AccountBox";
+import Grid from "@material-ui/core/Grid";
 import Phone from "@material-ui/icons/Phone";
 import Home from "@material-ui/icons/Home";
 import Comment from "@material-ui/icons/Comment";
-import { insertDashIntoPhoneNumber } from "util/phone";
+import { PayloadAction } from "typesafe-actions";
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import { CustomerForm, SET_CUSTOMER_ORDER_FORM, SET_CUSTOMER_MANAGEMENT_FORM } from "module/customer";
-import useCustomer from "hook/useCustomer";
+import { insertDashIntoPhoneNumber } from "util/phone";
+import useCustomerForm from "hook/useCustomerForm";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
-        paper: {
-            padding: "15px",
-            boxSizing: "border-box",
-        },
-        head: {
-            fontWeight: "bold",
-            fontSize: "1.1rem",
-            marginBottom: "5px",
-        },
         address: {
-            width: "438px",
+            width: "100%",
         },
         request: {
-            width: "438px",
+            width: "100%",
         },
         icon: {
             marginTop: 25,
+        },
+        fullWidth: {
+            width: "calc(100% - 42px)",
         },
     })
 );
@@ -41,9 +34,10 @@ interface StyledTextFieldProp {
     className?: string;
     value?: string;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    onKeyup?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+    onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
     error?: boolean;
     helperText?: string;
+    fullWidth?: boolean;
 }
 
 const StyledTextField = ({
@@ -52,9 +46,10 @@ const StyledTextField = ({
     className,
     value,
     onChange,
-    onKeyup,
+    onKeyDown,
     error,
     helperText,
+    fullWidth,
 }: StyledTextFieldProp) => {
     const classes = useStyles();
 
@@ -63,13 +58,13 @@ const StyledTextField = ({
             <Grid item className={classes.icon}>
                 {icon}
             </Grid>
-            <Grid item>
+            <Grid item className={fullWidth ? classes.fullWidth : ""}>
                 <TextField
                     label={label}
                     className={className}
                     value={value}
                     onChange={onChange}
-                    onKeyUp={onKeyup}
+                    onKeyDown={onKeyDown}
                     error={error}
                     helperText={helperText}
                 />
@@ -78,16 +73,23 @@ const StyledTextField = ({
     );
 };
 
-interface CustomerInfoProp {
+interface InputsProp {
     customerForm: CustomerForm;
     setCustomerForm: (
         customerForm: CustomerForm
     ) => PayloadAction<typeof SET_CUSTOMER_ORDER_FORM | typeof SET_CUSTOMER_MANAGEMENT_FORM, CustomerForm>;
 }
-
-const CustomerInfo = ({ customerForm, setCustomerForm }: CustomerInfoProp) => {
+const Inputs = ({ customerForm, setCustomerForm }: InputsProp) => {
     const classes = useStyles();
-    const { autoCompleteCustomerOrderForm } = useCustomer();
+    const { autoCompleteCustomerOrderForm, getOrdersByCustomer, resetOrdersByCustomer } = useCustomerForm();
+
+    useEffect(() => {
+        if (customerForm.idx >= 0) {
+            getOrdersByCustomer(customerForm.idx);
+        } else {
+            resetOrdersByCustomer();
+        }
+    }, [customerForm.idx, getOrdersByCustomer, resetOrdersByCustomer]);
 
     const handleCustomerNameChange = useCallback(
         (e) => {
@@ -153,11 +155,9 @@ const CustomerInfo = ({ customerForm, setCustomerForm }: CustomerInfoProp) => {
     );
     const validatePhoneNumber = useCallback(() => !!customerForm.phoneNumber, [customerForm.phoneNumber]);
     const validateAddress = useCallback(() => !!customerForm.address, [customerForm.address]);
-
     const { customerName, phoneNumber, address, request } = customerForm;
     return (
-        <Paper className={classes.paper}>
-            <div className={classes.head}>고객정보</div>
+        <>
             <Grid container spacing={2}>
                 <Grid item>
                     <StyledTextField
@@ -171,7 +171,7 @@ const CustomerInfo = ({ customerForm, setCustomerForm }: CustomerInfoProp) => {
                     <StyledTextField
                         label="전화"
                         onChange={handlePhoneNumberChange}
-                        onKeyup={handlePhoneNumberEnter}
+                        onKeyDown={handlePhoneNumberEnter}
                         icon={<Phone />}
                         value={phoneNumber}
                         error={!validatePhoneNumber()}
@@ -187,6 +187,7 @@ const CustomerInfo = ({ customerForm, setCustomerForm }: CustomerInfoProp) => {
                 onChange={handleAddressChange}
                 error={!validateAddress()}
                 helperText={!validateAddress() ? "주소는 반드시 입력해야합니다." : undefined}
+                fullWidth
             />
             <StyledTextField
                 label="단골 요청사항"
@@ -194,9 +195,10 @@ const CustomerInfo = ({ customerForm, setCustomerForm }: CustomerInfoProp) => {
                 icon={<Comment />}
                 value={request ? request : ""}
                 onChange={handleRequestChange}
+                fullWidth
             />
-        </Paper>
+        </>
     );
 };
 
-export default React.memo(CustomerInfo);
+export default Inputs;

@@ -9,13 +9,7 @@ import {
     setIsSearchingNowAction,
     SearchBy,
 } from "module/customer";
-import {
-    searchCustomersAsync,
-    addCustomerAsync,
-    editCustomerAsync,
-    removeCustomerAsync,
-    autoCompleteCustomerOrderFormAsync,
-} from "module/customer/saga";
+import { searchCustomersAsync, addCustomerAsync, editCustomerAsync, removeCustomerAsync } from "module/customer/saga";
 
 const useCustomer = () => {
     const customers = useSelector((state: RootState) => state.customer.customers.data);
@@ -73,12 +67,6 @@ const useCustomer = () => {
         [dispatch]
     );
 
-    const autoCompleteCustomerOrderForm = useCallback(
-        ({ searchBy, keyword }: { searchBy: SearchBy; keyword: string }) =>
-            dispatch(autoCompleteCustomerOrderFormAsync.request({ searchBy, keyword })),
-        [dispatch]
-    );
-
     return {
         customers,
         isAddCustomerSuccess,
@@ -95,7 +83,6 @@ const useCustomer = () => {
         setRemoveSuccess,
         setSearchInfo,
         setIsSearchingNow,
-        autoCompleteCustomerOrderForm,
     };
 };
 
