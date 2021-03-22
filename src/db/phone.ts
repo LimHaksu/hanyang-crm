@@ -41,7 +41,7 @@ export const getPhoneCallRecords = async (year: number, month: number, date: num
         const searchedDate = getTimePlusOpeningHour(new Date(year, month, date).getTime());
         const nextDate = searchedDate + 86_400_000; // 24 * 60 * 60 * 1000
         const rows = await select<PhoneCallRecord>(query, searchedDate, nextDate);
-        return changePropertyFromSnakeToCamel(rows);
+        return changePropertyFromSnakeToCamel<PhoneCallRecord[]>(rows);
     } catch (e) {
         throw e;
     }

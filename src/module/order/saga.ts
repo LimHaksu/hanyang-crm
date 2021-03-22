@@ -71,8 +71,8 @@ function* getOrdersSaga(action: ReturnType<typeof getOrdersAsync.request>) {
 
 function* submitOrderSaga(action: ReturnType<typeof submitOrderAsync.request>) {
     try {
-        const orderIdx = yield call(addOrder, action.payload);
-        const order = yield call(getOrderByIdx, orderIdx);
+        const orderIdx: number = yield call(addOrder, action.payload);
+        const order: Order = yield call(getOrderByIdx, orderIdx);
         yield put(submitOrderAsync.success(order));
     } catch (e) {
         yield put(submitOrderAsync.failure(e));
@@ -97,7 +97,7 @@ function* removeOrderSaga(action: ReturnType<typeof removeOrderAsync.request>) {
     }
 }
 
-function* setFirstOrderDateSage(action: ReturnType<typeof setFirstOrderDateAsync.request>) {
+function* setFirstOrderDateSage() {
     try {
         const { orderDatetime } = yield call(getFirstOrderDatetime);
         const dateObj = new Date(orderDatetime);

@@ -96,6 +96,8 @@ export const addOrder = async (
             await update(query, orderIdx, phoneCallRecordIdx);
 
             return orderIdx;
+        } else {
+            throw new Error("고객 등록 실패");
         }
     } catch (e) {
         throw e;

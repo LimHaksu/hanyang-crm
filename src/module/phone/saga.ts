@@ -37,7 +37,7 @@ export const removePhoneCallRecordAsync = createAsyncAction(
 function* getPhoneCallRecordsSaga(action: ReturnType<typeof getPhoneCallRecordsAsync.request>) {
     try {
         const { year, month, date } = action.payload;
-        const phoneCallRecords = yield call(getPhoneCallRecords, year, month, date);
+        const phoneCallRecords: PhoneCallRecord[] = yield call(getPhoneCallRecords, year, month, date);
         yield put(getPhoneCallRecordsAsync.success(phoneCallRecords));
     } catch (e) {
         yield put(getPhoneCallRecordsAsync.failure(e));
@@ -47,7 +47,14 @@ function* getPhoneCallRecordsSaga(action: ReturnType<typeof getPhoneCallRecordsA
 function* addPhoneCallRecordSaga(action: ReturnType<typeof addPhoneCallRecordAsync.request>) {
     try {
         const { receivedDatetime, customerName, phoneNumber, address, request } = action.payload;
-        const lastIdx = yield call(addPhoneCallRecord, receivedDatetime, customerName, phoneNumber, address, request);
+        const lastIdx: number = yield call(
+            addPhoneCallRecord,
+            receivedDatetime,
+            customerName,
+            phoneNumber,
+            address,
+            request
+        );
         yield put(addPhoneCallRecordAsync.success({ ...action.payload, idx: lastIdx }));
     } catch (e) {
         yield put(addPhoneCallRecordAsync.failure(e));

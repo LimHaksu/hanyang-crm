@@ -162,7 +162,7 @@ function* moveCategorySaga(action: ReturnType<typeof moveCategoryAsync.request>)
     const { srcIdx, destIdx } = action.payload;
     // categories는 정렬돼있는 상태
     const categories: Category[] = JSON.parse(
-        JSON.stringify(yield select((state: RootState) => state.product.categories.data))
+        JSON.stringify((yield select((state: RootState) => state.product.categories.data)) as Category[])
     );
     const srcCategory = categories[srcIdx];
     const destCategory = categories[destIdx];
@@ -231,7 +231,7 @@ function* addProductSaga(action: ReturnType<typeof addProductAsync.request>) {
         const categories: Category[] = yield select((state: RootState) => state.product.categories.data);
         const products = categories.find((category) => category.idx === categoryIdx)?.products;
         if (products) {
-            const lastIdx = yield call(addProduct, name, price, categoryIdx, Z_LEXO_RANK);
+            const lastIdx: number = yield call(addProduct, name, price, categoryIdx, Z_LEXO_RANK);
             const plen = products.length;
             const lastProduct = products[plen - 1];
 
@@ -305,7 +305,7 @@ function* moveProductSaga(action: ReturnType<typeof moveProductAsync.request>) {
     try {
         const { currentIndex, nextIndex, srcIdx, destIdx } = action.payload;
         const categories: Category[] = JSON.parse(
-            JSON.stringify(yield select((state: RootState) => state.product.categories.data))
+            JSON.stringify((yield select((state: RootState) => state.product.categories.data)) as Category[])
         );
 
         // 같은 카테고리 내에서 이동
