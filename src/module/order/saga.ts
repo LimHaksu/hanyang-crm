@@ -62,7 +62,7 @@ export const setFirstOrderDateAsync = createAsyncAction(
 function* getOrdersSaga(action: ReturnType<typeof getOrdersAsync.request>) {
     try {
         const { year, month, date } = action.payload;
-        const orders = yield call(getOrdersByYearMonthDate, year, month, date);
+        const orders: Order[] = yield call(getOrdersByYearMonthDate, year, month, date);
         yield put(getOrdersAsync.success(orders));
     } catch (e) {
         yield put(getOrdersAsync.failure(e));

@@ -13,6 +13,9 @@ import {
     REMOVE_CUSTOMER,
     REMOVE_CUSTOMER_SUCCESS,
     REMOVE_CUSTOMER_ERROR,
+    AUTO_COMPLETE_CUSTOMER_ORDER_FORM,
+    AUTO_COMPLETE_CUSTOMER_ORDER_FORM_SUCCESS,
+    AUTO_COMPLETE_CUSTOMER_ORDER_FORM_ERROR,
 } from "./saga";
 
 export type SearchBy = "name" | "phoneNumber" | "address";
@@ -42,6 +45,7 @@ const SET_EDIT_SUCCESS = "customer/SET_EDIT_SUCCESS";
 const SET_REMOVE_SUCCESS = "customer/SET_REMOVE_SUCCESS";
 const SET_SEARCH_INFO = "customer/SET_SEARCH_INFO";
 const SET_IS_SEARCHING_NOW = "customer/SET_IS_SEARCHING_NOW";
+const RESET_ERROR_MESSAGE = "customer/RESET_ERROR_MESSAGE";
 
 const searchCustomers = createAction(SEARCH_CUSTOMERS)();
 const searchCustomersSuccess = createAction(SEARCH_CUSTOMERS_SUCCESS)<{
@@ -61,6 +65,10 @@ const editCustomerError = createAction(EDIT_CUSTOMER_ERROR)<Error>();
 const removeCustomer = createAction(REMOVE_CUSTOMER)();
 const removeCustomerSuccess = createAction(REMOVE_CUSTOMER_SUCCESS)<number>();
 const removeCustomerError = createAction(REMOVE_CUSTOMER_ERROR)<Error>();
+
+const autoCompleteCustomerOrderForm = createAction(AUTO_COMPLETE_CUSTOMER_ORDER_FORM)();
+const autoCompleteCustomerOrderFormSuccess = createAction(AUTO_COMPLETE_CUSTOMER_ORDER_FORM_SUCCESS)<Customer>();
+const autoCompleteCustomerOrderFormError = createAction(AUTO_COMPLETE_CUSTOMER_ORDER_FORM_ERROR)<Error>();
 
 export const setCustomerOrderFormAction = createAction(
     SET_CUSTOMER_ORDER_FORM,
@@ -95,6 +103,8 @@ export const setRemoveSuccessAction = createAction(
     (isRemoveCustomerSuccess: boolean) => isRemoveCustomerSuccess
 )();
 
+export const resetErrorMessageAction = createAction(RESET_ERROR_MESSAGE)<void>();
+
 export const setSearchInfoAction = createAction(SET_SEARCH_INFO)<{ searchBy: SearchBy; keyword: string }>();
 export const setIsSearchingNowAction = createAction(SET_IS_SEARCHING_NOW)<boolean>();
 
@@ -124,6 +134,11 @@ const actions = {
     setRemoveSuccessAction,
     setSearchInfoAction,
     setIsSearchingNowAction,
+    resetErrorMessageAction,
+
+    autoCompleteCustomerOrderForm,
+    autoCompleteCustomerOrderFormSuccess,
+    autoCompleteCustomerOrderFormError,
 };
 
 interface CustomerState {
@@ -137,6 +152,7 @@ interface CustomerState {
     removeState: { loading: boolean; error: Error | null; isSuccess: boolean };
     searchInfo: { searchBy: SearchBy; keyword: string };
     isSearchingNow: boolean;
+    errorMessage: string | null;
 }
 
 const initialState: CustomerState = {
@@ -154,6 +170,7 @@ const initialState: CustomerState = {
     removeState: { loading: false, error: null, isSuccess: false },
     searchInfo: { searchBy: "name", keyword: "" },
     isSearchingNow: false,
+    errorMessage: null,
 };
 
 type CustomerAction = ActionType<typeof actions>;
@@ -249,6 +266,24 @@ const customer = createReducer<CustomerState, CustomerAction>(initialState, {
         ...state,
         isSearchingNow,
     }),
+    [AUTO_COMPLETE_CUSTOMER_ORDER_FORM_SUCCESS]: (state, { payload: customer }) =>
+        produce(state, (draft) => {
+            if (customer) {
+                draft.customerOrderForm.idx = customer.idx;
+                draft.customerOrderForm.address = customer.address;
+                draft.customerOrderForm.customerName = customer.customerName;
+                draft.customerOrderForm.phoneNumber = customer.phoneNumber;
+                draft.customerOrderForm.request = customer.request;
+            } else {
+                draft.errorMessage = "존재하지 않는 전화번호입니다.";
+            }
+        }),
+    [AUTO_COMPLETE_CUSTOMER_ORDER_FORM_ERROR]: (state, { payload: error }) =>
+        produce(state, (draft) => {
+            alert(error);
+        }),
+
+    [RESET_ERROR_MESSAGE]: (state) => ({ ...state, errorMessage: null }),
 });
 
 export default customer;

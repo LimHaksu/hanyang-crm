@@ -1,7 +1,7 @@
 import { call, put, takeLatest, takeEvery } from "redux-saga/effects";
 import { createAsyncAction } from "typesafe-actions";
 import { SearchBy, Customer } from "module/customer";
-import { getCustomers, addCustomer, editCustomer, removeCustomer } from "db/customer";
+import { getCustomers, addCustomer, editCustomer, removeCustomer, getCustomer } from "db/customer";
 
 export const SEARCH_CUSTOMERS = "customer/SEARCH_CUSTOMERS";
 export const SEARCH_CUSTOMERS_SUCCESS = "customer/SEARCH_CUSTOMERS_SUCCESS";
@@ -18,6 +18,10 @@ export const EDIT_CUSTOMER_ERROR = "customer/EDIT_CUSTOMER_ERROR";
 export const REMOVE_CUSTOMER = "customer/REMOVE_CUSTOMER";
 export const REMOVE_CUSTOMER_SUCCESS = "customer/REMOVE_CUSTOMER_SUCCESS";
 export const REMOVE_CUSTOMER_ERROR = "customer/REMOVE_CUSTOMER_ERROR";
+
+export const AUTO_COMPLETE_CUSTOMER_ORDER_FORM = "customer/AUTO_COMPLETE_CUSTOMER_ORDER_FORM";
+export const AUTO_COMPLETE_CUSTOMER_ORDER_FORM_SUCCESS = "customer/AUTO_COMPLETE_CUSTOMER_ORDER_FORM_SUCCESS";
+export const AUTO_COMPLETE_CUSTOMER_ORDER_FORM_ERROR = "customer/AUTO_COMPLETE_CUSTOMER_ORDER_FORM_ERROR";
 
 // createAsyncAction : request, success, failure, cancel arg를 넣으면
 // asyncAction을 만들어줌
@@ -66,10 +70,16 @@ export const removeCustomerAsync = createAsyncAction(REMOVE_CUSTOMER, REMOVE_CUS
     Error
 >();
 
+export const autoCompleteCustomerOrderFormAsync = createAsyncAction(
+    AUTO_COMPLETE_CUSTOMER_ORDER_FORM,
+    AUTO_COMPLETE_CUSTOMER_ORDER_FORM_SUCCESS,
+    AUTO_COMPLETE_CUSTOMER_ORDER_FORM_ERROR
+)<{ searchBy: SearchBy; keyword: string }, Customer, Error>();
+
 function* searchCustomersSaga(action: ReturnType<typeof searchCustomersAsync.request>) {
     try {
         const { searchBy, keyword, startIndex, isAppendMode } = action.payload;
-        const customers = yield call(getCustomers, { searchBy, keyword, startIndex });
+        const customers: Customer[] = yield call(getCustomers, { searchBy, keyword, startIndex });
         yield put(searchCustomersAsync.success({ customers, isAppendMode }));
     } catch (e) {
         yield put(searchCustomersAsync.failure(e));
@@ -103,9 +113,19 @@ function* removeCustomerSaga(action: ReturnType<typeof removeCustomerAsync.reque
     }
 }
 
+function* autoCompleteCustomerOrderFormSaga(action: ReturnType<typeof autoCompleteCustomerOrderFormAsync.request>) {
+    try {
+        const [customer]: Customer[] = yield call(getCustomer, action.payload);
+        yield put(autoCompleteCustomerOrderFormAsync.success(customer));
+    } catch (e) {
+        yield put(autoCompleteCustomerOrderFormAsync.failure(e));
+    }
+}
+
 export function* customerSaga() {
     yield takeLatest(SEARCH_CUSTOMERS, searchCustomersSaga);
     yield takeEvery(ADD_CUSTOMER, addCustomerSaga);
     yield takeEvery(EDIT_CUSTOMER, editCustomerSaga);
     yield takeEvery(REMOVE_CUSTOMER, removeCustomerSaga);
+    yield takeEvery(AUTO_COMPLETE_CUSTOMER_ORDER_FORM, autoCompleteCustomerOrderFormSaga);
 }

@@ -1,5 +1,6 @@
 import { insert, select, update, deleteQuery, Customer } from "./db";
 import { getSnakeCaseString, changePropertyFromSnakeToCamel } from "util/db";
+import { Customer as CustomerType, SearchBy } from "module/customer";
 
 /**
  * 고객정보를 입력하여 등록함
@@ -38,10 +39,10 @@ export const getCustomers = async ({
     keyword,
     startIndex = 0,
 }: {
-    searchBy: "name" | "phoneNumber" | "address";
+    searchBy: SearchBy;
     keyword: string;
     startIndex?: number;
-}) => {
+}): Promise<CustomerType[]> => {
     try {
         const query = `SELECT idx, phone_number, name customer_name, address, request
         FROM customers
@@ -49,7 +50,21 @@ export const getCustomers = async ({
         ORDER BY phone_number
         LIMIT ${startIndex},20;`;
         const customers = await select<Customer>(query, `%${keyword}%`);
-        return changePropertyFromSnakeToCamel(customers);
+        return changePropertyFromSnakeToCamel<CustomerType[]>(customers);
+    } catch (e) {
+        throw e;
+    }
+};
+
+export const getCustomer = async ({ searchBy, keyword }: { searchBy: SearchBy; keyword: string }) => {
+    try {
+        const query = `SELECT idx, phone_number, name customer_name, address, request
+        FROM customers
+        WHERE is_deleted = 0 AND ${getSnakeCaseString(searchBy)} like ?
+        ORDER BY phone_number
+        LIMIT 1;`;
+        const customers = await select<Customer>(query, `%${keyword}`);
+        return changePropertyFromSnakeToCamel<CustomerType>(customers);
     } catch (e) {
         throw e;
     }

@@ -7,6 +7,7 @@ import {
     setCustomerOrderFormEditModeAction,
     setCustomerManagementFormEditModeAction,
     CustomerForm,
+    resetErrorMessageAction,
 } from "module/customer";
 
 const useCustomerForm = () => {
@@ -16,6 +17,7 @@ const useCustomerForm = () => {
     const isCustomerManagementFormEditMode = useSelector(
         (state: RootState) => state.customer.isCustomerManagementFormEditMode
     );
+    const errorMessage = useSelector((state: RootState) => state.customer.errorMessage);
 
     const dispatch = useDispatch();
 
@@ -39,15 +41,19 @@ const useCustomerForm = () => {
         [dispatch]
     );
 
+    const resetErrorMessage = useCallback(() => dispatch(resetErrorMessageAction()), [dispatch]);
+
     return {
         customerOrderForm,
         customerManagementForm,
         isCustomerOrderFormEditMode,
         isCustomerManagementFormEditMode,
+        errorMessage,
         setCustomerOrderForm,
         setCustomerManagementForm,
         setCustomerOrderFormEditMode,
         setCustomerManagementFormEditMode,
+        resetErrorMessage,
     };
 };
 

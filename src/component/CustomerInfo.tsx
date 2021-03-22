@@ -10,6 +10,7 @@ import Home from "@material-ui/icons/Home";
 import Comment from "@material-ui/icons/Comment";
 import { insertDashIntoPhoneNumber } from "util/phone";
 import { CustomerForm, SET_CUSTOMER_ORDER_FORM, SET_CUSTOMER_MANAGEMENT_FORM } from "module/customer";
+import useCustomer from "hook/useCustomer";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -40,11 +41,21 @@ interface StyledTextFieldProp {
     className?: string;
     value?: string;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onKeyup?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
     error?: boolean;
     helperText?: string;
 }
 
-const StyledTextField = ({ label, icon, className, value, onChange, error, helperText }: StyledTextFieldProp) => {
+const StyledTextField = ({
+    label,
+    icon,
+    className,
+    value,
+    onChange,
+    onKeyup,
+    error,
+    helperText,
+}: StyledTextFieldProp) => {
     const classes = useStyles();
 
     return (
@@ -58,6 +69,7 @@ const StyledTextField = ({ label, icon, className, value, onChange, error, helpe
                     className={className}
                     value={value}
                     onChange={onChange}
+                    onKeyUp={onKeyup}
                     error={error}
                     helperText={helperText}
                 />
@@ -75,6 +87,7 @@ interface CustomerInfoProp {
 
 const CustomerInfo = ({ customerForm, setCustomerForm }: CustomerInfoProp) => {
     const classes = useStyles();
+    const { autoCompleteCustomerOrderForm } = useCustomer();
 
     const handleCustomerNameChange = useCallback(
         (e) => {
@@ -129,6 +142,15 @@ const CustomerInfo = ({ customerForm, setCustomerForm }: CustomerInfoProp) => {
         [setCustomerForm, customerForm.idx, customerForm.customerName, customerForm.phoneNumber, customerForm.address]
     );
 
+    const handlePhoneNumberEnter = useCallback(
+        (e) => {
+            const { key } = e;
+            if (key === "Enter") {
+                autoCompleteCustomerOrderForm({ searchBy: "phoneNumber", keyword: e.target.value });
+            }
+        },
+        [autoCompleteCustomerOrderForm]
+    );
     const validatePhoneNumber = useCallback(() => !!customerForm.phoneNumber, [customerForm.phoneNumber]);
     const validateAddress = useCallback(() => !!customerForm.address, [customerForm.address]);
 
@@ -148,8 +170,8 @@ const CustomerInfo = ({ customerForm, setCustomerForm }: CustomerInfoProp) => {
                 <Grid item>
                     <StyledTextField
                         label="전화"
-                        // value={insertDashIntoPhoneNumber(phoneNumber)}
                         onChange={handlePhoneNumberChange}
+                        onKeyup={handlePhoneNumberEnter}
                         icon={<Phone />}
                         value={phoneNumber}
                         error={!validatePhoneNumber()}
