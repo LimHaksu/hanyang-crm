@@ -10,6 +10,7 @@ import { changePropertyFromSnakeToCamel } from "util/db";
  */
 export const addPhoneCallRecord = async (
     receivedDatetime: number,
+    customerIdx: number,
     customerName: string,
     phoneNumber: string,
     address: string,
@@ -17,9 +18,9 @@ export const addPhoneCallRecord = async (
 ) => {
     try {
         const query = `INSERT INTO 
-        phone_call_records(received_datetime, customer_name, phone_number, address, request)
-        VALUES(?,?,?,?,?);`;
-        const lastId = await insert(query, receivedDatetime, customerName, phoneNumber, address, request);
+        phone_call_records(received_datetime, customer_idx, customer_name, phone_number, address, request)
+        VALUES(?,?,?,?,?,?);`;
+        const lastId = await insert(query, receivedDatetime, customerIdx, customerName, phoneNumber, address, request);
         return lastId;
     } catch (e) {
         throw e;
@@ -34,7 +35,7 @@ export const addPhoneCallRecord = async (
  */
 export const getPhoneCallRecords = async (year: number, month: number, date: number) => {
     try {
-        const query = `SELECT idx, received_datetime, customer_name, phone_number, address, request, order_idx
+        const query = `SELECT idx, received_datetime, customer_idx, customer_name, phone_number, address, request, order_idx
         FROM phone_call_records
         WHERE received_datetime between ? and ?
         ORDER BY received_datetime;`;

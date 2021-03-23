@@ -62,6 +62,7 @@ const InitializeApp = () => {
                 try {
                     const phoneNumber = getPhoneNumberFromDataByDevice(deviceName, data);
                     // 전화번호로 db에 유저 있는지 조회하기
+                    let customerIdx = -1;
                     let customerName = "";
                     let address = "";
                     let customerRequest = "";
@@ -72,12 +73,20 @@ const InitializeApp = () => {
                         });
                         if (customers.length > 0) {
                             const [customer] = customers;
+                            customerIdx = customer.idx;
                             customerName = customer.customerName;
                             address = customer.address;
                             customerRequest = customer.request;
                         }
                         createPhonCallPopup({ receivedDatetime, phoneNumber, customerName, address, customerRequest });
-                        addPhoneCallRecord(receivedDatetime, customerName, phoneNumber, address, customerRequest);
+                        addPhoneCallRecord(
+                            receivedDatetime,
+                            customerIdx,
+                            customerName,
+                            phoneNumber,
+                            address,
+                            customerRequest
+                        );
                     }
                 } catch (e) {
                     alert(e);

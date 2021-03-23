@@ -46,10 +46,11 @@ function* getPhoneCallRecordsSaga(action: ReturnType<typeof getPhoneCallRecordsA
 
 function* addPhoneCallRecordSaga(action: ReturnType<typeof addPhoneCallRecordAsync.request>) {
     try {
-        const { receivedDatetime, customerName, phoneNumber, address, request } = action.payload;
+        const { receivedDatetime, customerIdx, customerName, phoneNumber, address, request } = action.payload;
         const lastIdx: number = yield call(
             addPhoneCallRecord,
             receivedDatetime,
+            customerIdx,
             customerName,
             phoneNumber,
             address,

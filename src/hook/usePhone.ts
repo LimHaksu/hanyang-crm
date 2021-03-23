@@ -19,9 +19,23 @@ const usePhone = () => {
     );
 
     const addPhoneCallRecord = useCallback(
-        (receivedDatetime: number, customerName: string, phoneNumber: string, address: string, request: string) =>
+        (
+            receivedDatetime: number,
+            customerIdx: number,
+            customerName: string,
+            phoneNumber: string,
+            address: string,
+            request: string
+        ) =>
             dispatch(
-                addPhoneCallRecordAsync.request({ receivedDatetime, customerName, phoneNumber, address, request })
+                addPhoneCallRecordAsync.request({
+                    receivedDatetime,
+                    customerIdx,
+                    customerName,
+                    phoneNumber,
+                    address,
+                    request,
+                })
             ),
         [dispatch]
     );

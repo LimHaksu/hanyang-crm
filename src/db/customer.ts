@@ -147,7 +147,19 @@ export const getOrdersByCustomer = async (customerIdx: number): Promise<OrderByC
                         amount: product_amount,
                     });
                 } else {
-                    dic[idx] = { order_request, order_time, payment_method, products: [] };
+                    dic[idx] = {
+                        order_request,
+                        order_time,
+                        payment_method,
+                        products: [
+                            {
+                                idx: product_idx,
+                                name: product_name,
+                                price: product_price,
+                                amount: product_amount,
+                            },
+                        ],
+                    };
                 }
             }
         );

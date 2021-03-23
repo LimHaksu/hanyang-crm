@@ -9,6 +9,7 @@ const HID = window.require("node-hid");
 export interface PhoneCallRecord {
     idx: number;
     receivedDatetime: number;
+    customerIdx: number;
     customerName: string;
     phoneNumber: string;
     address: string;

@@ -178,13 +178,17 @@ const PhoneCallRecordTableBody = ({ handleRemoveButtonClick }: PhoneCallRecordTa
     const handleCreateButtonClick = useCallback(
         ({
             idx,
+            customerIdx,
             customerName,
             phoneNumber,
             address,
             request,
-        }: Pick<PhoneCallRecord, "idx" | "customerName" | "phoneNumber" | "address" | "request">) => () => {
+        }: Pick<
+            PhoneCallRecord,
+            "idx" | "customerIdx" | "customerName" | "phoneNumber" | "address" | "request"
+        >) => () => {
             setCustomerOrderForm({
-                idx: -1,
+                idx: customerIdx,
                 customerName,
                 phoneNumber,
                 address,
@@ -208,7 +212,7 @@ const PhoneCallRecordTableBody = ({ handleRemoveButtonClick }: PhoneCallRecordTa
         <TableBody>
             {phoneCallRecordsForDisplay.map((row, i) => {
                 const index = isPhoneCallRecordAsc ? i : phoneCallRecordsForDisplay.length - 1 - i;
-                const { idx, customerName, phoneNumber, address, request } = row;
+                const { idx, customerIdx, customerName, phoneNumber, address, request } = row;
                 return (
                     <StyledTableRow hover role="checkbox" key={row.idx}>
                         {columns.map((column) => {
@@ -221,20 +225,17 @@ const PhoneCallRecordTableBody = ({ handleRemoveButtonClick }: PhoneCallRecordTa
                             }
                             if (column.id === "orderIdx") {
                                 return (
-                                    <TableCell
-                                        className={clsx(classes.cell, !row.orderIdx && classes.clickableCell)}
-                                        key={column.id}
-                                        align={column.align}
-                                    >
+                                    <TableCell className={classes.cell} key={column.id} align={column.align}>
                                         {row.orderIdx ? (
                                             <div className={clsx(classes.button, classes.emphasis)}>
                                                 <DoneIcon /> 완료
                                             </div>
                                         ) : (
                                             <div
-                                                className={classes.button}
+                                                className={clsx(classes.button, classes.clickableCell)}
                                                 onClick={handleCreateButtonClick({
                                                     idx,
+                                                    customerIdx,
                                                     customerName,
                                                     phoneNumber,
                                                     address,
