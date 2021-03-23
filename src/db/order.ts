@@ -218,9 +218,25 @@ export const editOrder = async (order: Order) => {
     // 주문정보 : 상품명, 가격, 수량
     // 주문 요청사항, 현금/카드/선결제 , 선결제-배민/요기요/쿠팡
     try {
+        // 업데이트 하려는 전화번호가 다른사람으로 등록돼있으면(customerIdx와 phoneNumber로 조회한 사람의 idx가 다르면)
+        // 해당 사람은 soft delete
+        const querySelect = `SELECT idx
+        FROM customers
+        WHERE phone_number = ? AND is_deleted = 0;`;
+        const selectedCustomers = await select<{ idx: number }>(querySelect, phoneNumber);
+        await Promise.all(
+            selectedCustomers.map(async (customer) => {
+                if (customer.idx !== customerIdx) {
+                    const query = `UPDATE customers
+                    SET is_deleted = 1
+                    WHERE idx = ?;`;
+                    await update(query, customer.idx);
+                }
+            })
+        );
         // 고객 idx를 이용하여 고객 정보 업데이트
         const queryUpdateCustomer = `UPDATE customers
-            SET phone_number = ?, name = ?, address = ?, request = ?
+            SET phone_number = ?, name = ?, address = ?, request = ?, is_deleted = 0
             WHERE idx = ?;`;
         const changesCustomer = await update(
             queryUpdateCustomer,
