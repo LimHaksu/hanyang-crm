@@ -73,7 +73,7 @@ export const removeCategory = async (idx: number) => {
         const query = `UPDATE categories
         SET is_deleted = 1
         WHERE idx = ?`;
-        await deleteQuery(query, idx);
+        await update(query, idx);
     } catch (e) {
         throw e;
     }
@@ -126,7 +126,7 @@ export const removeProduct = async (idx: number) => {
         const query = `UPDATE products
         SET is_deleted = 1
         WHERE idx = ?;`;
-        await deleteQuery(query, idx);
+        await update(query, idx);
     } catch (e) {
         throw e;
     }

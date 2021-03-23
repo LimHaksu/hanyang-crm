@@ -217,7 +217,7 @@ export const removeCustomer = async (idx: number) => {
         const query = `UPDATE customers
         SET is_deleted = 1
         WHERE idx = ?;`;
-        await deleteQuery(query, idx);
+        await update(query, idx);
     } catch (e) {
         throw e;
     }
