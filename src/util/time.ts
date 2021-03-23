@@ -47,6 +47,9 @@ export const timeToFormatString = (orderTime: number) => {
     } else {
         prevStr = "오후 ";
         hours -= 12;
+        if (hours === 0) {
+            hours = 12;
+        }
     }
     return `${prevStr} ${hours < 10 ? "0" + hours : hours} : ${minutes < 10 ? "0" + minutes : minutes}`;
 };
@@ -69,6 +72,9 @@ export const timeToFullFormatString = (orderTime: number) => {
     } else {
         prevStr = "오후 ";
         hours -= 12;
+        if (hours === 0) {
+            hours = 12;
+        }
     }
     return `${y}년 ${m}월 ${d}일, ${prevStr} ${hours < 10 ? "0" + hours : hours} : ${
         minutes < 10 ? "0" + minutes : minutes
