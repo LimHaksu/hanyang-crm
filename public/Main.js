@@ -2,6 +2,39 @@ const { app, BrowserWindow, dialog } = require("electron");
 const path = require("path");
 const url = require("url");
 
+let myWindow = null;
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+    app.quit();
+} else {
+    app.on("second-instance", (event, commandLine, workingDirectory) => {
+        // 두번째 instance를 실행하려고 하면 이미 실행중인 instance를 화면에 띄움
+        if (myWindow) {
+            if (myWindow.isMinimized()) {
+                myWindow.restore();
+            }
+            myWindow.focus();
+        }
+    });
+    app.whenReady().then(() => {
+        myWindow = createWindow();
+    });
+
+    // 모든 윈도우가 닫히면 종료된다.
+    app.on("window-all-closed", () => {
+        if (process.platform !== "darwin") {
+            app.quit();
+        }
+    });
+
+    app.on("activate", () => {
+        if (BrowserWindow.getAllWindows().length === 0) {
+            createWindow();
+        }
+    });
+}
+
 let forceQuit = false;
 function createWindow() {
     const win = new BrowserWindow({
@@ -60,19 +93,6 @@ function createWindow() {
             event.newGuest = new BrowserWindow(options);
         }
     });
+
+    return win;
 }
-
-app.whenReady().then(createWindow);
-
-// 모든 윈도우가 닫히면 종료된다.
-app.on("window-all-closed", () => {
-    if (process.platform !== "darwin") {
-        app.quit();
-    }
-});
-
-app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-        createWindow();
-    }
-});
