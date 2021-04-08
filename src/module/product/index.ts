@@ -15,9 +15,6 @@ export interface Category {
     products: Product[];
     lexoRank: string;
 }
-export const CHANGE_CATEGORY_LEXO_RANK = "product/CHANGE_CATEGORY_LEXO_RANK";
-export const CHANGE_PRODUCT_LEXO_RANK = "product/CHANGE_PRODUCT_LEXO_RANK";
-
 export const GET_CATEGORIES = "product/GET_CATEGORIES";
 export const GET_CATEGORIES_SUCCESS = "product/GET_CATEGORIES_SUCCESS";
 export const GET_CATEGORIES_ERROR = "product/GET_CATEGORIES_ERROR";
@@ -59,19 +56,6 @@ const SET_PRODUCT_FORM = "product/SET_PRODUCT_FORM";
 
 const SET_CATEGORY_EDIT_MODE = "product/SET_CATEGORY_MODE";
 const SET_PRODUCT_EDIT_MODE = "product/SET_EDIT_MODE";
-
-const changeCategoryLexoRank = createAction(CHANGE_CATEGORY_LEXO_RANK, (index: number, lexoRank: string) => ({
-    index,
-    lexoRank,
-}))();
-const changeProductLexoRank = createAction(
-    CHANGE_PRODUCT_LEXO_RANK,
-    (categoryIdx: number, index: number, lexoRank: string) => ({
-        categoryIdx,
-        index,
-        lexoRank,
-    })
-)();
 
 const getCategories = createAction(GET_CATEGORIES)();
 const getCategoriesSuccess = createAction(GET_CATEGORIES_SUCCESS)<Category[]>();
@@ -124,9 +108,6 @@ export const setCategoryEditModeAction = createAction(SET_CATEGORY_EDIT_MODE, (i
 export const setProductEditModeAction = createAction(SET_PRODUCT_EDIT_MODE, (isEditMode: boolean) => isEditMode)();
 
 const actions = {
-    changeCategoryLexoRank,
-    changeProductLexoRank,
-
     getCategories,
     getCategoriesSuccess,
     getCategoriesError,
@@ -186,18 +167,6 @@ const initialState: ProductState = {
 type ProductAction = ActionType<typeof actions>;
 
 const product = createReducer<ProductState, ProductAction>(initialState, {
-    [CHANGE_CATEGORY_LEXO_RANK]: (state, { payload: { index, lexoRank } }) =>
-        produce(state, (draft) => {
-            draft.categories.data[index].lexoRank = lexoRank;
-        }),
-    [CHANGE_PRODUCT_LEXO_RANK]: (state, { payload: { categoryIdx, index, lexoRank } }) =>
-        produce(state, (draft) => {
-            const products = draft.categories.data.find((category) => category.idx === categoryIdx)?.products;
-            if (products) {
-                products[index].lexoRank = lexoRank;
-            }
-        }),
-
     [GET_CATEGORIES]: (state) =>
         produce(state, (draft) => {
             draft.categories.loading = true;
@@ -250,6 +219,7 @@ const product = createReducer<ProductState, ProductAction>(initialState, {
     [MOVE_CATEGORY_ERROR]: (state, { payload: error }) =>
         produce(state, (draft) => {
             //TODO... 에러 핸들링 로직
+            console.error(error);
         }),
 
     [REMOVE_CATEGORY_SUCCESS]: (state, { payload: idx }) => ({

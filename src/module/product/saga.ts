@@ -14,8 +14,6 @@ import { getRankBetween, A_LEXO_RANK, Z_LEXO_RANK } from "util/lexoRank";
 import {
     Category,
     Product,
-    CHANGE_CATEGORY_LEXO_RANK,
-    CHANGE_PRODUCT_LEXO_RANK,
     GET_CATEGORIES,
     GET_CATEGORIES_SUCCESS,
     GET_CATEGORIES_ERROR,
@@ -115,33 +113,26 @@ function* addCategorySaga(action: ReturnType<typeof addCategoryAsync.request>) {
         // lexoRank 생성 로직
         const name = action.payload;
         const categories: Category[] = yield select((state: RootState) => state.product.categories.data);
-        const lastIdx: number = yield call(addCategory, name, Z_LEXO_RANK);
         const clen = categories.length;
-        const lastCategory = categories[clen - 1];
-        if (clen === 1) {
-            // 마지막 한칸 전이 없는 경우(길이 1)에는 'a' * defaultLexoRankLength 와 마지막의 중간값
-            const newLexoRank = getRankBetween(A_LEXO_RANK, Z_LEXO_RANK);
-            // DB 업데이트
-            yield call(editCategory, lastCategory.idx, lastCategory.name, newLexoRank);
-            // redux store 업데이트
-            yield put({
-                type: CHANGE_CATEGORY_LEXO_RANK,
-                payload: { index: clen - 1, lexoRank: newLexoRank },
-            });
-        } else if (clen !== 0) {
-            // 기존의 마지막 lexoRank는 마지막 한칸 전과 마지막의 중간 값
-            const newLexoRank = getRankBetween(categories[clen - 2].lexoRank, Z_LEXO_RANK);
-            // DB 업데이트
-            yield call(editCategory, lastCategory.idx, lastCategory.name, newLexoRank);
-            // redux store 업데이트
-            yield put({
-                type: CHANGE_CATEGORY_LEXO_RANK,
-                payload: { index: clen - 1, lexoRank: newLexoRank },
-            });
+        let lastIdx = -1;
+        let newLexoRank = "";
+        if (clen === 0) {
+            // 카테고리가 없는경우
+            // 새로운 lexoRank는 'a'.repeat() 과 'z'.repeat() 의 중간 값
+            newLexoRank = getRankBetween(A_LEXO_RANK, Z_LEXO_RANK);
+        } else {
+            // 카테고리가 있는 경우
+            const lastCategory = categories[clen - 1];
+            // 새로운 lexoRank는 기존 마지막 카테고리의 lexoRank와 'z'.repeat()의 중간값
+            newLexoRank = getRankBetween(lastCategory.lexoRank, Z_LEXO_RANK);
         }
+        lastIdx = yield call(addCategory, name, newLexoRank);
 
-        // 새로운 lexoRank는 기존의 마지막 lexoRank (= 'z'* defaultLexoRankLength),
-        yield put(addCategoryAsync.success({ idx: lastIdx, name, lexoRank: Z_LEXO_RANK, products: [] }));
+        if (lastIdx !== -1 && newLexoRank !== "") {
+            yield put(addCategoryAsync.success({ idx: lastIdx, name, lexoRank: newLexoRank, products: [] }));
+        } else {
+            throw Error("카테고리 생성 실패");
+        }
     } catch (e) {
         yield put(addCategoryAsync.failure(e));
     }
@@ -163,22 +154,20 @@ function* moveCategorySaga(action: ReturnType<typeof moveCategoryAsync.request>)
     // categories는 정렬돼있는 상태
     const categories: Category[] = JSON.parse(
         JSON.stringify((yield select((state: RootState) => state.product.categories.data)) as Category[])
-    );
+    ); // ReadOnly 상태를 제거하기 위하여 JSON.stringify후 다시 parse
     const srcCategory = categories[srcIdx];
     const destCategory = categories[destIdx];
     let srcNewRank = "";
-    let destNewRank = "";
     try {
         if (srcIdx < destIdx) {
             // 위에서 아래로 이동
             if (destIdx === categories.length - 1) {
                 // destCategory가 마지막 카테고리인 경우
-                destCategory.lexoRank = destNewRank = getRankBetween(categories[destIdx - 1].lexoRank, Z_LEXO_RANK);
-                srcCategory.lexoRank = srcNewRank = Z_LEXO_RANK;
+                srcCategory.lexoRank = srcNewRank = getRankBetween(destCategory.lexoRank, Z_LEXO_RANK);
             } else {
                 // destCategory 뒤에 카테고리가 있는 경우
                 srcCategory.lexoRank = srcNewRank = getRankBetween(
-                    categories[destIdx].lexoRank,
+                    destCategory.lexoRank,
                     categories[destIdx + 1].lexoRank
                 );
             }
@@ -186,17 +175,15 @@ function* moveCategorySaga(action: ReturnType<typeof moveCategoryAsync.request>)
             // 아래에서 위로 이동
             if (destIdx === 0) {
                 // destCategory가 첫번째 카테고리인 경우
-                destCategory.lexoRank = destNewRank = getRankBetween(A_LEXO_RANK, categories[destIdx + 1].lexoRank);
-                srcCategory.lexoRank = srcNewRank = A_LEXO_RANK;
+                srcCategory.lexoRank = srcNewRank = getRankBetween(A_LEXO_RANK, destCategory.lexoRank);
             } else {
                 // destCategory 앞에 카테고리가 있는 경우
                 srcCategory.lexoRank = srcNewRank = getRankBetween(
                     categories[destIdx - 1].lexoRank,
-                    categories[destIdx].lexoRank
+                    destCategory.lexoRank
                 );
             }
         }
-
         categories.sort((a, b) => (a.lexoRank < b.lexoRank ? -1 : 1));
         yield put(moveCategoryAsync.success(categories));
 
@@ -204,11 +191,6 @@ function* moveCategorySaga(action: ReturnType<typeof moveCategoryAsync.request>)
         // try 부분에서 yield call을 호출하면 렌더링이 한번 되는 현상이 발생해서
         // 옮긴 위치로 정렬되기 전 리스트가 불필요하게 한 번 더 렌더링 됨.
         yield call(editCategory, srcCategory.idx, srcCategory.name, srcNewRank);
-        if ((srcIdx < destIdx && destIdx === categories.length - 1) || (srcIdx > destIdx && destIdx === 0)) {
-            // 위에서 아래로 이동 ,destCategory가 마지막 카테고리인 경우
-            // 아래에서 위로 이동, destCategory가 첫번째 카테고리인 경우
-            yield call(editCategory, destCategory.idx, destCategory.name, destNewRank);
-        }
     } catch (e) {
         yield put(moveCategoryAsync.failure(e));
     }
@@ -231,59 +213,30 @@ function* addProductSaga(action: ReturnType<typeof addProductAsync.request>) {
         const categories: Category[] = yield select((state: RootState) => state.product.categories.data);
         const products = categories.find((category) => category.idx === categoryIdx)?.products;
         if (products) {
-            const lastIdx: number = yield call(addProduct, name, price, categoryIdx, Z_LEXO_RANK);
             const plen = products.length;
-            const lastProduct = products[plen - 1];
-
-            if (plen === 1) {
-                // 마지막 한칸 전이 없는경우(길이 1)에는 'a'* defaultLexoRankLength 와 마지막의 중간값
-                const newLexoRank = getRankBetween(A_LEXO_RANK, Z_LEXO_RANK);
-                // DB
-                yield call(
-                    editProduct,
-                    lastProduct.idx,
-                    lastProduct.name,
-                    lastProduct.price,
-                    newLexoRank,
-                    lastProduct.categoryIdx
-                );
-                // redux store
-                yield put({
-                    type: CHANGE_PRODUCT_LEXO_RANK,
-                    payload: { categoryIdx, index: plen - 1, lexoRank: newLexoRank },
-                });
-            } else if (plen !== 0) {
-                // 기존의 마지막 lexoRank는 마지막 한칸 전과 마지막의 중간 값
-                const newLexoRank = getRankBetween(products[plen - 2].lexoRank, Z_LEXO_RANK);
-                // DB
-                yield call(
-                    editProduct,
-                    lastProduct.idx,
-                    lastProduct.name,
-                    lastProduct.price,
-                    newLexoRank,
-                    lastProduct.categoryIdx
-                );
-                // redux store
-                yield put({
-                    type: CHANGE_PRODUCT_LEXO_RANK,
-                    payload: {
-                        categoryIdx,
-                        index: plen - 1,
-                        lexoRank: newLexoRank,
-                    },
-                });
+            let newLexoRank = "";
+            if (plen === 0) {
+                // products가 없는경우 (카테고리가 비어있는경우)
+                // 새로운 lexoRank는 'a'.repeat() 과 'z'.repeat() 의 중간 값
+                newLexoRank = getRankBetween(A_LEXO_RANK, Z_LEXO_RANK);
+            } else {
+                // 카테고리에 상품이 있는경우
+                const lastProduct = products[plen - 1];
+                newLexoRank = getRankBetween(lastProduct.lexoRank, Z_LEXO_RANK);
             }
-            // 새로운 lexoRank는 기존의 마지막 lexoRank (= 'z'* defaultLexoRankLength ),
+
+            const lastIdx: number = yield call(addProduct, name, price, categoryIdx, newLexoRank);
             yield put(
                 addProductAsync.success({
                     idx: lastIdx,
                     name,
                     price,
                     categoryIdx,
-                    lexoRank: Z_LEXO_RANK,
+                    lexoRank: newLexoRank,
                 })
             );
+        } else {
+            throw Error("카테고리에서 상품 조회 실패");
         }
     } catch (e) {
         yield put(addProductAsync.failure(e));
@@ -314,37 +267,26 @@ function* moveProductSaga(action: ReturnType<typeof moveProductAsync.request>) {
             const srcProduct = products[srcIdx];
             const destProduct = products[destIdx];
             let srcNewRank = "";
-            let destNewRank = "";
             if (srcIdx < destIdx) {
                 if (destIdx === products.length - 1) {
                     // destProduct가 마지막 상품인 경우
-                    // destIdx - 1 === srcIdx일 수도 있기 때문에 destIdx 먼저 바꿔줘야함.
-                    products[destIdx].lexoRank = destNewRank = getRankBetween(
-                        products[destIdx - 1].lexoRank,
-                        Z_LEXO_RANK
-                    );
-                    products[srcIdx].lexoRank = srcNewRank = Z_LEXO_RANK;
+                    srcProduct.lexoRank = srcNewRank = getRankBetween(destProduct.lexoRank, Z_LEXO_RANK);
                 } else {
                     // destProduct 뒤에 상품이 있는 경우
-                    products[srcIdx].lexoRank = srcNewRank = getRankBetween(
-                        products[destIdx].lexoRank,
+                    srcProduct.lexoRank = srcNewRank = getRankBetween(
+                        destProduct.lexoRank,
                         products[destIdx + 1].lexoRank
                     );
                 }
             } else {
                 if (destIdx === 0) {
                     // destProduct가 첫번째 상품인 경우
-                    // destIdx + 1 === srcIdx일 수도 있기 때문에 destIdx 먼저 바꿔줘야 함.
-                    products[destIdx].lexoRank = destNewRank = getRankBetween(
-                        A_LEXO_RANK,
-                        products[destIdx + 1].lexoRank
-                    );
-                    products[srcIdx].lexoRank = srcNewRank = A_LEXO_RANK;
+                    srcProduct.lexoRank = srcNewRank = getRankBetween(A_LEXO_RANK, destProduct.lexoRank);
                 } else {
                     // destProduct 앞에 상품이 있는 경우
-                    products[srcIdx].lexoRank = srcNewRank = getRankBetween(
+                    srcProduct.lexoRank = srcNewRank = getRankBetween(
                         products[destIdx - 1].lexoRank,
-                        products[destIdx].lexoRank
+                        destProduct.lexoRank
                     );
                 }
             }
@@ -361,64 +303,43 @@ function* moveProductSaga(action: ReturnType<typeof moveProductAsync.request>) {
                 srcNewRank,
                 srcProduct.categoryIdx
             );
-            if ((srcIdx < destIdx && destIdx === products.length - 1) || (srcIdx > destIdx && destIdx === 0)) {
-                // 위에서 아래로 이동한 경우에는 마지막으로 이동할때만,
-                // 아래에서 위로 이동한 경우에는 첫번째로 이동할때만 destProduct.lexoRank 업데이트
-                yield call(
-                    editProduct,
-                    destProduct.idx,
-                    destProduct.name,
-                    destProduct.price,
-                    destNewRank,
-                    destProduct.categoryIdx
-                );
-            }
         } else {
             // 다른 카테고리로 이동
             const [srcProduct] = categories[currentIndex].products.splice(srcIdx, 1);
             const destProducts = categories[nextIndex].products;
-            let destProduct = destProducts[destIdx];
             const destProductsLength = destProducts.length;
             let srcNewRank = "";
-            let destNewRank = "";
             if (destProductsLength === 0) {
                 // destProducts가 비어있는 경우
-                srcProduct.lexoRank = srcNewRank = Z_LEXO_RANK;
+                srcProduct.lexoRank = srcNewRank = getRankBetween(A_LEXO_RANK, Z_LEXO_RANK);
             } else if (destProductsLength === 1) {
                 // destProducts에 하나만 있는 경우
+                const destProduct = destProducts[0];
                 if (destIdx === 0) {
                     // 첫번째로 이동한 경우
-                    srcProduct.lexoRank = srcNewRank = A_LEXO_RANK;
-                    destProduct.lexoRank = destNewRank = Z_LEXO_RANK;
+                    srcProduct.lexoRank = srcNewRank = getRankBetween(A_LEXO_RANK, destProduct.lexoRank);
                 } else {
                     // 마지막으로 이동한 경우
-                    srcProduct.lexoRank = srcNewRank = Z_LEXO_RANK;
-                    destProduct = destProducts[destIdx - 1];
-                    destProduct.lexoRank = destNewRank = A_LEXO_RANK;
+                    srcProduct.lexoRank = srcNewRank = getRankBetween(destProduct.lexoRank, Z_LEXO_RANK);
                 }
             } else if (destProductsLength > 1) {
                 // destProducts에 두개 이상 있는 경우
+                const destProduct = destProducts[destIdx];
                 if (destIdx === 0) {
                     // 첫번째로 이동한 경우
-                    destProduct.lexoRank = destNewRank = getRankBetween(
-                        destProducts[destIdx].lexoRank,
-                        destProducts[destIdx + 1].lexoRank
-                    );
-                    srcProduct.lexoRank = srcNewRank = A_LEXO_RANK;
+                    srcProduct.lexoRank = srcNewRank = getRankBetween(A_LEXO_RANK, destProduct.lexoRank);
                 } else if (destIdx === destProductsLength) {
-                    // 마지막으로 이동한 경우
                     // destProducts의 길이 이후에 붙이는 것이기때문에 destProductsLength-1을 안함
-                    srcProduct.lexoRank = srcNewRank = Z_LEXO_RANK;
-                    destProduct = destProducts[destIdx - 1];
-                    destProduct.lexoRank = destNewRank = getRankBetween(
-                        destProducts[destIdx - 2].lexoRank,
-                        destProducts[destIdx - 1].lexoRank
+                    // 마지막으로 이동한 경우
+                    srcProduct.lexoRank = srcNewRank = getRankBetween(
+                        destProducts[destProducts.length - 1].lexoRank,
+                        Z_LEXO_RANK
                     );
                 } else {
                     // 중간으로 이동한 경우
                     srcProduct.lexoRank = srcNewRank = getRankBetween(
                         destProducts[destIdx - 1].lexoRank,
-                        destProducts[destIdx].lexoRank
+                        destProduct.lexoRank
                     );
                 }
             }
@@ -435,21 +356,6 @@ function* moveProductSaga(action: ReturnType<typeof moveProductAsync.request>) {
                 srcNewRank,
                 categories[nextIndex].idx
             );
-            if (
-                destProductsLength === 1 ||
-                (destProductsLength > 1 && (destIdx === 0 || destIdx === destProductsLength))
-            ) {
-                // destProducts에 하나만 있는 경우.
-                // 또는, destProducts에 두개 이상 있고, 첫번째 또는 마지막으로 이동
-                yield call(
-                    editProduct,
-                    destProduct.idx,
-                    destProduct.name,
-                    destProduct.price,
-                    destNewRank,
-                    categories[nextIndex].idx
-                );
-            }
         }
     } catch (e) {
         yield put(moveCategoryAsync.failure(e));
