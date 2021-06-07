@@ -119,10 +119,14 @@ const phone = createReducer<PhoneState, PhoneAction>(initialState, {
                 // 기존 device 연결 해제
                 device.hid.close();
             });
+            try {
             draft.registeredPhoneDevices = selectedDevices.map((device) => ({
                 device: { ...device, product: getValidDeviceName(device) },
                 hid: new HID.HID(device.path!),
             }));
+            } catch (e) {
+                alert(`CID(전화 발신 표시) 장치 연결이 끊겼습니다.\n 환경설정에서 확인해주세요.`);
+            }
         }),
     [SET_SELECTED_DATE]: (state, { payload: selectedDate }) => ({ ...state, selectedDate }),
     [SET_IS_PHONE_CALL_RECORD_ASC]: (state, { payload: isPhoneCallRecordAsc }) => {
